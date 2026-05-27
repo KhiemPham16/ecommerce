@@ -9,40 +9,14 @@ const mailService = require('~/services/mail.service');
 
 const authConfig = require('~/configs/auth.config');
 const { dateAfterExpiresIn } = require('~/utils/expiresIn');
+const { generateUsername } = require('~/utils/generateUsername');
+
 const { AppError } = require('~/errors/AppError');
 const appConfig = require('~/configs/app.config');
 
 class AuthService {
-    removeVietnameseTones(str) {
-        return str
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/Đ/g, 'D');
-    }
-
-    async generateUsername(fullName) {
-        const cleaned = this.removeVietnameseTones(fullName)
-            .toLowerCase()
-            .replace(/[^a-z0-9\s]/g, '')
-            .trim()
-            .replace(/\s+/g, '');
-
-        const baseUsername = cleaned || `user${Date.now()}`;
-
-        let username = baseUsername;
-        let count = 1;
-
-        while (await User.exists({ username })) {
-            username = `${baseUsername}${count}`;
-            count++;
-        }
-
-        return username;
-    }
-
     generateVerificationLink(user) {
-        return `${appConfig.frontendUrl}/verify-email?token=${user.verificationToken}`;
+        return `${appConfig.frontendUrl}/api/v1/auth/verify-email?token=${user.verificationToken}`;
     }
 
     async verifyEmail(token) {
@@ -85,7 +59,7 @@ class AuthService {
         }
 
         // generate username
-        const username = await this.generateUsername(fullName);
+        const username = await generateUsername(fullName);
 
         // hash password
         const hashedPassword = await bcrypt.hash(password, authConfig.bcryptRounds);
@@ -130,11 +104,26 @@ class AuthService {
             throw new AppError(401, 'Email hoặc password không chính xác');
         }
 
+        if (user.deletedAt) {
+            const restoreDeadline = new Date(user.deletedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+            if (restoreDeadline < new Date()) {
+                throw new AppError(403, 'Tài khoản đã bị xóa vĩnh viễn');
+            }
+
+            user.deletedAt = null;
+        }
+
         const passwordCorrect = await bcrypt.compare(password, user.password);
 
         if (!passwordCorrect) {
             throw new AppError(401, 'Email hoặc password không chính xác');
         }
+
+        user.deletedAt = null;
+        user.lastLogin = new Date();
+
+        await user.save();
 
         // access token
         const accessToken = jwt.sign(
