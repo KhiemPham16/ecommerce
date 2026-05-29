@@ -400,6 +400,533 @@
                     "401": { "description": "Unauthorized" }
                 }
             }
+        },
+        "/categories": {
+            "get": {
+                "summary": "Get categories",
+                "tags": ["Categories"],
+                "responses": {
+                    "200": { "description": "Get categories successfully" }
+                }
+            },
+            "post": {
+                "summary": "Create category",
+                "tags": ["Categories"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["name"],
+                                "properties": {
+                                    "name": { "type": "string", "example": "Sách Công Nghệ" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Create category successfully" },
+                    "403": { "description": "Forbidden" }
+                }
+            }
+        },
+        "/categories/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "get": {
+                "summary": "Get category by id",
+                "tags": ["Categories"],
+                "responses": {
+                    "200": { "description": "Get category successfully" },
+                    "404": { "description": "Category not found" }
+                }
+            },
+            "patch": {
+                "summary": "Update category",
+                "tags": ["Categories"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": { "type": "string", "example": "Sách Kinh Tế" },
+                                    "isActive": { "type": "boolean", "example": true }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update category successfully" }
+                }
+            },
+            "delete": {
+                "summary": "Delete category",
+                "tags": ["Categories"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Delete category successfully" }
+                }
+            }
+        },
+        "/products": {
+            "get": {
+                "summary": "Get products",
+                "tags": ["Products"],
+                "parameters": [
+                    { "name": "keyword", "in": "query", "schema": { "type": "string" }, "example": "clean" },
+                    { "name": "categoryId", "in": "query", "schema": { "type": "string" } },
+                    { "name": "minPrice", "in": "query", "schema": { "type": "number" } },
+                    { "name": "maxPrice", "in": "query", "schema": { "type": "number" } },
+                    { "name": "page", "in": "query", "schema": { "type": "number" }, "example": 1 },
+                    { "name": "limit", "in": "query", "schema": { "type": "number" }, "example": 10 }
+                ],
+                "responses": {
+                    "200": { "description": "Get products successfully" }
+                }
+            },
+            "post": {
+                "summary": "Create product",
+                "tags": ["Products"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["title", "categoryId", "author", "price"],
+                                "properties": {
+                                    "title": { "type": "string", "example": "Clean Code" },
+                                    "categoryId": { "type": "string", "example": "665f1a2b3c4d5e6f78901234" },
+                                    "author": { "type": "string", "example": "Robert C. Martin" },
+                                    "publisher": { "type": "string", "example": "Prentice Hall" },
+                                    "isbn": { "type": "string", "example": "9780132350884" },
+                                    "description": { "type": "string", "example": "Cuốn sách kinh điển về Clean Code" },
+                                    "thumbnail": { "type": "string", "example": "/uploads/products/clean-code.jpg" },
+                                    "images": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "example": ["/uploads/products/clean-code-1.jpg"]
+                                    },
+                                    "price": { "type": "number", "example": 250000 },
+                                    "stock": { "type": "number", "example": 100 },
+                                    "isFeatured": { "type": "boolean", "example": true },
+                                    "isActive": { "type": "boolean", "example": true }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Create product successfully" }
+                }
+            }
+        },
+        "/products/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "get": {
+                "summary": "Get product by id",
+                "tags": ["Products"],
+                "responses": {
+                    "200": { "description": "Get product successfully" }
+                }
+            },
+            "patch": {
+                "summary": "Update product",
+                "tags": ["Products"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": { "type": "string", "example": "Clean Code 2nd Edition" },
+                                    "price": { "type": "number", "example": 280000 },
+                                    "stock": { "type": "number", "example": 150 },
+                                    "isActive": { "type": "boolean", "example": true }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update product successfully" }
+                }
+            },
+            "delete": {
+                "summary": "Delete product",
+                "tags": ["Products"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Delete product successfully" }
+                }
+            }
+        },
+        "/orders": {
+            "post": {
+                "summary": "Create order",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["addressId", "items"],
+                                "properties": {
+                                    "addressId": {
+                                        "type": "string",
+                                        "example": "665f1a2b3c4d5e6f78901234"
+                                    },
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": ["productId", "quantity"],
+                                            "properties": {
+                                                "productId": {
+                                                    "type": "string",
+                                                    "example": "665f1a2b3c4d5e6f78905678"
+                                                },
+                                                "quantity": {
+                                                    "type": "number",
+                                                    "example": 2
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "paymentMethod": {
+                                        "type": "string",
+                                        "enum": ["cod"],
+                                        "example": "cod"
+                                    },
+                                    "note": {
+                                        "type": "string",
+                                        "example": "Giao giờ hành chính"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Create order successfully" },
+                    "400": { "description": "Invalid input" },
+                    "401": { "description": "Unauthorized" }
+                }
+            },
+            "get": {
+                "summary": "Get all orders",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get orders successfully" },
+                    "403": { "description": "Forbidden" }
+                }
+            }
+        },
+        "/orders/my-orders": {
+            "get": {
+                "summary": "Get my orders",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get my orders successfully" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/orders/my-orders/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "get": {
+                "summary": "Get my order detail",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get order successfully" },
+                    "404": { "description": "Order not found" }
+                }
+            }
+        },
+        "/orders/my-orders/{id}/cancel": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "patch": {
+                "summary": "Cancel my order",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Cancel order successfully" },
+                    "400": { "description": "Cannot cancel this order" },
+                    "404": { "description": "Order not found" }
+                }
+            }
+        },
+        "/orders/{id}/status": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "patch": {
+                "summary": "Update order status",
+                "tags": ["Orders"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["status"],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": ["pending", "confirmed", "shipping", "completed", "cancelled"],
+                                        "example": "confirmed"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update order status successfully" },
+                    "400": { "description": "Invalid status" },
+                    "403": { "description": "Forbidden" }
+                }
+            }
+        },
+        "/coupons/validate": {
+            "post": {
+                "summary": "Validate coupon",
+                "tags": ["Coupons"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["code", "totalAmount"],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "KHIEM50K"
+                                    },
+                                    "totalAmount": {
+                                        "type": "number",
+                                        "example": 500000
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Validate coupon successfully" },
+                    "400": { "description": "Invalid coupon" },
+                    "404": { "description": "Coupon not found" }
+                }
+            }
+        },
+        "/coupons": {
+            "get": {
+                "summary": "Get coupons",
+                "tags": ["Coupons"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get coupons successfully" },
+                    "403": { "description": "Forbidden" }
+                }
+            },
+            "post": {
+                "summary": "Create coupon",
+                "tags": ["Coupons"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["couponType", "type", "value", "expiresAt"],
+                                "properties": {
+                                    "couponType": {
+                                        "type": "string",
+                                        "enum": ["holiday", "random", "custom"],
+                                        "example": "custom"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "BOOKTOK20"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": ["percent", "fixed"],
+                                        "example": "percent"
+                                    },
+                                    "value": {
+                                        "type": "number",
+                                        "example": 20
+                                    },
+                                    "minOrderAmount": {
+                                        "type": "number",
+                                        "example": 200000
+                                    },
+                                    "maxDiscountAmount": {
+                                        "type": "number",
+                                        "example": 50000
+                                    },
+                                    "usageLimit": {
+                                        "type": "number",
+                                        "example": 300
+                                    },
+                                    "startsAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-08-08T00:00:00.000Z"
+                                    },
+                                    "expiresAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-12-31T23:59:59.000Z"
+                                    },
+                                    "isActive": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Create coupon successfully" },
+                    "400": { "description": "Invalid input" },
+                    "403": { "description": "Forbidden" }
+                }
+            }
+        },
+        "/coupons/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" }
+                }
+            ],
+            "get": {
+                "summary": "Get coupon by id",
+                "tags": ["Coupons"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get coupon successfully" },
+                    "404": { "description": "Coupon not found" }
+                }
+            },
+            "patch": {
+                "summary": "Update coupon",
+                "tags": ["Coupons"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "enum": ["percent", "fixed"],
+                                        "example": "fixed"
+                                    },
+                                    "value": {
+                                        "type": "number",
+                                        "example": 50000
+                                    },
+                                    "minOrderAmount": {
+                                        "type": "number",
+                                        "example": 300000
+                                    },
+                                    "maxDiscountAmount": {
+                                        "type": "number",
+                                        "example": 100000
+                                    },
+                                    "usageLimit": {
+                                        "type": "number",
+                                        "example": 100
+                                    },
+                                    "startsAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-08-08T00:00:00.000Z"
+                                    },
+                                    "expiresAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-12-31T23:59:59.000Z"
+                                    },
+                                    "isActive": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update coupon successfully" }
+                }
+            },
+            "delete": {
+                "summary": "Delete coupon",
+                "tags": ["Coupons"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Delete coupon successfully" }
+                }
+            }
         }
     },
     "components": {
