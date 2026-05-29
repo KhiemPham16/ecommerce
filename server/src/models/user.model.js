@@ -46,38 +46,6 @@ const userSchema = new mongoose.Schema(
             default: null
         },
 
-        address: {
-            type: [
-                {
-                    receiverName: {
-                        type: String,
-                        required: true
-                    },
-                    receiverPhone: {
-                        type: String,
-                        required: true
-                    },
-                    provinceCity: {
-                        type: String,
-                        required: true
-                    },
-                    ward: {
-                        type: String,
-                        required: true
-                    },
-                    specificAddress: {
-                        type: String,
-                        required: true
-                    },
-                    isDefault: {
-                        type: Boolean,
-                        default: false
-                    }
-                }
-            ],
-            default: []
-        },
-
         role: {
             type: String,
             enum: ['admin', 'manager', 'employee', 'customer'],
