@@ -13,6 +13,8 @@ const { connectDB } = require('~/libs/mongodb');
 const { registerRoutes } = require('~/routes');
 const { responseMiddleware } = require('~/middlewares/response');
 const { errorHandler } = require('~/middlewares/errorHandler');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
 
 async function bootstrap() {
     await connectDB();
@@ -36,6 +38,8 @@ async function bootstrap() {
         })
     );
 
+    const swaggerDocument = JSON.parse(fs.readFileSync('./src/swagger.json', 'utf8'));
+
     app.use(express.json());
     app.use(cookieParser());
     app.use(morgan('common'));
@@ -50,6 +54,8 @@ async function bootstrap() {
             message: 'Quá nhiều yêu cầu, vui lòng thử lại sau'
         }
     });
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use('/api/v1', limiter);
 

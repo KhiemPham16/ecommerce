@@ -10,7 +10,8 @@ import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
 import VerifyEmail from './pages/Auth/VerifyEmail';
-
+import Contact from './pages/Contact';
+import Blog from './pages/Blog';
 
 export default function App() {
     return (
@@ -28,6 +29,12 @@ export default function App() {
         </Route>
         <Route path="/api/v1/auth/verify-email" element={<VerifyEmail />} />
         </Routes>
+            <Header />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/contact" element={<Contact />} />
+            </Routes>
         </>
     );
 }
