@@ -1,33 +1,36 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import styles from './Auth.module.scss';
+import classNames from 'classnames/bind';
+
+const cx = classNames.bind(styles);
 
 export default function AuthLayout() {
     return (
-        <div className={styles.page}>
-            <div className={styles.card}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Tài khoản</h1>
-                    <p className={styles.subtitle}>Đăng nhập hoặc tạo tài khoản để tiếp tục.</p>
+        <div className={cx('page')}>
+            <div className={cx('card')}>
+                <div className={cx('header')}>
+                    <h1 className={cx('title')}>Tài khoản</h1>
+                    <p className={cx('subtitle')}>Đăng nhập hoặc tạo tài khoản để tiếp tục.</p>
                 </div>
 
-                <div className={styles.tabs}>
+                <div className={cx('tabs')}>
                     <NavLink
                         to="/auth/login"
-                        className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
+                        className={({ isActive }) => `${cx('tab')} ${isActive ? cx('tabActive') : ''}`}
                     >
                         Đăng nhập
                     </NavLink>
 
                     <NavLink
                         to="/auth/register"
-                        className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
+                        className={({ isActive }) => `${cx('tab')} ${isActive ? cx('tabActive') : ''}`}
                     >
                         Đăng ký
                     </NavLink>
                 </div>
 
-                <div className={styles.content}>
+                <div className={cx('content')}>
                     <Outlet />
                 </div>
             </div>
