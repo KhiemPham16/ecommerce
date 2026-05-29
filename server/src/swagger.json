@@ -1,0 +1,419 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "E-Commerce API",
+        "version": "1.0.0",
+        "description": "RESTful API documentation for E-Commerce project"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3500/api/v1"
+        }
+    ],
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "summary": "Register account",
+                "tags": ["Auth"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["fullName", "email", "password", "phone"],
+                                "properties": {
+                                    "fullName": { "type": "string", "example": "Nguyễn Văn A" },
+                                    "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                                    "password": { "type": "string", "example": "123456" },
+                                    "phone": { "type": "string", "example": "0900000000" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Register successfully" },
+                    "400": { "description": "Invalid input" }
+                }
+            }
+        },
+        "/auth/verify-email": {
+            "get": {
+                "summary": "Verify email",
+                "tags": ["Auth"],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "example": "your-verification-token"
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Email verified successfully" },
+                    "400": { "description": "Invalid or expired token" }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "summary": "Login",
+                "tags": ["Auth"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email", "password"],
+                                "properties": {
+                                    "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                                    "password": { "type": "string", "example": "123456" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Login successfully" },
+                    "401": { "description": "Invalid email or password" }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "summary": "Refresh token",
+                "tags": ["Auth"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Refresh token successfully" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "summary": "Logout",
+                "tags": ["Auth"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Logout successfully" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "summary": "Forgot password",
+                "tags": ["Auth"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email"],
+                                "properties": {
+                                    "email": { "type": "string", "format": "email", "example": "user@example.com" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "OTP sent to email" },
+                    "404": { "description": "Email not found" }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "summary": "Reset password",
+                "tags": ["Auth"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email", "otp", "newPassword"],
+                                "properties": {
+                                    "email": { "type": "string", "format": "email", "example": "user@example.com" },
+                                    "otp": { "type": "string", "example": "123456" },
+                                    "newPassword": { "type": "string", "example": "newPassword123" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Password reset successfully" },
+                    "400": { "description": "Invalid OTP or input" }
+                }
+            }
+        },
+        "/auth/change-password": {
+            "patch": {
+                "summary": "Change password",
+                "tags": ["Auth"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["currentPassword", "newPassword", "confirmNewPassword"],
+                                "properties": {
+                                    "currentPassword": { "type": "string", "example": "123456" },
+                                    "newPassword": { "type": "string", "example": "newPassword123" },
+                                    "confirmNewPassword": { "type": "string", "example": "newPassword123" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Password changed successfully" },
+                    "400": { "description": "Invalid password" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "summary": "Get current user profile",
+                "tags": ["Profile"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get profile successfully" },
+                    "401": { "description": "Unauthorized" }
+                }
+            },
+            "patch": {
+                "summary": "Update current user profile",
+                "tags": ["Profile"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fullName": { "type": "string", "example": "Nguyễn Văn A" },
+                                    "phone": { "type": "string", "example": "0900000000" },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": ["male", "female", "other"],
+                                        "example": "male"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update profile successfully" },
+                    "400": { "description": "Invalid input" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/users/me/avatar": {
+            "patch": {
+                "summary": "Change avatar",
+                "tags": ["Profile"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["avatar"],
+                                "properties": {
+                                    "avatar": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Avatar changed successfully" },
+                    "400": { "description": "Invalid file" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "summary": "Get users",
+                "tags": ["Admin - Manager"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get users successfully" },
+                    "403": { "description": "Forbidden" }
+                }
+            },
+            "post": {
+                "summary": "Create user",
+                "tags": ["Admin - Manager"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["fullName", "email", "password", "phone", "role"],
+                                "properties": {
+                                    "fullName": { "type": "string", "example": "Trần Văn B" },
+                                    "email": { "type": "string", "format": "email", "example": "employee@example.com" },
+                                    "password": { "type": "string", "example": "123456" },
+                                    "phone": { "type": "string", "example": "0911111111" },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": ["admin", "manager", "employee", "customer"],
+                                        "example": "employee"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Create user successfully" },
+                    "400": { "description": "Invalid input" },
+                    "403": { "description": "Forbidden" }
+                }
+            }
+        },
+        "/users/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": { "type": "string" },
+                    "example": "665f1a2b3c4d5e6f78901234"
+                }
+            ],
+            "get": {
+                "summary": "Get user by id",
+                "tags": ["Admin - Manager"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get user successfully" },
+                    "404": { "description": "User not found" }
+                }
+            },
+            "patch": {
+                "summary": "Update user",
+                "tags": ["Admin - Manager"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fullName": { "type": "string", "example": "Nguyễn Văn B" },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": ["admin", "manager", "employee", "customer"],
+                                        "example": "manager"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": ["male", "female", "other"],
+                                        "example": "male"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update user successfully" },
+                    "400": { "description": "Invalid input" },
+                    "404": { "description": "User not found" }
+                }
+            },
+            "delete": {
+                "summary": "Delete user",
+                "tags": ["Admin - Manager"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Delete user successfully" },
+                    "404": { "description": "User not found" }
+                }
+            }
+        },
+        "/address/me": {
+            "get": {
+                "summary": "Get current user address",
+                "tags": ["Address"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Get address successfully" },
+                    "401": { "description": "Unauthorized" }
+                }
+            },
+            "put": {
+                "summary": "Update current user address",
+                "tags": ["Address"],
+                "security": [{ "BearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "receiverName",
+                                    "receiverPhone",
+                                    "provinceCity",
+                                    "ward",
+                                    "specificAddress"
+                                ],
+                                "properties": {
+                                    "receiverName": { "type": "string", "example": "Nguyễn Văn A" },
+                                    "receiverPhone": { "type": "string", "example": "0900000000" },
+                                    "provinceCity": { "type": "string", "example": "TP.HCM" },
+                                    "ward": { "type": "string", "example": "Phường Bến Nghé" },
+                                    "specificAddress": { "type": "string", "example": "123 Nguyễn Huệ" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Update address successfully" },
+                    "400": { "description": "Invalid input" },
+                    "401": { "description": "Unauthorized" }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "Security": [
+        {
+            "BearerAuth": []
+        }
+    ]
+}
