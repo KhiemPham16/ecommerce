@@ -10,7 +10,8 @@ import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
 import VerifyEmail from './pages/Auth/VerifyEmail';
-
+import Footer from './components/Footer';
+import Category from './pages/Category';
 export default function App() {
     return (
         <>
@@ -19,14 +20,16 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/category" element={<Category />} />
                 <Route path="/auth" element={<AuthLayout />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
                     <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="reset-password" element={<ResetPassword />} />
                 </Route>
-                <Route path="/api/v1/auth/verify-email" element={<VerifyEmail />} />
+                <Route path="/api/v1/auth/verify-email" element={<VerifyEmail />} />    
             </Routes>
+            <Footer />
         </>
     );
 }

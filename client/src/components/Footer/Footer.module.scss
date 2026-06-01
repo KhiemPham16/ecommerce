@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* --- Biến dùng chung hệ màu hiện đại --- */
+$color-dark: #111111;
+$color-accent: #d93a3a; 
+$color-muted: #555555;
+$color-light-bg: #f8f9fa;
+$color-border: #eeeeee;
+
+$shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
+$shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+.footer {
+  background: #111111; color: #ffffff; padding: 60px 20px 30px; border-top: 4px solid $color-accent;
+  .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; padding-bottom: 40px; border-bottom: 1px solid #222222; }
+  .footer-column {
+    .footer-logo { font-size: 24px; font-weight: 800; margin-bottom: 20px; letter-spacing: 0.5px; .logo-accent { color: $color-accent; } }
+    .footer-desc { color: #999999; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    ul { list-style: none; padding: 0; li { margin-bottom: 12px; a { color: #999999; text-decoration: none; font-size: 14px; transition: color 0.2s; &:hover { color: $color-accent; } } } }
+    .footer-socials { display: flex; gap: 15px; a { color: white; background: #222222; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; &:hover { background: $color-accent; transform: translateY(-2px); } } }
+  }
+  .footer-bottom { text-align: center; padding-top: 30px; font-size: 13px; color: #555555; }
+}

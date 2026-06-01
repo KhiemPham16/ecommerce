@@ -56,12 +56,18 @@ export default function Header() {
                     </li>
 
                     <li>
+                        <Link to="/category">Category</Link>
+                    </li>
+                    
+                    <li>
                         <Link to="/blog">Blog</Link>
                     </li>
 
                     <li>
                         <Link to="/contact">Contact</Link>
                     </li>
+
+                    
                 </ul>
             </nav>
         </div>
