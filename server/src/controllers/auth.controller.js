@@ -112,7 +112,7 @@ class AuthController {
 
     async changePassword(req, res, next) {
         try {
-            const userId = req.user._id;
+            const userId = req.user.id;
 
             const { currentPassword, newPassword, confirmNewPassword } = req.body;
 

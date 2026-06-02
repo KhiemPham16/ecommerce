@@ -3,7 +3,7 @@ const userService = require('~/services/user.service');
 class UserController {
     async me(req, res, next) {
         try {
-            const user = await userService.getMe(req.user._id);
+            const user = await userService.getMe(req.user.id);
 
             return res.status(200).json({
                 success: true,
@@ -16,7 +16,7 @@ class UserController {
 
     async updateMe(req, res, next) {
         try {
-            const user = await userService.updateMe(req.user._id, req.body);
+            const user = await userService.updateMe(req.user.id, req.body);
 
             return res.status(200).json({
                 success: true,
@@ -30,7 +30,7 @@ class UserController {
 
     async updateAvatar(req, res, next) {
         try {
-            const user = await userService.updateAvatar(req.user._id, req.file);
+            const user = await userService.updateAvatar(req.user.id, req.file);
 
             return res.status(200).json({
                 success: true,
@@ -103,6 +103,19 @@ class UserController {
             return res.status(200).json({
                 success: true,
                 message: 'Xóa người dùng thành công'
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteMe(req, res, next) {
+        try {
+            await userService.deleteUser(req.user.id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Xóa tài khoản thành công'
             });
         } catch (error) {
             next(error);

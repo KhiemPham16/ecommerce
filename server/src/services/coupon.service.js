@@ -1,4 +1,4 @@
-const Coupon = require('~/models/coupon.model');
+const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
 
@@ -18,11 +18,19 @@ class CouponService {
     }
 
     async makeUniqueCode(code) {
-        let couponCode = code.toUpperCase().trim();
+        const baseCode = code.toUpperCase().trim();
+
+        let couponCode = baseCode;
         let count = 1;
 
-        while (await Coupon.exists({ code: couponCode })) {
-            couponCode = `${code.toUpperCase().trim()}-${count}`;
+        while (
+            await prisma.coupon.findUnique({
+                where: {
+                    code: couponCode
+                }
+            })
+        ) {
+            couponCode = `${baseCode}-${count}`;
             count++;
         }
 
@@ -30,13 +38,19 @@ class CouponService {
     }
 
     async getCoupons() {
-        return Coupon.find().sort({
-            createdAt: -1
+        return prisma.coupon.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
 
     async getCouponById(couponId) {
-        const coupon = await Coupon.findById(couponId);
+        const coupon = await prisma.coupon.findUnique({
+            where: {
+                id: couponId
+            }
+        });
 
         if (!coupon) {
             throw new AppError(404, 'Mã giảm giá không tồn tại');
@@ -87,29 +101,36 @@ class CouponService {
 
         couponCode = await this.makeUniqueCode(couponCode);
 
-        return Coupon.create({
-            couponType,
-            code: couponCode,
-            type,
-            value,
-            minOrderAmount,
-            maxDiscountAmount,
-            usageLimit,
-            startsAt,
-            expiresAt,
-            isActive
+        return prisma.coupon.create({
+            data: {
+                couponType: couponType.toUpperCase(),
+                code: couponCode,
+                type: type.toUpperCase(),
+                value,
+                minOrderAmount,
+                maxDiscountAmount,
+                usageLimit,
+                startsAt: startsAt ? new Date(startsAt) : null,
+                expiresAt: new Date(expiresAt),
+                isActive
+            }
         });
     }
 
     async updateCoupon(couponId, data) {
-        const coupon = await Coupon.findById(couponId);
+        const coupon = await prisma.coupon.findUnique({
+            where: {
+                id: couponId
+            }
+        });
 
         if (!coupon) {
             throw new AppError(404, 'Mã giảm giá không tồn tại');
         }
 
+        const updateData = {};
+
         const allowedFields = [
-            'type',
             'value',
             'minOrderAmount',
             'maxDiscountAmount',
@@ -121,24 +142,45 @@ class CouponService {
 
         allowedFields.forEach((field) => {
             if (data[field] !== undefined) {
-                coupon[field] = data[field];
+                updateData[field] = data[field];
             }
         });
 
-        await coupon.save();
+        if (data.type !== undefined) {
+            updateData.type = data.type.toUpperCase();
+        }
 
-        return coupon;
+        if (data.startsAt !== undefined) {
+            updateData.startsAt = data.startsAt ? new Date(data.startsAt) : null;
+        }
+
+        if (data.expiresAt !== undefined) {
+            updateData.expiresAt = new Date(data.expiresAt);
+        }
+
+        return prisma.coupon.update({
+            where: {
+                id: couponId
+            },
+            data: updateData
+        });
     }
 
     async deleteCoupon(couponId) {
-        const coupon = await Coupon.findById(couponId);
+        const coupon = await prisma.coupon.findUnique({
+            where: {
+                id: couponId
+            }
+        });
 
         if (!coupon) {
             throw new AppError(404, 'Mã giảm giá không tồn tại');
         }
 
-        await Coupon.deleteOne({
-            _id: couponId
+        await prisma.coupon.delete({
+            where: {
+                id: couponId
+            }
         });
 
         return true;
@@ -153,9 +195,11 @@ class CouponService {
             throw new AppError(400, 'Tổng tiền đơn hàng không hợp lệ');
         }
 
-        const coupon = await Coupon.findOne({
-            code: code.toUpperCase().trim(),
-            isActive: true
+        const coupon = await prisma.coupon.findFirst({
+            where: {
+                code: code.toUpperCase().trim(),
+                isActive: true
+            }
         });
 
         if (!coupon) {
@@ -176,30 +220,34 @@ class CouponService {
             throw new AppError(400, 'Mã giảm giá đã hết lượt sử dụng');
         }
 
-        if (totalAmount < coupon.minOrderAmount) {
-            throw new AppError(400, `Đơn hàng tối thiểu ${coupon.minOrderAmount}`);
+        const orderAmount = Number(totalAmount);
+        const minOrderAmount = Number(coupon.minOrderAmount || 0);
+
+        if (orderAmount < minOrderAmount) {
+            throw new AppError(400, `Đơn hàng tối thiểu ${minOrderAmount}`);
         }
 
         let discountAmount = 0;
+        const couponValue = Number(coupon.value);
 
-        if (coupon.type === 'percent') {
-            discountAmount = (totalAmount * coupon.value) / 100;
+        if (coupon.type === 'PERCENT') {
+            discountAmount = (orderAmount * couponValue) / 100;
 
             if (coupon.maxDiscountAmount) {
-                discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
+                discountAmount = Math.min(discountAmount, Number(coupon.maxDiscountAmount));
             }
         }
 
-        if (coupon.type === 'fixed') {
-            discountAmount = coupon.value;
+        if (coupon.type === 'FIXED') {
+            discountAmount = couponValue;
         }
 
-        discountAmount = Math.min(discountAmount, totalAmount);
+        discountAmount = Math.min(discountAmount, orderAmount);
 
         return {
             coupon,
             discountAmount,
-            finalAmount: totalAmount - discountAmount
+            finalAmount: orderAmount - discountAmount
         };
     }
 }

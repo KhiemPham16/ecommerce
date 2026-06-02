@@ -3,7 +3,7 @@ const addressService = require('~/services/address.service');
 class AddressController {
     async me(req, res, next) {
         try {
-            const address = await addressService.getMyAddress(req.user._id);
+            const address = await addressService.getMyAddress(req.user.id);
 
             return res.status(200).json({
                 success: true,
@@ -16,7 +16,7 @@ class AddressController {
 
     async upsertMe(req, res, next) {
         try {
-            const address = await addressService.upsertMyAddress(req.user._id, req.body);
+            const address = await addressService.upsertMyAddress(req.user.id, req.body);
 
             return res.status(200).json({
                 success: true,

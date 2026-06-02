@@ -9,10 +9,10 @@ const { authorize } = require('~/middlewares/rbac');
 
 router.post('/validate', couponController.validate);
 
-router.get('/', authenticate, authorize('admin', 'manager'), couponController.index);
-router.get('/:id', authenticate, authorize('admin', 'manager'), couponController.show);
-router.post('/', authenticate, authorize('admin', 'manager'), couponController.store);
-router.patch('/:id', authenticate, authorize('admin', 'manager'), couponController.update);
-router.delete('/:id', authenticate, authorize('admin', 'manager'), couponController.destroy);
+router.get('/', authenticate, authorize('ADMIN', 'MANAGER'), couponController.index);
+router.get('/:id', authenticate, authorize('ADMIN', 'MANAGER'), couponController.show);
+router.post('/', authenticate, authorize('ADMIN', 'MANAGER'), couponController.store);
+router.patch('/:id', authenticate, authorize('ADMIN', 'MANAGER'), couponController.update);
+router.delete('/:id', authenticate, authorize('ADMIN', 'MANAGER'), couponController.destroy);
 
 module.exports = router;

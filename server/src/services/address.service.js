@@ -1,37 +1,38 @@
-const Address = require('~/models/address.model');
+const prisma = require('~/libs/prisma');
 
 class AddressService {
     async getMyAddress(userId) {
-        return Address.findOne({
-            userId,
-            deletedAt: null
+        return prisma.address.findUnique({
+            where: {
+                userId
+            }
         });
     }
 
     async upsertMyAddress(userId, data) {
         const { receiverName, receiverPhone, provinceCity, ward, specificAddress } = data;
 
-        const address = await Address.findOneAndUpdate(
-            {
-                userId,
-                deletedAt: null
+        return prisma.address.upsert({
+            where: {
+                userId
             },
-            {
-                userId,
+            update: {
                 receiverName,
                 receiverPhone,
                 provinceCity,
                 ward,
                 specificAddress
             },
-            {
-                new: true,
-                upsert: true,
-                runValidators: true
+            create: {
+                userId,
+                receiverName,
+                receiverPhone,
+                provinceCity,
+                ward,
+                specificAddress,
+                isDefault: true
             }
-        );
-
-        return address;
+        });
     }
 }
 

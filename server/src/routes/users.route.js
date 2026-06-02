@@ -10,16 +10,15 @@ const { authorize } = require('~/middlewares/rbac');
 
 const { uploadAvatar } = require('~/middlewares/uploadAvatar');
 
-// me
 router.get('/me', authenticate, userController.me);
 router.patch('/me', authenticate, userController.updateMe);
 router.patch('/me/avatar', authenticate, uploadAvatar.single('avatar'), userController.updateAvatar);
+router.delete('/me', authenticate, userController.deleteMe);
 
-// admin
-router.get('/', authenticate, authorize('admin', 'manager'), userController.index);
-router.post('/', authenticate, authorize('admin', 'manager'), userController.store);
-router.get('/:id', authenticate, authorize('admin', 'manager'), userController.show);
-router.patch('/:id', authenticate, authorize('admin', 'manager'), userController.update);
-router.delete('/:id', authenticate, authorize('admin', 'manager'), userController.destroy);
+router.get('/', authenticate, authorize('ADMIN', 'MANAGER'), userController.index);
+router.post('/', authenticate, authorize('ADMIN', 'MANAGER'), userController.store);
+router.get('/:id', authenticate, authorize('ADMIN', 'MANAGER'), userController.show);
+router.patch('/:id', authenticate, authorize('ADMIN', 'MANAGER'), userController.update);
+router.delete('/:id', authenticate, authorize('ADMIN', 'MANAGER'), userController.destroy);
 
 module.exports = router;

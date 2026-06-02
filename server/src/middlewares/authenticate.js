@@ -1,7 +1,15 @@
 const jwt = require('jsonwebtoken');
 
-const User = require('~/models/user.model');
+const prisma = require('~/libs/prisma');
 const authConfig = require('~/configs/auth.config');
+
+function requireAccessSecret() {
+    if (!authConfig.accessJwtSecret) {
+        throw new Error('Missing accessJwtSecret');
+    }
+
+    return authConfig.accessJwtSecret;
+}
 
 async function authenticate(req, res, next) {
     try {
@@ -20,7 +28,7 @@ async function authenticate(req, res, next) {
         let payload;
 
         try {
-            payload = jwt.verify(token, authConfig.accessJwtSecret);
+            payload = jwt.verify(token, requireAccessSecret());
         } catch {
             return res.error(401, 'Token không hợp lệ hoặc đã hết hạn');
         }
@@ -29,16 +37,21 @@ async function authenticate(req, res, next) {
             return res.error(401, 'Token không hợp lệ');
         }
 
-        const user = await User.findById(payload.userId);
+        const user = await prisma.user.findUnique({
+            where: {
+                id: payload.userId
+            }
+        });
 
-        if (!user) {
+        if (!user || user.deletedAt) {
             return res.error(401, 'Người dùng không tồn tại');
         }
 
         req.user = user;
+
         next();
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 }
 
