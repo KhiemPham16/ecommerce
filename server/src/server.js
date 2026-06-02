@@ -9,7 +9,8 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-const { connectDB } = require('~/libs/mongodb');
+// const { connectDB } = require('~/libs/mongodb');
+const prisma = require('~/libs/prisma');
 const { registerRoutes } = require('~/routes');
 const { responseMiddleware } = require('~/middlewares/response');
 const { errorHandler } = require('~/middlewares/errorHandler');
@@ -17,7 +18,8 @@ const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 
 async function bootstrap() {
-    await connectDB();
+    // await connectDB();
+    prisma.initPrisma();
 
     const app = express();
     const port = process.env.PORT || 3000;

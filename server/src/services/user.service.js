@@ -1,45 +1,51 @@
 const bcrypt = require('bcrypt');
 
-const User = require('~/models/user.model');
+const prisma = require('~/libs/prisma');
+
 const authConfig = require('~/configs/auth.config');
 
 const { AppError } = require('~/errors/AppError');
 const { generateUsername } = require('~/utils/generateUsername');
 
-const USER_PRIVATE_FIELDS =
-    '-password -resetPasswordOtp -resetPasswordOtpExpiresAt -verificationToken -verificationTokenExpiresAt';
-
 class UserService {
     async getMe(userId) {
-        const user = await User.findById(userId).select(USER_PRIVATE_FIELDS);
-
-        if (!user) {
-            throw new AppError(404, 'Người dùng không tồn tại');
-        }
-
-        return user;
-    }
-
-    async updateMe(userId, data) {
-        const allowedFields = ['fullName', 'phone', 'gender'];
-        const updateData = {};
-
-        allowedFields.forEach((field) => {
-            if (data[field] !== undefined) {
-                updateData[field] = data[field];
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
             }
         });
 
-        const user = await User.findByIdAndUpdate(userId, updateData, {
-            new: true,
-            runValidators: true
-        }).select(USER_PRIVATE_FIELDS);
-
         if (!user) {
             throw new AppError(404, 'Người dùng không tồn tại');
         }
 
-        return user;
+        const {
+            password,
+            resetPasswordOtp,
+            resetPasswordOtpExpiresAt,
+            verificationToken,
+            verificationTokenExpiresAt,
+            ...safeUser
+        } = user;
+
+        return safeUser;
+    }
+
+    async updateMe(userId, data) {
+        const user = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                fullName: data.fullName,
+                phone: data.phone,
+                gender: data.gender
+            }
+        });
+
+        const { password, ...safeUser } = user;
+
+        return safeUser;
     }
 
     async updateAvatar(userId, file) {
@@ -47,36 +53,54 @@ class UserService {
             throw new AppError(400, 'Avatar là bắt buộc');
         }
 
-        const user = await User.findByIdAndUpdate(
-            userId,
-            {
-                avatarUrl: `/uploads/avatars/${file.filename}`
+        const user = await prisma.user.update({
+            where: {
+                id: userId
             },
-            {
-                new: true,
-                runValidators: true
+            data: {
+                avatarUrl: `/uploads/avatars/${file.filename}`
             }
-        ).select(USER_PRIVATE_FIELDS);
+        });
 
-        if (!user) {
-            throw new AppError(404, 'Người dùng không tồn tại');
-        }
+        const { password, ...safeUser } = user;
 
-        return user;
+        return safeUser;
     }
 
     async getUsers() {
-        return User.find({ deletedAt: null }).select(USER_PRIVATE_FIELDS);
+        return prisma.user.findMany({
+            where: {
+                deletedAt: null
+            },
+            select: {
+                id: true,
+                username: true,
+                fullName: true,
+                email: true,
+                phone: true,
+                role: true,
+                gender: true,
+                avatarUrl: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        });
     }
 
     async getUserById(userId) {
-        const user = await User.findById(userId).select(USER_PRIVATE_FIELDS);
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
 
         if (!user || user.deletedAt) {
             throw new AppError(404, 'Người dùng không tồn tại');
         }
 
-        return user;
+        const { password, ...safeUser } = user;
+
+        return safeUser;
     }
 
     async createUser(data) {
@@ -86,8 +110,10 @@ class UserService {
             throw new AppError(400, 'Thiếu thông tin bắt buộc');
         }
 
-        const duplicate = await User.findOne({
-            $or: [{ email }, { phone }]
+        const duplicate = await prisma.user.findFirst({
+            where: {
+                OR: [{ email }, { phone }]
+            }
         });
 
         if (duplicate) {
@@ -98,57 +124,55 @@ class UserService {
 
         const hashedPassword = await bcrypt.hash(password, authConfig.bcryptRounds);
 
-        const user = await User.create({
-            username,
-            fullName,
-            email,
-            password: hashedPassword,
-            phone,
-            role: role || 'customer',
-            emailVerifiedAt: new Date()
+        const user = await prisma.user.create({
+            data: {
+                username,
+                fullName,
+                email,
+                password: hashedPassword,
+                phone,
+                role: role || 'CUSTOMER',
+                emailVerifiedAt: new Date()
+            }
         });
 
-        return User.findById(user._id).select(USER_PRIVATE_FIELDS);
+        const { password: _, ...safeUser } = user;
+
+        return safeUser;
     }
 
     async updateUser(userId, data) {
-        const allowedFields = ['fullName', 'phone', 'gender', 'avatarUrl', 'role'];
-        const updateData = {};
-
-        allowedFields.forEach((field) => {
-            if (data[field] !== undefined) {
-                updateData[field] = data[field];
+        const user = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                fullName: data.fullName,
+                phone: data.phone,
+                gender: data.gender,
+                avatarUrl: data.avatarUrl,
+                role: data.role
             }
         });
 
-        const user = await User.findByIdAndUpdate(userId, updateData, {
-            new: true,
-            runValidators: true
-        }).select(USER_PRIVATE_FIELDS);
+        const { password, ...safeUser } = user;
 
-        if (!user) {
-            throw new AppError(404, 'Người dùng không tồn tại');
-        }
-
-        return user;
+        return safeUser;
     }
 
     async deleteUser(userId) {
-        const user = await User.findByIdAndUpdate(
-            userId,
-            {
-                deletedAt: new Date()
+        const user = await prisma.user.update({
+            where: {
+                id: userId
             },
-            {
-                new: true
+            data: {
+                deletedAt: new Date()
             }
-        ).select(USER_PRIVATE_FIELDS);
+        });
 
-        if (!user) {
-            throw new AppError(404, 'Người dùng không tồn tại');
-        }
+        const { password, ...safeUser } = user;
 
-        return user;
+        return safeUser;
     }
 }
 

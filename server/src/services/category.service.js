@@ -1,18 +1,23 @@
-const Category = require('~/models/category.model');
-const Product = require('~/models/product.model');
+const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
-const { generateUniqueSlug } = require('~/utils/slugify');
+const { generateUniqueCategorySlug } = require('~/utils/slugify');
 
 class CategoryService {
     async getCategories() {
-        return Category.find().sort({
-            createdAt: -1
+        return prisma.category.findMany({
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
 
     async getCategoryById(categoryId) {
-        const category = await Category.findById(categoryId);
+        const category = await prisma.category.findUnique({
+            where: {
+                id: categoryId
+            }
+        });
 
         if (!category) {
             throw new AppError(404, 'Danh mục không tồn tại');
@@ -26,59 +31,84 @@ class CategoryService {
             throw new AppError(400, 'Tên danh mục là bắt buộc');
         }
 
-        const existed = await Category.findOne({ name });
+        const existed = await prisma.category.findUnique({
+            where: {
+                name
+            }
+        });
 
         if (existed) {
             throw new AppError(409, 'Danh mục đã tồn tại');
         }
 
-        const slug = await generateUniqueSlug(name, Category);
+        const slug = await generateUniqueCategorySlug(name);
 
-        return Category.create({
-            name,
-            slug
+        return prisma.category.create({
+            data: {
+                name,
+                slug
+            }
         });
     }
 
     async updateCategory(categoryId, data) {
-        const category = await Category.findById(categoryId);
+        const category = await prisma.category.findUnique({
+            where: {
+                id: categoryId
+            }
+        });
 
         if (!category) {
             throw new AppError(404, 'Danh mục không tồn tại');
         }
 
+        const updateData = {};
+
         if (data.name && data.name !== category.name) {
-            const existed = await Category.findOne({
-                name: data.name,
-                _id: { $ne: categoryId }
+            const existed = await prisma.category.findFirst({
+                where: {
+                    name: data.name,
+                    NOT: {
+                        id: categoryId
+                    }
+                }
             });
 
             if (existed) {
                 throw new AppError(409, 'Danh mục đã tồn tại');
             }
 
-            category.name = data.name;
-            category.slug = await generateUniqueSlug(data.name, Category);
+            updateData.name = data.name;
+            updateData.slug = await generateUniqueCategorySlug(data.name);
         }
 
         if (data.isActive !== undefined) {
-            category.isActive = data.isActive;
+            updateData.isActive = data.isActive;
         }
 
-        await category.save();
-
-        return category;
+        return prisma.category.update({
+            where: {
+                id: categoryId
+            },
+            data: updateData
+        });
     }
 
     async deleteCategory(categoryId) {
-        const category = await Category.findById(categoryId);
+        const category = await prisma.category.findUnique({
+            where: {
+                id: categoryId
+            }
+        });
 
         if (!category) {
             throw new AppError(404, 'Danh mục không tồn tại');
         }
 
-        const productCount = await Product.countDocuments({
-            categoryId
+        const productCount = await prisma.product.count({
+            where: {
+                categoryId
+            }
         });
 
         if (productCount > 0) {
@@ -88,8 +118,10 @@ class CategoryService {
             );
         }
 
-        await Category.deleteOne({
-            _id: categoryId
+        await prisma.category.delete({
+            where: {
+                id: categoryId
+            }
         });
 
         return true;

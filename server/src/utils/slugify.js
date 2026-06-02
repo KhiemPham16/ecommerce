@@ -1,3 +1,4 @@
+const prisma = require('~/libs/prisma');
 const slugify = require('slugify');
 
 function generateSlug(text) {
@@ -9,15 +10,17 @@ function generateSlug(text) {
     });
 }
 
-async function generateUniqueSlug(name, model) {
+async function generateUniqueCategorySlug(name) {
     const baseSlug = generateSlug(name);
 
     let slug = baseSlug;
     let count = 1;
 
     while (
-        await model.exists({
-            slug
+        await prisma.category.findUnique({
+            where: {
+                slug
+            }
         })
     ) {
         slug = `${baseSlug}-${count}`;
@@ -29,5 +32,5 @@ async function generateUniqueSlug(name, model) {
 
 module.exports = {
     generateSlug,
-    generateUniqueSlug
+    generateUniqueCategorySlug
 };

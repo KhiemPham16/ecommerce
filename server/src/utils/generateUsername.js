@@ -1,4 +1,4 @@
-const User = require('~/models/user.model');
+const prisma = require('~/libs/prisma');
 
 function removeVietnameseTones(str) {
     return str
@@ -20,7 +20,13 @@ async function generateUsername(fullName) {
     let username = baseUsername;
     let count = 1;
 
-    while (await User.exists({ username })) {
+    while (
+        await prisma.user.findUnique({
+            where: {
+                username
+            }
+        })
+    ) {
         username = `${baseUsername}${count}`;
         count++;
     }

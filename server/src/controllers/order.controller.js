@@ -3,7 +3,7 @@ const orderService = require('~/services/order.service');
 class OrderController {
     async store(req, res, next) {
         try {
-            const order = await orderService.createOrder(req.user._id, req.body);
+            const order = await orderService.createOrder(req.user.id, req.body);
 
             return res.status(201).json({
                 success: true,
@@ -17,7 +17,7 @@ class OrderController {
 
     async myOrders(req, res, next) {
         try {
-            const orders = await orderService.getMyOrders(req.user._id);
+            const orders = await orderService.getMyOrders(req.user.id);
 
             return res.status(200).json({
                 success: true,
@@ -30,7 +30,7 @@ class OrderController {
 
     async showMine(req, res, next) {
         try {
-            const order = await orderService.getOrderById(req.user._id, req.params.id);
+            const order = await orderService.getOrderById(req.user.id, req.params.id);
 
             return res.status(200).json({
                 success: true,
@@ -70,7 +70,7 @@ class OrderController {
 
     async cancelMine(req, res, next) {
         try {
-            const order = await orderService.cancelMyOrder(req.user._id, req.params.id);
+            const order = await orderService.cancelMyOrder(req.user.id, req.params.id);
 
             return res.status(200).json({
                 success: true,
