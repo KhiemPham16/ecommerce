@@ -10,6 +10,8 @@ import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
 import VerifyEmail from './pages/Auth/VerifyEmail';
 import Category from './pages/Category';
+import Account from './pages/Account';
+import AccountOrders from './pages/Account/Orders';
 
 import SiteLayout from '~/layouts/SiteLayout';
 import DashboardLayout from '~/layouts/DashboardLayout';
@@ -36,6 +38,13 @@ export default function App() {
                     <Route path="reset-password" element={<ResetPassword />} />
                 </Route>
                 <Route path="/api/v1/auth/verify-email" element={<VerifyEmail />} />
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+                <Route element={<SiteLayout />}>
+                    <Route path="/account" element={<Account />} />
+                    <Route path="/account/orders" element={<AccountOrders />} />
+                </Route>
             </Route>
 
             <Route element={<ProtectedRoute />}>
