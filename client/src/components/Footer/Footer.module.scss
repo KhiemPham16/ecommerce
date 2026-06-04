@@ -1,23 +1,167 @@
+/* --- Nhúng font chữ hiện đại Inter từ Google Fonts --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* --- Biến dùng chung hệ màu hiện đại --- */
-$color-dark: #111111;
-$color-accent: #d93a3a; 
-$color-muted: #555555;
-$color-light-bg: #f8f9fa;
-$color-border: #eeeeee;
-
-$shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
-$shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
+/* ================= FOOTER (ĐỒNG BỘ MÀU CHUẨN THEO HEADER) ================= */
 .footer {
-  background: #111111; color: #ffffff; padding: 60px 20px 30px; border-top: 4px solid $color-accent;
-  .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; padding-bottom: 40px; border-bottom: 1px solid #222222; }
-  .footer-column {
-    .footer-logo { font-size: 24px; font-weight: 800; margin-bottom: 20px; letter-spacing: 0.5px; .logo-accent { color: $color-accent; } }
-    .footer-desc { color: #999999; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
-    h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-    ul { list-style: none; padding: 0; li { margin-bottom: 12px; a { color: #999999; text-decoration: none; font-size: 14px; transition: color 0.2s; &:hover { color: $color-accent; } } } }
-    .footer-socials { display: flex; gap: 15px; a { color: white; background: #222222; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; &:hover { background: $color-accent; transform: translateY(-2px); } } }
+  /* Lấy đúng mã màu xanh dương sáng từ ảnh Header của bạn */
+  background: #1e74db; 
+  color: #ffffff; 
+  padding: 0 0 30px 0; 
+  border: none;
+  font-family: 'Inter', sans-serif;
+
+  /* Thanh tiện ích phía trên đầu - Màu xanh dương dịu và nhạt hơn màu nền */
+  .footer-top-bar {
+    background: #4da3ff; 
+    padding: 15px 20px;
+    margin-bottom: 50px;
+
+    .top-bar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      span {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+    }
   }
-  .footer-bottom { text-align: center; padding-top: 30px; font-size: 13px; color: #555555; }
+
+  /* Grid chia 4 cột nội dung */
+  .footer-container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0 20px;
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 50px; 
+  }
+
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+
+    &.col-logo {
+      gap: 16px; 
+    }
+
+    .footer-logo { 
+      font-size: 32px; 
+      font-weight: 800; 
+      color: #ffffff; 
+      letter-spacing: -0.5px; 
+      
+      .logo-accent { 
+        color: #b3e0ff; /* Chữ STORY đổi sang màu xanh sáng dịu mắt, nổi bật trên nền xanh */
+      } 
+    }
+
+    .footer-desc { 
+      color: #f0f7ff; /* Chữ mô tả dùng màu trắng xanh nhạt rất dịu và dễ đọc */
+      font-size: 14px; 
+      line-height: 1.6; 
+    }
+
+    h3 { 
+      font-size: 18px; 
+      font-weight: 700; 
+      margin-bottom: 24px; 
+      color: #ffffff; 
+    }
+
+    ul { 
+      list-style: none; 
+      padding: 0; 
+      display: flex;
+      flex-direction: column;
+      gap: 14px; 
+      
+      li { 
+        a { 
+          color: #f0f7ff; /* Màu chữ link lúc bình thường */
+          text-decoration: none; 
+          font-size: 14px; 
+          font-weight: 500;
+          transition: color 0.2s, opacity 0.2s; 
+          
+          &:hover { 
+            color: #ffffff; /* Khi hover vào link sẽ rực sáng lên màu trắng */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4); 
+            opacity: 1;
+          } 
+        } 
+      } 
+    }
+
+    /* Khối liên hệ hiển thị icon text */
+    .footer-socials { 
+      display: flex; 
+      align-items: center;
+      
+      a { 
+        color: #ffffff; 
+        font-size: 14px; 
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s; 
+        
+        svg {
+          font-size: 16px;
+        }
+        
+        &:hover { 
+          color: #b3e0ff; /* Di chuột vào đổi sang xanh nhạt */
+          transform: translateX(4px); 
+        } 
+      } 
+    }
+  }
+
+  /* Chữ bản quyền ở đáy dưới cùng */
+  .footer-bottom { 
+    text-align: center; 
+    margin-top: 50px;
+    padding-top: 20px; 
+    font-size: 13px; 
+    color: #b3d7ff; /* Màu text copyright xanh nhạt hài hòa */
+    border-top: 1px solid rgba(255, 255, 255, 0.15); /* Đường kẻ mờ tinh tế */
+  }
+}
+
+/* Responsive mượt mà cho các thiết bị di động */
+@media (max-width: 992px) {
+  .footer {
+    .footer-top-bar {
+      .top-bar-container {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        text-align: center;
+        span { width: 45%; }
+      }
+    }
+    .footer-container { 
+      grid-template-columns: 1fr 1fr; 
+      gap: 30px; 
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .footer {
+    .footer-top-bar {
+      .top-bar-container span { width: 100%; }
+    }
+    .footer-container { 
+      grid-template-columns: 1fr; 
+    }
+  }
 }
