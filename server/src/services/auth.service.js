@@ -116,6 +116,10 @@ class AuthService {
             throw new AppError(401, 'Email hoặc password không chính xác');
         }
 
+        if (!user.emailVerifiedAt) {
+            throw new AppError(403, 'Vui lòng xác thực email trước khi đăng nhập');
+        }
+
         if (user.deletedAt) {
             const restoreDeadline = new Date(user.deletedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
 
