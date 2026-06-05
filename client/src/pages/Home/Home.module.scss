@@ -1,9 +1,7 @@
-/* --- Nhúng font chữ hiện đại Inter từ Google Fonts --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* --- Biến dùng chung hệ màu hiện đại --- */
 $color-dark: #111111;
-$color-accent: #d93a3a; 
+$color-accent: #d93a3a;
 $color-muted: #555555;
 $color-light-bg: #f8f9fa;
 $color-border: #eeeeee;
@@ -12,366 +10,457 @@ $shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
 $shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
 
 .home-wrapper {
-  width: 100%;
-  background-color: #ffffff;
-  font-family: 'Inter', sans-serif; /* Áp dụng font chữ mới */
-  -webkit-font-smoothing: antialiased;
+    width: 100%;
+    background-color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* --- SECTION CHUNG --- */
 .section {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 20px;
+}
 
-  &.bg-light {
-    max-width: 100%;
+.bg-light {
     background-color: $color-light-bg;
-    .section-header, .book-grid { 
-      max-width: 1200px; 
-      margin: 0 auto; 
-    }
-  }
+    width: 100%;
 }
 
 .section-header {
-  text-align: center;
-  margin-bottom: 50px;
-  
-  h2 { 
-    font-size: 32px; 
-    font-weight: 800; 
-    color: $color-dark; 
-    margin-bottom: 12px; 
-    letter-spacing: -0.5px;
-  }
-  p { 
-    font-size: 16px; 
-    color: $color-muted; 
-  }
+    text-align: center;
+    margin-bottom: 50px;
+
+    h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: $color-dark;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+    p {
+        font-size: 16px;
+        color: $color-muted;
+    }
 }
 
-/* ================= 2. HERO BANNER (ĐÃ CHỈNH SỬA ĐẸP VÀ CÂN ĐỐI) ================= */
 .hero {
-  background: linear-gradient(135deg, #f5f7f8 0%, #eef1f3 100%);
-  padding: 80px 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  // Container bọc trong để giới hạn độ rộng PC
-  display: flex;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  align-items: center;
-  justify-content: space-between;
-  gap: 60px;
-
-  .hero-content {
-    flex: 1.2;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; // Căn lề trái chuẩn chỉnh
-
-    .hero-badge {
-      background: rgba(217, 58, 58, 0.08);
-      color: $color-accent;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      display: inline-block;
-      letter-spacing: 0.5px;
-    }
-
-    .hero-title { 
-      font-size: 46px; 
-      font-weight: 800; 
-      color: $color-dark; 
-      line-height: 1.25; 
-      margin-bottom: 20px;
-      letter-spacing: -1px;
-    }
-    
-    .hero-desc { 
-      font-size: 16px; 
-      color: $color-muted; 
-      line-height: 1.6; 
-      margin-bottom: 35px;
-    }
-    
-    .hero-btn {
-      background: $color-dark;
-      color: white;
-      border: none;
-      padding: 16px 40px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: $color-accent;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(217, 58, 58, 0.3);
-      }
-    }
-  }
-
-  .hero-image-area {
-    flex: 1;
+    background: linear-gradient(135deg, #f5f7f8 0%, #eef1f3 100%);
+    padding: 80px 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    .hero-image-wrapper {
-      width: 100%;
-      max-width: 440px;
-      border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      background: transparent;
-      transition: transform 0.4s ease;
 
-      &:hover {
-        transform: scale(1.02);
-      }
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
 
-      img { 
-        width: 100%; 
-        height: auto;
-        display: block; 
-        object-fit: cover; 
-      }
+    .hero-content {
+        flex: 1.2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .hero-badge {
+            background: rgba(217, 58, 58, 0.08);
+            color: $color-accent;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-title {
+            font-size: 46px;
+            font-weight: 800;
+            color: $color-dark;
+            line-height: 1.25;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: $color-muted;
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .hero-btn {
+            background: $color-dark;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: $color-accent;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(217, 58, 58, 0.3);
+            }
+        }
     }
-  }
+
+    .hero-image-area {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .hero-image-wrapper {
+            width: 100%;
+            max-width: 440px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: transparent;
+            transition: transform 0.4s ease;
+
+            &:hover {
+                transform: scale(1.02);
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+                display: block;
+                object-fit: cover;
+            }
+        }
+    }
 }
 
-/* ================= 3. DANH MỤC SÁCH (SỬA LẠI THOÁNG VÀ ĐẸP HƠN) ================= */
 .category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); // Tăng độ rộng tối thiểu cho thoáng
-  gap: 24px; // Thêm khoảng cách giữa các khối
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
 }
 
 .category-card {
-  background: white;
-  border-radius: 14px;
-  padding: 16px;
-  border: 1px solid $color-border;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  cursor: pointer;
-  box-shadow: $shadow-sm;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: $shadow-md;
-    border-color: $color-dark;
-    
-    .cat-thumb img {
-      transform: scale(1.08);
-    }
-  }
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: $shadow-md;
+        border-color: $color-dark;
 
-  .cat-thumb {
-    width: 64px;
-    height: 64px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f5f5f5;
-    flex-shrink: 0;
-    
-    img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      transition: transform 0.3s ease;
+        .cat-thumb img {
+            transform: scale(1.08);
+        }
     }
-  }
 
-  .cat-info {
-    h3 { 
-      font-size: 16px; 
-      font-weight: 700; 
-      color: $color-dark;
-      margin-bottom: 4px;
+    .cat-thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #f5f5f5;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
     }
-    p { 
-      font-size: 13px; 
-      color: #888888; 
+
+    .cat-info {
+        h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: $color-dark;
+            margin-bottom: 4px;
+        }
+        p {
+            font-size: 13px;
+            color: #888888;
+        }
     }
-  }
 }
 
-/* ================= 4. PRODUCT SÁCH NỔI BẬT ================= */
 .book-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
 }
 
 .book-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid $color-border;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: $shadow-sm;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: $shadow-md;
-    border-color: #cccccc;
-    .book-thumb img { transform: scale(1.05); }
-  }
-
-  .wishlist-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
     background: white;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    color: #888888;
-    cursor: pointer;
-    transition: all 0.2s;
-    &:hover { color: $color-accent; transform: scale(1.1); }
-  }
-
-  .book-thumb {
-    height: 220px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fafafa;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 16px;
-    img { max-height: 180px; object-fit: contain; transition: transform 0.3s ease; }
-  }
-
-  .book-info {
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid $color-border;
+    position: relative;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    .book-author { font-size: 12px; color: #999999; text-transform: uppercase; margin-bottom: 6px; font-weight: 500; }
-    .book-title { font-size: 16px; font-weight: 700; color: $color-dark; margin-bottom: 10px; line-height: 1.4; }
-    .book-rating { display: flex; gap: 3px; margin-bottom: 16px; .star { color: #ffc107; font-size: 12px; } }
-    
-    .book-price-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-      
-      .price-box {
+    box-shadow: $shadow-sm;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: $shadow-md;
+        border-color: #cccccc;
+        .book-thumb img {
+            transform: scale(1.05);
+        }
+    }
+
+    .wishlist-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10;
+        background: white;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        color: #888888;
+        cursor: pointer;
+        transition: all 0.2s;
+        &:hover {
+            color: $color-accent;
+            transform: scale(1.1);
+        }
+    }
+
+    .book-thumb {
+        position: relative;
+        z-index: 1;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 16px;
+        img {
+            max-height: 180px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+    }
+
+    .book-info {
         display: flex;
         flex-direction: column;
-        .price { font-size: 18px; font-weight: 700; color: $color-accent; }
-        .old-price { font-size: 13px; color: #aaaaaa; text-decoration: line-through; margin-top: 2px; }
-      }
-      
-      .add-cart-btn {
-        background: $color-dark;
-        color: white;
-        border: none;
-        padding: 9px 18px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: background 0.2s;
-        &:hover { background: $color-accent; }
-      }
+        flex: 1;
+        .book-author {
+            font-size: 12px;
+            color: #999999;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .book-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: $color-dark;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .book-rating {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 16px;
+            .star {
+                color: #ffc107;
+                font-size: 12px;
+            }
+        }
+
+        .book-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+
+            .price-box {
+                display: flex;
+                flex-direction: column;
+                .price {
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: $color-accent;
+                }
+                .old-price {
+                    font-size: 13px;
+                    color: #aaaaaa;
+                    text-decoration: line-through;
+                    margin-top: 2px;
+                }
+            }
+
+            .add-cart-btn {
+                background: $color-dark;
+                color: white;
+                border: none;
+                padding: 9px 18px;
+                font-size: 13px;
+                font-weight: 600;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: background 0.2s;
+                &:hover {
+                    background: $color-accent;
+                }
+            }
+        }
     }
-  }
 }
 
-/* ================= 5. BANNER ƯU ĐÃI ================= */
 .promo-section {
-  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-              url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1400&auto=format&fit=crop&q=80');
-  background-size: cover;
-  background-position: center;
-  padding: 100px 20px;
-  text-align: center;
-  color: white;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1400&auto=format&fit=crop&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    text-align: center;
+    color: white;
 
-  .promo-content {
-    max-width: 650px;
-    margin: 0 auto;
-    .promo-badge { background: $color-accent; padding: 6px 16px; font-size: 13px; font-weight: 700; border-radius: 4px; display: inline-block; margin-bottom: 20px; letter-spacing: 0.5px; }
-    h2 { font-size: 40px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
-    p { font-size: 16px; color: #dddddd; margin-bottom: 30px; line-height: 1.6; }
-    .promo-btn {
-      background: white; color: #111; border: none; padding: 14px 36px; font-size: 15px; font-weight: 600; border-radius: 25px; cursor: pointer; transition: all 0.2s;
-      &:hover { background: $color-accent; color: white; transform: scale(1.05); }
+    .promo-content {
+        max-width: 650px;
+        margin: 0 auto;
+        .promo-badge {
+            background: $color-accent;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        p {
+            font-size: 16px;
+            color: #dddddd;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .promo-btn {
+            background: white;
+            color: #111;
+            border: none;
+            padding: 14px 36px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            &:hover {
+                background: $color-accent;
+                color: white;
+                transform: scale(1.05);
+            }
+        }
     }
-  }
 }
 
-/* ================= 6. BLOG PREVIEW ================= */
-.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
 .blog-card {
-  background: white; border-radius: 14px; overflow: hidden; border: 1px solid $color-border; box-shadow: $shadow-sm; transition: all 0.3s;
-  &:hover { transform: translateY(-5px); box-shadow: $shadow-md; }
-  .blog-thumb { width: 100%; height: 200px; img { width: 100%; height: 100%; object-fit: cover; } }
-  .blog-info {
-    padding: 22px;
-    .blog-date { font-size: 12px; color: #999999; display: block; margin-bottom: 8px; }
-    h3 { font-size: 18px; font-weight: 700; color: #111; margin-bottom: 10px; line-height: 1.45; }
-    p { font-size: 14px; color: #666666; line-height: 1.55; margin-bottom: 16px; }
-    .blog-link { color: $color-accent; text-decoration: none; font-weight: 600; font-size: 14px; &:hover { text-decoration: underline; } }
-  }
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid $color-border;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s;
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-md;
+    }
+    .blog-thumb {
+        width: 100%;
+        height: 200px;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+    .blog-info {
+        padding: 22px;
+        .blog-date {
+            font-size: 12px;
+            color: #999999;
+            display: block;
+            margin-bottom: 8px;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 10px;
+            line-height: 1.45;
+        }
+        p {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+        .blog-link {
+            color: $color-accent;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
 }
 
-/* ================= 7. FOOTER ================= */
-.footer {
-  background: #111111; color: #ffffff; padding: 60px 20px 30px; border-top: 4px solid $color-accent;
-  .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; padding-bottom: 40px; border-bottom: 1px solid #222222; }
-  .footer-column {
-    .footer-logo { font-size: 24px; font-weight: 800; margin-bottom: 20px; letter-spacing: 0.5px; .logo-accent { color: $color-accent; } }
-    .footer-desc { color: #999999; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
-    h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-    ul { list-style: none; padding: 0; li { margin-bottom: 12px; a { color: #999999; text-decoration: none; font-size: 14px; transition: color 0.2s; &:hover { color: $color-accent; } } } }
-    .footer-socials { display: flex; gap: 15px; a { color: white; background: #222222; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; &:hover { background: $color-accent; transform: translateY(-2px); } } }
-  }
-  .footer-bottom { text-align: center; padding-top: 30px; font-size: 13px; color: #555555; }
-}
-
-/* ================= RESPONSIVE LAYOUT ================= */
 @media (max-width: 992px) {
-  .hero { 
-    text-align: center; 
-    flex-direction: column; 
-    padding: 50px 20px;
-    .hero-content { 
-      max-width: 100%; 
-      align-items: center; // Đưa về giữa ở màn hình nhỏ
-      .hero-title { font-size: 36px; }
-    } 
-  }
-  .blog-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-  .footer-container { grid-template-columns: 1fr; gap: 30px; }
-  .blog-grid { grid-template-columns: 1fr; }
-  .category-grid { grid-template-columns: 1fr 1fr; }
+    .hero {
+        text-align: center;
+        flex-direction: column;
+        padding: 50px 20px;
+        .hero-content {
+            max-width: 100%;
+            align-items: center;
+            .hero-title {
+                font-size: 36px;
+            }
+        }
+    }
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
