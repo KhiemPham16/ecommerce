@@ -63,64 +63,62 @@ export default function Header() {
                         <button>Search</button>
                     </div>
                 </div>
-                    
+
                 <div className={cx('headerTopRight')}>
-                        <div className={cx('cart')}>Cart</div>
+                    <div className={cx('cart')}>Cart</div>
 
-                        <div className={cx('user')}>
-                            {user ? (
-                                <div className={cx('userDropdown')} ref={userMenuRef}>
-                                    <button
-                                        className={cx('userTrigger')}
-                                        type="button"
-                                        onClick={() => setUserMenuOpen((prev) => !prev)}
-                                        aria-haspopup="menu"
-                                        aria-expanded={userMenuOpen}
-                                    >
-                                        <span className={cx('userName')}>{displayName}</span>
-                                        <span className={cx('userChevron')} aria-hidden="true">
-                                            ▾
-                                        </span>
-                                    </button>
+                    <div className={cx('user')}>
+                        {user ? (
+                            <div className={cx('userDropdown')} ref={userMenuRef}>
+                                <button
+                                    className={cx('userTrigger')}
+                                    type="button"
+                                    onClick={() => setUserMenuOpen((prev) => !prev)}
+                                    aria-haspopup="menu"
+                                    aria-expanded={userMenuOpen}
+                                >
+                                    <span className={cx('userName')}>{displayName}</span>
+                                    <span className={cx('userChevron')} aria-hidden="true">
+                                        ▾
+                                    </span>
+                                </button>
 
-                                    {userMenuOpen && (
-                                        <div className={cx('userMenu')} role="menu">
-                                            <Link
-                                                className={cx('userMenuItem')}
-                                                to="/account"
-                                                role="menuitem"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
-                                                Profile
-                                            </Link>
-                                            <Link
-                                                className={cx('userMenuItem')}
-                                                to="/account/orders"
-                                                role="menuitem"
-                                                onClick={() => setUserMenuOpen(false)}
-                                            >
-                                                Lịch sử mua hàng
-                                            </Link>
-                                            <button
-                                                className={cx('userMenuItem', 'userMenuButton')}
-                                                type="button"
-                                                role="menuitem"
-                                                onClick={handleLogout}
-                                            >
-                                                Đăng xuất
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <Link className={cx('accountLink')} to="/auth/login">
-                                    Tài khoản
-                                </Link>
-                            )}
-                        </div>                                                              
+                                {userMenuOpen && (
+                                    <div className={cx('userMenu')} role="menu">
+                                        <Link
+                                            className={cx('userMenuItem')}
+                                            to="/account"
+                                            role="menuitem"
+                                            onClick={() => setUserMenuOpen(false)}
+                                        >
+                                            Profile
+                                        </Link>
+                                        <Link
+                                            className={cx('userMenuItem')}
+                                            to="/account/orders"
+                                            role="menuitem"
+                                            onClick={() => setUserMenuOpen(false)}
+                                        >
+                                            Lịch sử mua hàng
+                                        </Link>
+                                        <button
+                                            className={cx('userMenuItem', 'userMenuButton')}
+                                            type="button"
+                                            role="menuitem"
+                                            onClick={handleLogout}
+                                        >
+                                            Đăng xuất
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Link className={cx('accountLink')} to="/auth/login">
+                                Tài khoản
+                            </Link>
+                        )}
                     </div>
-
-                
+                </div>
             </div>
 
             <nav className={cx('nav')}>
@@ -132,7 +130,7 @@ export default function Header() {
                     <li>
                         <Link to="/category">Category</Link>
                     </li>
-                    
+
                     <li>
                         <Link to="/blog">Blog</Link>
                     </li>
@@ -141,10 +139,8 @@ export default function Header() {
                         <Link to="/contact">Contact</Link>
                     </li>
                     <li>
-                        {user && user.role === 'ADMIN' && (
-                            <Link to="/dashboard">Dashboard</Link>
-                        )}
-                    </li>              
+                        {user && ['ADMIN', 'MANAGER'].includes(user.role) && <Link to="/dashboard">Dashboard</Link>}
+                    </li>
                 </ul>
             </nav>
         </div>

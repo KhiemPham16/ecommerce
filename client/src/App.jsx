@@ -37,7 +37,7 @@ export default function App() {
                     <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="reset-password" element={<ResetPassword />} />
                 </Route>
-                <Route path="/api/v1/auth/verify-email" element={<VerifyEmail />} />
+                <Route path="verify-email" element={<VerifyEmail />} />
             </Route>
 
             <Route element={<ProtectedRoute />}>
@@ -47,7 +47,7 @@ export default function App() {
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']} />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="employees" element={<Employees />} />
