@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { useAuthStore } from '~/stores/useAuthStore';
 
-export default function ProtectedRoute() {
-    const { accessToken, user, loading, refresh, fetchMe } = useAuthStore();
+export default function ProtectedRoute({ allowedRoles = [] }) {
+    const { loading, refresh, fetchMe } = useAuthStore();
     const [starting, setStarting] = useState(true);
+    const location = useLocation();
 
     useEffect(() => {
         const init = async () => {
@@ -32,8 +33,24 @@ export default function ProtectedRoute() {
         return <div>Đang tải trang...</div>;
     }
 
-    if (!accessToken && !useAuthStore.getState().accessToken) {
+    const { accessToken, user } = useAuthStore.getState();
+
+    if (!accessToken) {
         return <Navigate to="/auth/login" replace />;
+    }
+
+    const role = user?.role?.toUpperCase();
+
+    if (allowedRoles.length > 0) {
+        const normalizedRoles = allowedRoles.map((item) => item.toUpperCase());
+
+        if (!normalizedRoles.includes(role)) {
+            return <Navigate to="/" replace />;
+        }
+    }
+
+    if (['ADMIN', 'MANAGER'].includes(role) && !location.pathname.startsWith('/dashboard')) {
+        return <Navigate to="/dashboard" replace />;
     }
 
     return <Outlet />;

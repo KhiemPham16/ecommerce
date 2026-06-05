@@ -28,7 +28,15 @@ export default function Login() {
 
         const success = await login(formData.email, formData.password);
 
-        if (success) {
+        if (!success) return;
+
+        const { user } = useAuthStore.getState();
+
+        const role = user?.role?.toUpperCase();
+
+        if (['ADMIN', 'MANAGER'].includes(role)) {
+            navigate('/dashboard');
+        } else {
             navigate('/');
         }
     };
