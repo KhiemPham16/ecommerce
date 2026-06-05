@@ -1,15 +1,17 @@
 .header {
-    margin: 0px 100px 100px;
     font-family: 'Arial', sans-serif;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #2a83e9;
 }
 .headerTop {
     display: flex;
     align-items: center;
-    padding: 14px 50px;
+    padding: 14px 0px;
     background: #2a83e9;
     justify-content: space-between;
     color: #fff;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 .headerTopLeft {
     display: flex;
@@ -157,14 +159,14 @@
 
 .nav {
     background: #1d73d6;
+    width: 100%;
 
     ul {
         display: flex;
         align-items: center;
-
-        margin: 0;
-        padding: 0 40px;
-
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 0px;
         list-style: none;
     }
 
@@ -173,10 +175,9 @@
     }
 
     li a {
+        
+        padding: 14px 20px;
         display: block;
-
-        padding: 14px 18px;
-
         color: #fff;
         text-decoration: none;
         font-weight: 500;

@@ -3,8 +3,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { useAuthStore } from '~/stores/useAuthStore';
 
-export default function ProtectedRoute() {
-    const { accessToken, user, loading, refresh, fetchMe } = useAuthStore();
+export default function ProtectedRoute({ allowedRoles = [] }) {
+    const { loading, refresh, fetchMe } = useAuthStore();
     const [starting, setStarting] = useState(true);
 
     useEffect(() => {
@@ -29,11 +29,17 @@ export default function ProtectedRoute() {
     }, [refresh, fetchMe]);
 
     if (starting || loading) {
-        return <div>Đang tải trang...</div>;
+        return <div>chỉ cho phép người quản trị sử dụng tính năng này...</div>;
     }
 
-    if (!accessToken && !useAuthStore.getState().accessToken) {
+    const { accessToken, user } = useAuthStore.getState();
+
+    if (!accessToken) {
         return <Navigate to="/auth/login" replace />;
+    }
+
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+        return <Navigate to="/" replace />;
     }
 
     return <Outlet />;

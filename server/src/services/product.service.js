@@ -15,12 +15,13 @@ class ProductService {
 
         if (keyword) {
             where.title = {
-                contains: keyword
+                contains: keyword,
+                mode: 'insensitive'
             };
         }
 
         if (categoryId) {
-            where.categoryId = Number(categoryId);
+            where.categoryId = categoryId;
         }
 
         if (isActive !== undefined) {
@@ -75,7 +76,7 @@ class ProductService {
     async getProductById(productId) {
         const product = await prisma.product.findUnique({
             where: {
-                id: Number(productId)
+                id: productId
             },
             include: {
                 category: {
@@ -117,7 +118,7 @@ class ProductService {
 
         const category = await prisma.category.findFirst({
             where: {
-                id: Number(categoryId),
+                id: categoryId,
                 isActive: true
             }
         });
@@ -132,7 +133,7 @@ class ProductService {
             data: {
                 title,
                 slug,
-                categoryId: Number(categoryId),
+                categoryId,
                 author,
                 publisher,
                 isbn,
@@ -148,7 +149,7 @@ class ProductService {
     }
 
     async updateProduct(productId, data) {
-        const id = Number(productId);
+        const id = productId;
 
         const product = await prisma.product.findUnique({
             where: { id }
@@ -163,7 +164,7 @@ class ProductService {
         if (data.categoryId !== undefined) {
             const category = await prisma.category.findFirst({
                 where: {
-                    id: Number(data.categoryId),
+                    id: data.categoryId,
                     isActive: true
                 }
             });
@@ -172,7 +173,7 @@ class ProductService {
                 throw new AppError(404, 'Danh mục không tồn tại hoặc đã bị tắt');
             }
 
-            updateData.categoryId = Number(data.categoryId);
+            updateData.categoryId = data.categoryId;
         }
 
         if (data.title && data.title !== product.title) {
@@ -214,7 +215,7 @@ class ProductService {
     }
 
     async deleteProduct(productId) {
-        const id = Number(productId);
+        const id = productId;
 
         const product = await prisma.product.findUnique({
             where: { id }
