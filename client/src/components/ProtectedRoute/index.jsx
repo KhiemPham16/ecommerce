@@ -30,7 +30,7 @@ export default function ProtectedRoute({ allowedRoles = [] }) {
     }, [refresh, fetchMe]);
 
     if (starting || loading) {
-        return <div>Đang tải trang...</div>;
+        return <div>chỉ cho phép người quản trị sử dụng tính năng này...</div>;
     }
 
     const { accessToken, user } = useAuthStore.getState();
