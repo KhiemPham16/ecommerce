@@ -322,6 +322,86 @@ async function main() {
     }
 
     console.log('Seed orders completed');
+
+    const admin = await prisma.user.findUnique({
+        where: {
+            email: 'admin@bookstore.com'
+        }
+    });
+
+    if (!admin) {
+        throw new Error('Admin user not found');
+    }
+
+    const postSeeds = [
+        {
+            title: 'Top 10 cuốn sách nên đọc năm 2026',
+            slug: 'top-10-cuon-sach-nen-doc-2026',
+            dek: 'Những cuốn sách đáng đọc nhất năm 2026.',
+            excerpt: 'Gợi ý những cuốn sách phù hợp cho sinh viên, dân văn phòng và người mới bắt đầu đọc sách.',
+            bodyHtml: `
+            <h2>Top 10 cuốn sách nên đọc năm 2026</h2>
+            <p>Danh sách này phù hợp cho người muốn phát triển bản thân, học tập và nâng cấp tư duy.</p>
+            <p>Một số đầu sách nổi bật gồm Đắc Nhân Tâm, Atomic Habits, Clean Code và Nhà Giả Kim.</p>
+        `,
+            coverImageUrl: '/uploads/posts/books-2026.jpg',
+            readMinutes: 5,
+            featured: true,
+            publishedAt: new Date(),
+            status: 'PUBLISHED'
+        },
+        {
+            title: 'Clean Code có còn đáng đọc?',
+            slug: 'clean-code-co-con-dang-doc',
+            dek: 'Đánh giá Clean Code trong thời đại AI.',
+            excerpt: 'Clean Code vẫn là một cuốn sách nền tảng giúp lập trình viên viết code dễ đọc, dễ bảo trì hơn.',
+            bodyHtml: `
+            <h2>Clean Code có còn đáng đọc?</h2>
+            <p>Clean Code vẫn đáng đọc, đặc biệt với sinh viên IT và lập trình viên mới đi làm.</p>
+            <p>AI có thể sinh code nhanh, nhưng tư duy đặt tên biến, tách hàm và tổ chức module vẫn là kỹ năng lõi.</p>
+        `,
+            coverImageUrl: '/uploads/posts/clean-code.jpg',
+            readMinutes: 4,
+            featured: true,
+            publishedAt: new Date(),
+            status: 'PUBLISHED'
+        },
+        {
+            title: 'Atomic Habits và cách xây dựng thói quen học lập trình',
+            slug: 'atomic-habits-lap-trinh',
+            dek: 'Áp dụng Atomic Habits để học lập trình hiệu quả.',
+            excerpt: 'Học lập trình không cần học quá nhiều một ngày, quan trọng là duy trì thói quen đều đặn.',
+            bodyHtml: `
+            <h2>Atomic Habits và việc học lập trình</h2>
+            <p>Mỗi ngày code một ít, đọc tài liệu một ít và sửa lỗi một ít sẽ tạo ra tiến bộ lớn sau vài tháng.</p>
+            <p>Thói quen nhỏ nhưng đều đặn thường hiệu quả hơn việc học dồn trong vài ngày.</p>
+        `,
+            coverImageUrl: '/uploads/posts/atomic-habits.jpg',
+            readMinutes: 6,
+            featured: false,
+            publishedAt: new Date(),
+            status: 'PUBLISHED'
+        }
+    ];
+
+    for (const postData of postSeeds) {
+        await prisma.post.upsert({
+            where: {
+                slug: postData.slug
+            },
+            update: {
+                ...postData,
+                authorId: admin.id
+            },
+            create: {
+                ...postData,
+                authorId: admin.id
+            }
+        });
+    }
+
+    console.log('Seed posts completed');
+
     console.log('Seed completed');
 }
 

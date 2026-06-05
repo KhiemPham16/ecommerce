@@ -50,6 +50,17 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -76,12 +87,13 @@ model User {
   sessions Session[]
   address  Address?
   orders   Order[]
+  posts    Post[]
+
+  uploadedMedia Media[]
 
   emailVerifiedAt DateTime?
-
-  deletedAt DateTime?
-
-  lastLogin DateTime?
+  deletedAt       DateTime?
+  lastLogin       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -273,4 +285,90 @@ model PaymentMethod {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model BlogCategory {
+  id String @id @default(uuid())
+
+  name String @unique
+  slug String @unique
+
+  isActive Boolean @default(true)
+
+  posts PostBlogCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id String @id @default(uuid())
+
+  slug  String @unique
+  title String
+
+  dek     String @db.Text
+  excerpt String @db.Text
+
+  bodyHtml String @db.MediumText
+
+  coverImageUrl String @db.VarChar(2048)
+
+  readMinutes Int
+
+  featured Boolean @default(false)
+
+  publishedAt DateTime?
+
+  status PostStatus @default(DRAFT)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  categories PostBlogCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([status])
+}
+
+model PostBlogCategory {
+  postId     String
+  categoryId String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  category BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@id([postId, categoryId])
+  @@index([categoryId])
+}
+
+model Media {
+  id String @id @default(uuid())
+
+  fileName     String
+  originalName String
+
+  mimeType String
+  size     Int
+
+  url String @db.VarChar(2048)
+
+  type MediaType @default(IMAGE)
+
+  alt    String?
+  folder String?
+
+  uploadedById String?
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([uploadedById])
+  @@index([type])
 }
