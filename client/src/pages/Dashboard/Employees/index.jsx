@@ -1,27 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { formatDate, genderLabels, getImageUrl, roleLabels, staffRoles } from '~/lib/dashboardUtils';
 import { useAuthStore } from '~/stores/useAuthStore';
+import { useUserStore } from '~/stores/useUserStore';
 
+import EmployeeForm from './EmployeeForm';
 import styles from './DashboardEmployees.module.scss';
 
 const cx = classNames.bind(styles);
-
-const staffRoles = ['ADMIN', 'MANAGER', 'EMPLOYEE'];
-
-const roleLabels = {
-    ADMIN: 'Quản trị viên',
-    MANAGER: 'Quản lý',
-    EMPLOYEE: 'Nhân viên'
-};
-
-const genderLabels = {
-    MALE: 'Nam',
-    FEMALE: 'Nữ',
-    OTHER: 'Khác'
-};
 
 const initialFormData = {
     fullName: '',
@@ -33,65 +21,26 @@ const initialFormData = {
     avatarUrl: ''
 };
 
-const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) {
-        return '';
-    }
-
-    if (/^https?:\/\//i.test(avatarUrl)) {
-        return avatarUrl;
-    }
-
-    return `${import.meta.env.VITE_API_URL}${avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`}`;
-};
-
-const formatDate = (value) => {
-    if (!value) {
-        return '-';
-    }
-
-    return new Intl.DateTimeFormat('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(new Date(value));
-};
-
 export default function Employees() {
     const currentUser = useAuthStore((state) => state.user);
-    const [employees, setEmployees] = useState([]);
+    const { users, loading, saving, fetchUsers, createUser, updateUser, deleteUser } = useUserStore();
     const [keyword, setKeyword] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
 
-    const fetchEmployees = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/users');
-            const users = response.data?.data || [];
-            setEmployees(users.filter((user) => staffRoles.includes(user.role)));
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách nhân viên');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
-        fetchEmployees();
-    }, [fetchEmployees]);
+        fetchUsers();
+    }, [fetchUsers]);
+
+    const employees = useMemo(() => users.filter((user) => staffRoles.includes(user.role)), [users]);
 
     const filteredEmployees = useMemo(() => {
         const search = keyword.trim().toLowerCase();
 
         return employees.filter((employee) => {
             const matchesRole = roleFilter === 'all' || employee.role === roleFilter;
-
             const matchesKeyword =
                 !search ||
                 [employee.fullName, employee.email, employee.phone, employee.username]
@@ -163,24 +112,12 @@ export default function Employees() {
             payload.password = formData.password;
         }
 
-        try {
-            setSaving(true);
+        const success = editingEmployee
+            ? await updateUser(editingEmployee.id, payload, 'Cập nhật nhân viên thành công')
+            : await createUser(payload, 'Thêm nhân viên thành công');
 
-            if (editingEmployee) {
-                await api.patch(`/users/${editingEmployee.id}`, payload);
-                toast.success('Cập nhật nhân viên thành công');
-            } else {
-                await api.post('/users', payload);
-                toast.success('Thêm nhân viên thành công');
-            }
-
+        if (success) {
             closeModal();
-            fetchEmployees();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không lưu được nhân viên');
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -194,14 +131,7 @@ export default function Employees() {
             return;
         }
 
-        try {
-            await api.delete(`/users/${employee.id}`);
-            toast.success('Đã khóa tài khoản nhân viên');
-            fetchEmployees();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không khóa được tài khoản');
-        }
+        await deleteUser(employee.id, 'Đã khóa tài khoản nhân viên');
     };
 
     return (
@@ -227,11 +157,7 @@ export default function Employees() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select
-                    className={cx('select')}
-                    value={roleFilter}
-                    onChange={(event) => setRoleFilter(event.target.value)}
-                >
+                <select className={cx('select')} value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
                     <option value="all">Tất cả quyền</option>
                     {staffRoles.map((role) => (
                         <option key={role} value={role}>
@@ -289,7 +215,7 @@ export default function Employees() {
                                             <div className={cx('employeeCell')}>
                                                 <div className={cx('avatar')}>
                                                     {employee.avatarUrl ? (
-                                                        <img src={getAvatarUrl(employee.avatarUrl)} alt={employee.fullName} />
+                                                        <img src={getImageUrl(employee.avatarUrl)} alt={employee.fullName} />
                                                     ) : (
                                                         <span>{employee.fullName?.slice(0, 1) || '?'}</span>
                                                     )}
@@ -346,96 +272,15 @@ export default function Employees() {
                             </button>
                         </div>
 
-                        <form className={cx('form')} onSubmit={handleSubmit}>
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Họ tên
-                                    <input
-                                        name="fullName"
-                                        required
-                                        value={formData.fullName}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label>
-                                    Số điện thoại
-                                    <input
-                                        name="phone"
-                                        required
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                            </div>
-
-                            <label>
-                                Email
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    disabled={Boolean(editingEmployee)}
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            {!editingEmployee && (
-                                <label>
-                                    Mật khẩu tạm thời
-                                    <input
-                                        name="password"
-                                        type="password"
-                                        required
-                                        minLength="6"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        autoComplete="new-password"
-                                    />
-                                </label>
-                            )}
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Quyền
-                                    <select name="role" required value={formData.role} onChange={handleInputChange}>
-                                        {roleOptions.map((role) => (
-                                            <option key={role} value={role}>
-                                                {roleLabels[role]}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-                                <label>
-                                    Giới tính
-                                    <select name="gender" value={formData.gender} onChange={handleInputChange}>
-                                        <option value="">Chưa chọn</option>
-                                        <option value="MALE">Nam</option>
-                                        <option value="FEMALE">Nữ</option>
-                                        <option value="OTHER">Khác</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <label>
-                                Avatar URL
-                                <input
-                                    name="avatarUrl"
-                                    placeholder="/uploads/avatars/example.webp"
-                                    value={formData.avatarUrl}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            <div className={cx('modalActions')}>
-                                <button type="button" onClick={closeModal}>
-                                    Hủy
-                                </button>
-                                <button className={cx('primaryBtn')} type="submit" disabled={saving}>
-                                    {saving ? 'Đang lưu...' : 'Lưu'}
-                                </button>
-                            </div>
-                        </form>
+                        <EmployeeForm
+                            editingEmployee={editingEmployee}
+                            formData={formData}
+                            roleOptions={roleOptions}
+                            saving={saving}
+                            onChange={handleInputChange}
+                            onClose={closeModal}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             )}

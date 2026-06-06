@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { useProductStore } from '~/stores/useProductStore';
 
+import ProductForm from './ProductForm';
 import styles from './DashboardProducts.module.scss';
 
 const cx = classNames.bind(styles);
@@ -42,12 +42,19 @@ const getImageUrl = (thumbnail) => {
 };
 
 export default function Products() {
-    const [products, setProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const {
+        products,
+        categories,
+        loading,
+        saving,
+        fetchProducts,
+        fetchCategories,
+        createProduct,
+        updateProduct,
+        deleteProduct
+    } = useProductStore();
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
@@ -61,36 +68,13 @@ export default function Products() {
         [keyword, statusFilter]
     );
 
-    const fetchProducts = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/products', { params: productParams });
-            setProducts(response.data?.data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách sản phẩm');
-        } finally {
-            setLoading(false);
-        }
-    }, [productParams]);
+    useEffect(() => {
+        fetchProducts(productParams);
+    }, [fetchProducts, productParams]);
 
     useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await api.get('/categories');
-                setCategories(response.data?.data || []);
-            } catch (error) {
-                console.error(error);
-                toast.error(error?.response?.data?.message || 'Không tải được danh mục');
-            }
-        };
-
         fetchCategories();
-    }, []);
+    }, [fetchCategories]);
 
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -139,24 +123,12 @@ export default function Products() {
             stock: Number(formData.stock || 0)
         };
 
-        try {
-            setSaving(true);
+        const success = editingProduct
+            ? await updateProduct(editingProduct.id, payload, productParams)
+            : await createProduct(payload, productParams);
 
-            if (editingProduct) {
-                await api.patch(`/products/${editingProduct.id}`, payload);
-                toast.success('Cập nhật sản phẩm thành công');
-            } else {
-                await api.post('/products', payload);
-                toast.success('Tạo sản phẩm thành công');
-            }
-
+        if (success) {
             closeModal();
-            fetchProducts();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không lưu được sản phẩm');
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -165,14 +137,7 @@ export default function Products() {
             return;
         }
 
-        try {
-            await api.delete(`/products/${product.id}`);
-            toast.success('Xóa sản phẩm thành công');
-            fetchProducts();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không xóa được sản phẩm');
-        }
+        await deleteProduct(product.id, productParams);
     };
 
     return (
@@ -291,133 +256,15 @@ export default function Products() {
                             </button>
                         </div>
 
-                        <form className={cx('form')} onSubmit={handleSubmit}>
-                            <label>
-                                Tên sản phẩm
-                                <input
-                                    name="title"
-                                    required
-                                    value={formData.title}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            <label>
-                                Danh mục
-                                <select
-                                    name="categoryId"
-                                    required
-                                    value={formData.categoryId}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="">Chọn danh mục</option>
-                                    {categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Tác giả
-                                    <input
-                                        name="author"
-                                        required
-                                        value={formData.author}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label>
-                                    Nhà xuất bản
-                                    <input
-                                        name="publisher"
-                                        value={formData.publisher}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                            </div>
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Giá
-                                    <input
-                                        name="price"
-                                        type="number"
-                                        min="0"
-                                        required
-                                        value={formData.price}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label>
-                                    Tồn kho
-                                    <input
-                                        name="stock"
-                                        type="number"
-                                        min="0"
-                                        value={formData.stock}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                            </div>
-
-                            <label>
-                                ISBN
-                                <input name="isbn" value={formData.isbn} onChange={handleInputChange} />
-                            </label>
-
-                            <label>
-                                Ảnh đại diện
-                                <input
-                                    name="thumbnail"
-                                    placeholder="/uploads/products/example.jpg"
-                                    value={formData.thumbnail}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            <label>
-                                Mô tả
-                                <textarea
-                                    name="description"
-                                    rows="4"
-                                    value={formData.description}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            <div className={cx('checks')}>
-                                <label>
-                                    <input
-                                        name="isFeatured"
-                                        type="checkbox"
-                                        checked={formData.isFeatured}
-                                        onChange={handleInputChange}
-                                    />
-                                    Nổi bật
-                                </label>
-                                <label>
-                                    <input
-                                        name="isActive"
-                                        type="checkbox"
-                                        checked={formData.isActive}
-                                        onChange={handleInputChange}
-                                    />
-                                    Đang bán
-                                </label>
-                            </div>
-
-                            <div className={cx('modalActions')}>
-                                <button type="button" onClick={closeModal}>
-                                    Hủy
-                                </button>
-                                <button className={cx('primaryBtn')} type="submit" disabled={saving}>
-                                    {saving ? 'Đang lưu...' : 'Lưu'}
-                                </button>
-                            </div>
-                        </form>
+                        <ProductForm
+                            categories={categories}
+                            editingProduct={editingProduct}
+                            formData={formData}
+                            saving={saving}
+                            onChange={handleInputChange}
+                            onClose={closeModal}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             )}

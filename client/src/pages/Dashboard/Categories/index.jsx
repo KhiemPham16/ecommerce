@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { useCategoryStore } from '~/stores/useCategoryStore';
 
+import CategoryForm from './CategoryForm';
 import styles from './DashboardCategories.module.scss';
 
 const cx = classNames.bind(styles);
@@ -26,27 +26,21 @@ const formatDate = (value) => {
 };
 
 export default function Categories() {
-    const [categories, setCategories] = useState([]);
+    const {
+        categories,
+        loading,
+        saving,
+        fetchCategories,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+        toggleCategoryStatus
+    } = useCategoryStore();
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
-
-    const fetchCategories = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/categories');
-            setCategories(response.data?.data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách danh mục');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
         fetchCategories();
@@ -103,24 +97,12 @@ export default function Categories() {
             isActive: formData.isActive
         };
 
-        try {
-            setSaving(true);
+        const success = editingCategory
+            ? await updateCategory(editingCategory.id, payload)
+            : await createCategory({ name: payload.name });
 
-            if (editingCategory) {
-                await api.patch(`/categories/${editingCategory.id}`, payload);
-                toast.success('Cập nhật danh mục thành công');
-            } else {
-                await api.post('/categories', { name: payload.name });
-                toast.success('Thêm danh mục thành công');
-            }
-
+        if (success) {
             closeModal();
-            fetchCategories();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không lưu được danh mục');
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -129,27 +111,11 @@ export default function Categories() {
             return;
         }
 
-        try {
-            await api.delete(`/categories/${category.id}`);
-            toast.success('Xóa danh mục thành công');
-            fetchCategories();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không xóa được danh mục');
-        }
+        await deleteCategory(category.id);
     };
 
     const handleToggleStatus = async (category) => {
-        try {
-            await api.patch(`/categories/${category.id}`, {
-                isActive: !category.isActive
-            });
-            toast.success(category.isActive ? 'Đã tắt danh mục' : 'Đã bật danh mục');
-            fetchCategories();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không cập nhật được trạng thái');
-        }
+        await toggleCategoryStatus(category);
     };
 
     return (
@@ -278,38 +244,14 @@ export default function Categories() {
                             </button>
                         </div>
 
-                        <form className={cx('form')} onSubmit={handleSubmit}>
-                            <label>
-                                Tên danh mục
-                                <input
-                                    name="name"
-                                    required
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            {editingCategory && (
-                                <label className={cx('checkLabel')}>
-                                    <input
-                                        name="isActive"
-                                        type="checkbox"
-                                        checked={formData.isActive}
-                                        onChange={handleInputChange}
-                                    />
-                                    Đang hoạt động
-                                </label>
-                            )}
-
-                            <div className={cx('modalActions')}>
-                                <button type="button" onClick={closeModal}>
-                                    Hủy
-                                </button>
-                                <button className={cx('primaryBtn')} type="submit" disabled={saving}>
-                                    {saving ? 'Đang lưu...' : 'Lưu'}
-                                </button>
-                            </div>
-                        </form>
+                        <CategoryForm
+                            editingCategory={editingCategory}
+                            formData={formData}
+                            saving={saving}
+                            onChange={handleInputChange}
+                            onClose={closeModal}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             )}

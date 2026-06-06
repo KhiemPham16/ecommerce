@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { useDashboardStore } from '~/stores/useDashboardStore';
 
 import pageStyles from './DashboardPage.module.scss';
 import styles from './Dashboard.module.scss';
@@ -53,35 +52,11 @@ const getSalesPerson = (order) =>
     null;
 
 export default function Dashboard() {
-    const [orders, setOrders] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-
-    const fetchDashboardData = useCallback(async () => {
-        try {
-            setLoading(true);
-
-            const [ordersRes, productsRes, usersRes] = await Promise.all([
-                api.get('/orders'),
-                api.get('/products', { params: { limit: 100 } }),
-                api.get('/users')
-            ]);
-
-            setOrders(ordersRes.data?.data || []);
-            setProducts(productsRes.data?.data || []);
-            setUsers(usersRes.data?.data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được dữ liệu tổng quan');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const { orders, products, users, loading, fetchOverview } = useDashboardStore();
 
     useEffect(() => {
-        fetchDashboardData();
-    }, [fetchDashboardData]);
+        fetchOverview();
+    }, [fetchOverview]);
 
     const stats = useMemo(() => {
         const todayKey = toDateKey(new Date());
@@ -258,7 +233,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className={cp('actions')}>
-                    <button className={cp('secondaryBtn')} type="button" onClick={fetchDashboardData} disabled={loading}>
+                    <button className={cp('secondaryBtn')} type="button" onClick={fetchOverview} disabled={loading}>
                         {loading ? 'Đang tải...' : 'Làm mới'}
                     </button>
                 </div>
