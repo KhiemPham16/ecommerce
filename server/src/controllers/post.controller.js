@@ -14,6 +14,19 @@ class PostController {
         }
     }
 
+    async getAdminPosts(req, res, next) {
+        try {
+            const posts = await postService.getAdminPosts();
+
+            res.json({
+                success: true,
+                data: posts
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async show(req, res, next) {
         try {
             const post = await postService.getPostBySlug(req.params.slug);

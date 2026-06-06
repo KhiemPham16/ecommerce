@@ -8,6 +8,9 @@ const { authenticate } = require('~/middlewares/authenticate');
 const { authorize } = require('~/middlewares/rbac');
 
 router.get('/', postController.index);
+
+router.get('/admin', authenticate, authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), postController.getAdminPosts);
+
 router.get('/:slug', postController.show);
 
 router.post('/', authenticate, authorize('ADMIN', 'MANAGER'), postController.store);
