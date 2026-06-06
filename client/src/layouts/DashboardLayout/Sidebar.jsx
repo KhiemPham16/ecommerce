@@ -30,6 +30,7 @@ export default function Sidebar() {
         if (location.pathname.startsWith('/dashboard/products')) return 'Quản lý sản phẩm';
         if (location.pathname.startsWith('/dashboard/categories')) return 'Quản lý danh mục';
         if (location.pathname.startsWith('/dashboard/orders')) return 'Quản lý đơn hàng';
+        if (location.pathname.startsWith('/dashboard/blogs')) return 'Quản lý bài viết';
         return 'Tổng quan';
     }, [location.pathname]);
 
@@ -53,6 +54,7 @@ export default function Sidebar() {
                 <SidebarLink to="/dashboard/categories">Danh mục</SidebarLink>
                 <SidebarLink to="/dashboard/customers">Khách hàng</SidebarLink>
                 <SidebarLink to="/dashboard/orders">Đơn hàng</SidebarLink>
+                <SidebarLink to="/dashboard/blogs">Bài viết</SidebarLink>
             </nav>
 
             <div className={cx('sidebarFooter')}>

@@ -24,11 +24,7 @@ const publicAuthRoutes = [
     '/auth/refresh',
     '/auth/verify-email',
     '/auth/forgot-password',
-    '/auth/reset-password',
-    '/',
-    '/products',
-    '/products/:id',
-    'contacts'
+    '/auth/reset-password'
 ];
 
 axiosInstance.interceptors.response.use(
@@ -41,7 +37,10 @@ axiosInstance.interceptors.response.use(
             throw err;
         }
 
-        const isPublicAuthRoute = publicAuthRoutes.some((route) => original.url?.includes(route));
+        const requestPath = original.url?.split('?')[0] || '';
+        const isPublicAuthRoute = publicAuthRoutes.some(
+            (route) => requestPath === route || requestPath.startsWith(`${route}/`)
+        );
 
         if (isPublicAuthRoute) {
             throw err;

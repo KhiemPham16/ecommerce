@@ -39,10 +39,11 @@ export const authService = {
         return res.data;
     },
 
-    changePassword: async (oldPassword, newPassword) => {
+    changePassword: async (currentPassword, newPassword, confirmNewPassword = newPassword) => {
         const res = await api.patch('/auth/change-password', {
-            oldPassword,
-            newPassword
+            currentPassword,
+            newPassword,
+            confirmNewPassword
         });
 
         return res.data;
