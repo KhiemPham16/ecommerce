@@ -22,16 +22,18 @@ class MediaService {
             type = 'VIDEO';
         }
 
+        const safeFolder = folder || 'common';
+
         return prisma.media.create({
             data: {
                 fileName: file.filename,
                 originalName: file.originalname,
                 mimeType: file.mimetype,
                 size: file.size,
-                url: `/uploads/${folder || 'media'}/${file.filename}`,
+                url: `/uploads/media/${safeFolder}/${file.filename}`,
                 type,
                 alt,
-                folder: folder || 'media',
+                folder: safeFolder,
                 uploadedById: userId
             }
         });
@@ -110,7 +112,7 @@ class MediaService {
             throw new AppError(404, 'Media không tồn tại');
         }
 
-        const filePath = path.join(process.cwd(), 'src', 'public', media.url);
+        const filePath = path.join(process.cwd(), media.url.replace(/^\/+/, ''));
 
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
