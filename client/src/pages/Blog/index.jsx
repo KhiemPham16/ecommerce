@@ -1,73 +1,115 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
+import { toast } from 'sonner';
+import { FaSearch } from 'react-icons/fa';
+
+import { formatDate, getImageUrl, getPostId, getPostList } from '~/lib/dashboardUtils';
+import { postService } from '~/services/postService';
+
 import styles from './Blog.module.scss';
 
 const cx = classNames.bind(styles);
 
-const DUMMY_POSTS = [
-  {
-    id: 'top-10-sach-tu-duy',
-    title: 'Top 10 cuốn sách tư duy thay đổi cuộc đời bạn trong năm 2026',
-    desc: 'Khám phá những tựa sách giúp bạn thay đổi tư duy, rèn luyện kỹ năng và bứt phá mạnh mẽ hơn trong công việc và cuộc sống...',
-    date: '03/06/2026',
-    thumb: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600&auto=format&fit=crop',
-    category: 'Tư duy - Kỹ năng'
-  },
-  {
-    id: 'duy-tri-thoi-quen-doc-sach',
-    title: 'Làm thế nào để duy trì thói quen đọc sách 30 phút mỗi ngày?',
-    desc: 'Đọc sách là một thói quen tốt nhưng không phải ai cũng biết cách duy trì nó giữa nhịp sống bận rộn hiện đại...',
-    date: '01/06/2026',
-    thumb: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?q=80&w=600&auto=format&fit=crop',
-    category: 'Chia sẻ'
-  },
-  {
-    id: 'review-sach-kinh-te-vi-mo',
-    title: 'Review sách Kinh Tế Vĩ Mô: Những bài học đắt giá cho khởi nghiệp',
-    desc: 'Cuốn sách cung cấp cái nhìn toàn diện về bức tranh kinh tế toàn cầu và những ứng dụng thực tế cực kỳ đắt giá...',
-    date: '28/05/2026',
-    thumb: 'https://images.unsplash.com/photo-1592492159418-09f31333c516?q=80&w=600&auto=format&fit=crop',
-    category: 'Sách Kinh Tế'
-  }
-];
-
 export default function Blog() {
-  const navigate = useNavigate();
+    const [posts, setPosts] = useState([]);
+    const [keyword, setKeyword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  return (
-    <div className={cx('blog-wrapper')}>
-      <div className={cx('container')}>
-        {/* Tiêu đề trang */}
-        <div className={cx('blog-header')}>
-          <h1>Bài Viết Mới Nhất</h1>
-          <p>Cập nhật tin tức, review sách và những kiến thức bổ ích mỗi ngày.</p>
-        </div>
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                setLoading(true);
+                const response = await postService.getPublicPosts();
+                setPosts(
+                    getPostList(response).sort(
+                        (a, b) =>
+                            new Date(b.publishedAt || b.createdAt || 0).getTime() -
+                            new Date(a.publishedAt || a.createdAt || 0).getTime()
+                    )
+                );
+            } catch (error) {
+                console.error(error);
+                toast.error(error?.response?.data?.message || 'Không tải được danh sách bài viết');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        <div className={cx('blog-grid')}>
-          {DUMMY_POSTS.map((post) => (
-            <article key={post.id} className={cx('blog-card')}>
-              <div className={cx('thumb')}>
-                <img src={post.thumb} alt={post.title} />
-                <span className={cx('category-tag')}>{post.category}</span>
-              </div>
-              <div className={cx('info')}>
-                <span className={cx('date')}>{post.date}</span>
-                <h2 className={cx('title')}>{post.title}</h2>
-                <p className={cx('desc')}>{post.desc}</p>
-                
-            
-                <button 
-                  onClick={() => navigate(`/blog/${post.id}`)} 
-                  className={cx('btn-readmore')}
->
-                  Đọc thêm &rarr;
-                </button>
-              </div>
-            </article>
-          ))}
+        fetchPosts();
+    }, []);
+
+    const filteredPosts = useMemo(() => {
+        const search = keyword.trim().toLowerCase();
+
+        if (!search) {
+            return posts;
+        }
+
+        return posts.filter((post) =>
+            [post.title, post.excerpt, post.dek, post.slug, post.author?.fullName]
+                .filter(Boolean)
+                .some((value) => value.toLowerCase().includes(search))
+        );
+    }, [keyword, posts]);
+
+    return (
+        <div className={cx('blog-wrapper')}>
+            <div className={cx('container')}>
+                <div className={cx('blogHero')}>
+                    <div className={cx('blog-header')}>
+                        <span>Tin tức BookStory</span>
+                        <h1>Bài viết mới nhất</h1>
+                        <p>Cập nhật tin tức, review sách và những kiến thức hữu ích từ hệ thống blog.</p>
+                    </div>
+
+                    <div className={cx('toolbar')}>
+                        <FaSearch className={cx('searchIcon')} />
+                        <input
+                            type="search"
+                            placeholder="Tìm bài viết theo tiêu đề, mô tả, tác giả"
+                            value={keyword}
+                            onChange={(event) => setKeyword(event.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className={cx('empty')}>Đang tải danh sách bài viết...</div>
+                ) : filteredPosts.length === 0 ? (
+                    <div className={cx('empty')}>Chưa có bài viết phù hợp.</div>
+                ) : (
+                    <div className={cx('blog-grid')}>
+                        {filteredPosts.map((post) => {
+                            const postId = getPostId(post);
+                            const category = post.categories?.[0]?.category?.name || 'BookStory';
+
+                            return (
+                                <article key={postId} className={cx('blog-card')}>
+                                    <Link className={cx('thumb')} to={`/blog/${post.slug}`}>
+                                        {post.coverImageUrl ? (
+                                            <img src={getImageUrl(post.coverImageUrl)} alt={post.title} />
+                                        ) : (
+                                            <span className={cx('thumb-placeholder')}>{post.title?.slice(0, 1) || '?'}</span>
+                                        )}
+                                        <span className={cx('category-tag')}>{category}</span>
+                                    </Link>
+                                    <div className={cx('info')}>
+                                        <span className={cx('date')}>{formatDate(post.publishedAt || post.createdAt)}</span>
+                                        <Link className={cx('title')} to={`/blog/${post.slug}`}>
+                                            {post.title}
+                                        </Link>
+                                        <p className={cx('desc')}>{post.excerpt || post.dek || 'Bài viết từ BookStory.'}</p>
+                                        <Link to={`/blog/${post.slug}`} className={cx('btn-readmore')}>
+                                            Đọc thêm &rarr;
+                                        </Link>
+                                    </div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

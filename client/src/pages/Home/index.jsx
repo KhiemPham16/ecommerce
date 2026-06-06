@@ -206,7 +206,7 @@ export default function Home() {
                                     <span className={cx('blog-date')}>{formatDate(post.publishedAt || post.createdAt)}</span>
                                     <h3>{post.title}</h3>
                                     <p>{post.excerpt || post.dek || 'Bài viết từ BookStory.'}</p>
-                                    <Link to="/blog" className={cx('blog-link')}>
+                                    <Link to={`/blog/${post.slug}`} className={cx('blog-link')}>
                                         Đọc tiếp
                                     </Link>
                                 </div>

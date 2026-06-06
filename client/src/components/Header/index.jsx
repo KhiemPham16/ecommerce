@@ -56,15 +56,8 @@ export default function Header() {
 
     const handleSearch = (event) => {
         event.preventDefault();
-
         const search = keyword.trim();
-
-        if (!search) {
-            navigate('/category');
-            return;
-        }
-
-        navigate(`/category?search=${encodeURIComponent(search)}`);
+        navigate(search ? `/category?search=${encodeURIComponent(search)}` : '/category');
     };
 
     const handleLogout = async () => {
@@ -77,7 +70,7 @@ export default function Header() {
             <div className={cx('headerTop')}>
                 <div className={cx('headerTopLeft')}>
                     <Link className={cx('logo')} to="/">
-                        Logo
+                        Book<span className={cx('logoAccent')}>STORY</span>
                     </Link>
 
                     <form className={cx('search')} onSubmit={handleSearch}>
