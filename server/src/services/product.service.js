@@ -15,8 +15,7 @@ class ProductService {
 
         if (keyword) {
             where.title = {
-                contains: keyword,
-                mode: 'insensitive'
+                contains: keyword
             };
         }
 

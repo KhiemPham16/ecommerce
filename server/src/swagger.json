@@ -1577,6 +1577,379 @@
                     }
                 }
             }
+        },
+        "/posts": {
+            "get": {
+                "summary": "Get published posts",
+                "tags": ["Posts"],
+                "responses": {
+                    "200": {
+                        "description": "Get posts successfully"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create post",
+                "tags": ["Posts"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["title", "dek", "excerpt", "bodyHtml", "coverImageUrl", "readMinutes"],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Top 5 cuốn sách lập trình nên đọc"
+                                    },
+                                    "dek": {
+                                        "type": "string",
+                                        "example": "Gợi ý sách lập trình phù hợp cho sinh viên IT"
+                                    },
+                                    "excerpt": {
+                                        "type": "string",
+                                        "example": "Danh sách các cuốn sách giúp cải thiện tư duy lập trình."
+                                    },
+                                    "bodyHtml": {
+                                        "type": "string",
+                                        "example": "<p>Clean Code là một trong những cuốn sách kinh điển...</p>"
+                                    },
+                                    "coverImageUrl": {
+                                        "type": "string",
+                                        "example": "/uploads/media/posts/book-cover.webp"
+                                    },
+                                    "readMinutes": {
+                                        "type": "number",
+                                        "example": 5
+                                    },
+                                    "featured": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": ["DRAFT", "PUBLISHED"],
+                                        "example": "PUBLISHED"
+                                    },
+                                    "categoryIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": ["550e8400-e29b-41d4-a716-446655440000"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Create post successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/posts/{slug}": {
+            "parameters": [
+                {
+                    "name": "slug",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "example": "top-5-cuon-sach-lap-trinh-nen-doc"
+                }
+            ],
+            "get": {
+                "summary": "Get post by slug",
+                "tags": ["Posts"],
+                "responses": {
+                    "200": {
+                        "description": "Get post successfully"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/posts/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                }
+            ],
+            "patch": {
+                "summary": "Update post",
+                "tags": ["Posts"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Top 10 cuốn sách lập trình nên đọc"
+                                    },
+                                    "dek": {
+                                        "type": "string",
+                                        "example": "Cập nhật danh sách sách lập trình đáng đọc"
+                                    },
+                                    "excerpt": {
+                                        "type": "string",
+                                        "example": "Các cuốn sách giúp sinh viên IT cải thiện kỹ năng."
+                                    },
+                                    "bodyHtml": {
+                                        "type": "string",
+                                        "example": "<p>Nội dung bài viết đã cập nhật...</p>"
+                                    },
+                                    "coverImageUrl": {
+                                        "type": "string",
+                                        "example": "/uploads/media/posts/book-cover.webp"
+                                    },
+                                    "readMinutes": {
+                                        "type": "number",
+                                        "example": 7
+                                    },
+                                    "featured": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": ["DRAFT", "PUBLISHED"],
+                                        "example": "PUBLISHED"
+                                    },
+                                    "categoryIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": ["550e8400-e29b-41d4-a716-446655440000"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update post successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete post",
+                "tags": ["Posts"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete post successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        },
+        "/media/upload": {
+            "post": {
+                "summary": "Upload media",
+                "tags": ["Media"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["file"],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "alt": {
+                                        "type": "string",
+                                        "example": "Ảnh bìa sản phẩm"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "products"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Upload media successfully"
+                    },
+                    "400": {
+                        "description": "Invalid file"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/media": {
+            "get": {
+                "summary": "Get media list",
+                "tags": ["Media"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get media successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/media/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                }
+            ],
+            "get": {
+                "summary": "Get media by id",
+                "tags": ["Media"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get media successfully"
+                    },
+                    "404": {
+                        "description": "Media not found"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update media",
+                "tags": ["Media"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "alt": {
+                                        "type": "string",
+                                        "example": "Ảnh bìa Clean Code"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "products"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update media successfully"
+                    },
+                    "404": {
+                        "description": "Media not found"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete media",
+                "tags": ["Media"],
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete media successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Media not found"
+                    }
+                }
+            }
         }
     },
     "components": {
