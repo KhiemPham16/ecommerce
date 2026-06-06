@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import Contact from './pages/Contact';
 import AuthLayout from './pages/Auth';
 import Login from './pages/Auth/Login';
@@ -26,6 +27,7 @@ import Categories from '~/pages/Dashboard/Categories';
 import Orders from '~/pages/Dashboard/Orders';
 import Blogs from '~/pages/Dashboard/Blogs';
 import Media from '~/pages/Dashboard/Media';
+import Coupons from '~/pages/Dashboard/Coupons';
 import ProductDetails from './pages/ProductDetails';
 
 export default function App() {
@@ -34,6 +36,7 @@ export default function App() {
             <Route element={<SiteLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/category" element={<Category />} />
                 <Route path="/cart" element={<ShoppingCart />} />
@@ -64,6 +67,7 @@ export default function App() {
                     <Route path="orders" element={<Orders />} />
                     <Route path="blogs" element={<Blogs />} />
                     <Route path="media" element={<Media />} />
+                    <Route path="coupons" element={<Coupons />} />
                 </Route>
             </Route>
         </Routes>
