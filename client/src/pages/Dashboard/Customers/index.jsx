@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { formatDate, formatMoney, genderLabels, getImageUrl, orderStatusLabels, paymentStatusLabels } from '~/lib/dashboardUtils';
+import { useOrderStore } from '~/stores/useOrderStore';
+import { useUserStore } from '~/stores/useUserStore';
 
+import CustomerForm from './CustomerForm';
 import styles from './DashboardCustomers.module.scss';
 
 const cx = classNames.bind(styles);
@@ -17,88 +19,21 @@ const initialFormData = {
     avatarUrl: ''
 };
 
-const genderLabels = {
-    MALE: 'Nam',
-    FEMALE: 'Nữ',
-    OTHER: 'Khác'
-};
-
-const orderStatusLabels = {
-    PENDING: 'Chờ xử lý',
-    CONFIRMED: 'Đã xác nhận',
-    SHIPPING: 'Đang giao',
-    COMPLETED: 'Hoàn tất',
-    CANCELLED: 'Đã hủy'
-};
-
-const paymentStatusLabels = {
-    UNPAID: 'Chưa thanh toán',
-    PAID: 'Đã thanh toán',
-    FAILED: 'Thất bại',
-    REFUNDED: 'Hoàn tiền'
-};
-
-const formatDate = (value) => {
-    if (!value) {
-        return '-';
-    }
-
-    return new Intl.DateTimeFormat('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    }).format(new Date(value));
-};
-
-const formatMoney = (value) =>
-    new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        maximumFractionDigits: 0
-    }).format(Number(value || 0));
-
-const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) {
-        return '';
-    }
-
-    if (/^https?:\/\//i.test(avatarUrl)) {
-        return avatarUrl;
-    }
-
-    return `${import.meta.env.VITE_API_URL}${avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`}`;
-};
-
 export default function Customers() {
-    const [customers, setCustomers] = useState([]);
-    const [orders, setOrders] = useState([]);
+    const { users, loading, saving, fetchUsers, createUser, updateUser } = useUserStore();
+    const { orders, loading: ordersLoading, fetchOrders } = useOrderStore();
     const [keyword, setKeyword] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [ordersLoading, setOrdersLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [historyCustomer, setHistoryCustomer] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
 
-    const fetchCustomers = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/users');
-            const users = response.data?.data || [];
-            setCustomers(users.filter((user) => user.role === 'CUSTOMER'));
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách khách hàng');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
-        fetchCustomers();
-    }, [fetchCustomers]);
+        fetchUsers();
+    }, [fetchUsers]);
+
+    const customers = useMemo(() => users.filter((user) => user.role === 'CUSTOMER'), [users]);
 
     const filteredCustomers = useMemo(() => {
         const search = keyword.trim().toLowerCase();
@@ -180,45 +115,22 @@ export default function Customers() {
             payload.password = formData.password;
         }
 
-        try {
-            setSaving(true);
+        const success = editingCustomer
+            ? await updateUser(editingCustomer.id, payload, 'Cập nhật khách hàng thành công')
+            : await createUser(payload, 'Thêm khách hàng thành công');
 
-            if (editingCustomer) {
-                await api.patch(`/users/${editingCustomer.id}`, payload);
-                toast.success('Cập nhật khách hàng thành công');
-            } else {
-                await api.post('/users', payload);
-                toast.success('Thêm khách hàng thành công');
-            }
-
+        if (success) {
             closeModal();
-            fetchCustomers();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không lưu được khách hàng');
-        } finally {
-            setSaving(false);
         }
     };
 
     const openHistoryModal = async (customer) => {
         setHistoryCustomer(customer);
-
-        try {
-            setOrdersLoading(true);
-            const response = await api.get('/orders');
-            setOrders(response.data?.data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được lịch sử mua hàng');
-        } finally {
-            setOrdersLoading(false);
-        }
+        await fetchOrders();
     };
 
     const closeHistoryModal = () => {
         setHistoryCustomer(null);
-        setOrders([]);
     };
 
     return (
@@ -242,11 +154,7 @@ export default function Customers() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select
-                    className={cx('select')}
-                    value={genderFilter}
-                    onChange={(event) => setGenderFilter(event.target.value)}
-                >
+                <select className={cx('select')} value={genderFilter} onChange={(event) => setGenderFilter(event.target.value)}>
                     <option value="all">Tất cả giới tính</option>
                     <option value="MALE">Nam</option>
                     <option value="FEMALE">Nữ</option>
@@ -302,7 +210,7 @@ export default function Customers() {
                                             <div className={cx('customerCell')}>
                                                 <div className={cx('avatar')}>
                                                     {customer.avatarUrl ? (
-                                                        <img src={getAvatarUrl(customer.avatarUrl)} alt={customer.fullName} />
+                                                        <img src={getImageUrl(customer.avatarUrl)} alt={customer.fullName} />
                                                     ) : (
                                                         <span>{customer.fullName?.slice(0, 1) || '?'}</span>
                                                     )}
@@ -350,85 +258,14 @@ export default function Customers() {
                             </button>
                         </div>
 
-                        <form className={cx('form')} onSubmit={handleSubmit}>
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Họ tên
-                                    <input
-                                        name="fullName"
-                                        required
-                                        value={formData.fullName}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label>
-                                    Số điện thoại
-                                    <input
-                                        name="phone"
-                                        required
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                            </div>
-
-                            <label>
-                                Email
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    disabled={Boolean(editingCustomer)}
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            {!editingCustomer && (
-                                <label>
-                                    Mật khẩu tạm thời
-                                    <input
-                                        name="password"
-                                        type="password"
-                                        required
-                                        minLength="6"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        autoComplete="new-password"
-                                    />
-                                </label>
-                            )}
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Giới tính
-                                    <select name="gender" value={formData.gender} onChange={handleInputChange}>
-                                        <option value="">Chưa chọn</option>
-                                        <option value="MALE">Nam</option>
-                                        <option value="FEMALE">Nữ</option>
-                                        <option value="OTHER">Khác</option>
-                                    </select>
-                                </label>
-                                <label>
-                                    Avatar URL
-                                    <input
-                                        name="avatarUrl"
-                                        placeholder="/uploads/avatars/example.webp"
-                                        value={formData.avatarUrl}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                            </div>
-
-                            <div className={cx('modalActions')}>
-                                <button type="button" onClick={closeModal}>
-                                    Hủy
-                                </button>
-                                <button className={cx('primaryBtn')} type="submit" disabled={saving}>
-                                    {saving ? 'Đang lưu...' : 'Lưu'}
-                                </button>
-                            </div>
-                        </form>
+                        <CustomerForm
+                            editingCustomer={editingCustomer}
+                            formData={formData}
+                            saving={saving}
+                            onChange={handleInputChange}
+                            onClose={closeModal}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             )}
@@ -456,11 +293,7 @@ export default function Customers() {
                                 <span>Tổng giá trị</span>
                             </div>
                             <div>
-                                <strong>
-                                    {
-                                        customerOrders.filter((order) => order.status === 'COMPLETED').length
-                                    }
-                                </strong>
+                                <strong>{customerOrders.filter((order) => order.status === 'COMPLETED').length}</strong>
                                 <span>Hoàn tất</span>
                             </div>
                         </div>
@@ -492,7 +325,7 @@ export default function Customers() {
                                                 <div className={cx('items')}>
                                                     {order.items.map((item) => (
                                                         <span key={item.id}>
-                                                            {item.title} × {item.quantity}
+                                                            {item.title} x {item.quantity}
                                                         </span>
                                                     ))}
                                                 </div>

@@ -197,9 +197,15 @@
     border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 8px;
     background: #fff;
+    color: rgba(0, 0, 0, 0.72);
     padding: 8px 10px;
     font-weight: 800;
     cursor: pointer;
+}
+
+.modalActions .primaryBtn {
+    background: #2a83e9;
+    color: #fff;
 }
 
 .rowActions button:disabled {

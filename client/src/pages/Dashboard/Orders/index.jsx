@@ -1,50 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import { formatDate, formatMoney, orderStatusLabels, paymentStatusLabels } from '~/lib/dashboardUtils';
+import { useOrderStore } from '~/stores/useOrderStore';
 
 import styles from './DashboardOrders.module.scss';
 
 const cx = classNames.bind(styles);
 
 const orderStatuses = ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED'];
-
-const statusLabels = {
-    PENDING: 'Chờ xác nhận',
-    CONFIRMED: 'Đang xử lý',
-    SHIPPING: 'Đang giao hàng',
-    COMPLETED: 'Hoàn thành',
-    CANCELLED: 'Đã hủy'
-};
-
-const paymentStatusLabels = {
-    UNPAID: 'Chưa thanh toán',
-    PAID: 'Đã thanh toán',
-    FAILED: 'Thất bại',
-    REFUNDED: 'Hoàn tiền'
-};
-
-const formatMoney = (value) =>
-    new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-        maximumFractionDigits: 0
-    }).format(Number(value || 0));
-
-const formatDate = (value) => {
-    if (!value) {
-        return '-';
-    }
-
-    return new Intl.DateTimeFormat('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(new Date(value));
-};
 
 const getNextStatus = (status) => {
     if (status === 'PENDING') {
@@ -63,25 +27,10 @@ const getNextStatus = (status) => {
 };
 
 export default function Orders() {
-    const [orders, setOrders] = useState([]);
+    const { orders, loading, updatingId, fetchOrders, updateOrderStatus } = useOrderStore();
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [updatingId, setUpdatingId] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
-
-    const fetchOrders = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/orders');
-            setOrders(response.data?.data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách đơn hàng');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
         fetchOrders();
@@ -117,7 +66,7 @@ export default function Orders() {
         [orders]
     );
 
-    const updateOrderStatus = async (order, status) => {
+    const handleUpdateOrderStatus = async (order, status) => {
         if (!status || order.status === status) {
             return;
         }
@@ -126,24 +75,10 @@ export default function Orders() {
             return;
         }
 
-        try {
-            setUpdatingId(order.id);
-            const response = await api.patch(`/orders/${order.id}/status`, { status });
-            const updatedOrder = response.data?.data;
+        const success = await updateOrderStatus(order, status);
 
-            setOrders((current) =>
-                current.map((item) => (item.id === order.id ? { ...item, ...updatedOrder, user: item.user, address: item.address } : item))
-            );
-            setSelectedOrder((current) =>
-                current?.id === order.id ? { ...current, ...updatedOrder, user: current.user, address: current.address } : current
-            );
-
-            toast.success(`Đã chuyển đơn hàng sang "${statusLabels[status]}"`);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không cập nhật được trạng thái đơn hàng');
-        } finally {
-            setUpdatingId(null);
+        if (success) {
+            setSelectedOrder((current) => (current?.id === order.id ? { ...current, status } : current));
         }
     };
 
@@ -174,15 +109,11 @@ export default function Orders() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select
-                    className={cx('select')}
-                    value={statusFilter}
-                    onChange={(event) => setStatusFilter(event.target.value)}
-                >
+                <select className={cx('select')} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
                     <option value="all">Tất cả trạng thái</option>
                     {orderStatuses.map((status) => (
                         <option key={status} value={status}>
-                            {statusLabels[status]}
+                            {orderStatusLabels[status]}
                         </option>
                     ))}
                 </select>
@@ -249,10 +180,10 @@ export default function Orders() {
                                             <td>{paymentStatusLabels[order.paymentStatus] || order.paymentStatus}</td>
                                             <td>
                                                 <span className={cx('badge', order.status.toLowerCase())}>
-                                                    {statusLabels[order.status] || order.status}
+                                                    {orderStatusLabels[order.status] || order.status}
                                                 </span>
                                             </td>
-                                            <td>{formatDate(order.createdAt)}</td>
+                                            <td>{formatDate(order.createdAt, { hour: '2-digit', minute: '2-digit' })}</td>
                                             <td>
                                                 <div className={cx('rowActions')}>
                                                     <button type="button" onClick={() => openDetailModal(order)}>
@@ -262,9 +193,9 @@ export default function Orders() {
                                                         <button
                                                             type="button"
                                                             disabled={updatingId === order.id}
-                                                            onClick={() => updateOrderStatus(order, nextStatus)}
+                                                            onClick={() => handleUpdateOrderStatus(order, nextStatus)}
                                                         >
-                                                            {order.status === 'PENDING' ? 'Xác nhận' : statusLabels[nextStatus]}
+                                                            {order.status === 'PENDING' ? 'Xác nhận' : orderStatusLabels[nextStatus]}
                                                         </button>
                                                     )}
                                                     {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
@@ -272,7 +203,7 @@ export default function Orders() {
                                                             className={cx('danger')}
                                                             type="button"
                                                             disabled={updatingId === order.id}
-                                                            onClick={() => updateOrderStatus(order, 'CANCELLED')}
+                                                            onClick={() => handleUpdateOrderStatus(order, 'CANCELLED')}
                                                         >
                                                             Hủy
                                                         </button>
@@ -294,7 +225,7 @@ export default function Orders() {
                         <div className={cx('modalHeader')}>
                             <div>
                                 <h2>Chi tiết đơn hàng #{selectedOrder.id.slice(0, 8)}</h2>
-                                <span>{formatDate(selectedOrder.createdAt)}</span>
+                                <span>{formatDate(selectedOrder.createdAt, { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                             <button type="button" onClick={closeDetailModal} aria-label="Đóng">
                                 ×
@@ -331,18 +262,18 @@ export default function Orders() {
                                     <h3>Trạng thái</h3>
                                     <p>
                                         <span className={cx('badge', selectedOrder.status.toLowerCase())}>
-                                            {statusLabels[selectedOrder.status] || selectedOrder.status}
+                                            {orderStatusLabels[selectedOrder.status] || selectedOrder.status}
                                         </span>
                                     </p>
                                     <select
                                         className={cx('statusSelect')}
                                         value={selectedOrder.status}
                                         disabled={updatingId === selectedOrder.id}
-                                        onChange={(event) => updateOrderStatus(selectedOrder, event.target.value)}
+                                        onChange={(event) => handleUpdateOrderStatus(selectedOrder, event.target.value)}
                                     >
                                         {orderStatuses.map((status) => (
                                             <option key={status} value={status}>
-                                                {statusLabels[status]}
+                                                {orderStatusLabels[status]}
                                             </option>
                                         ))}
                                     </select>
@@ -395,11 +326,11 @@ export default function Orders() {
                                         className={cx('primaryBtn')}
                                         type="button"
                                         disabled={updatingId === selectedOrder.id}
-                                        onClick={() => updateOrderStatus(selectedOrder, getNextStatus(selectedOrder.status))}
+                                        onClick={() => handleUpdateOrderStatus(selectedOrder, getNextStatus(selectedOrder.status))}
                                     >
                                         {selectedOrder.status === 'PENDING'
                                             ? 'Xác nhận đơn hàng'
-                                            : `Chuyển sang ${statusLabels[getNextStatus(selectedOrder.status)]}`}
+                                            : `Chuyển sang ${orderStatusLabels[getNextStatus(selectedOrder.status)]}`}
                                     </button>
                                 )}
                                 {selectedOrder.status !== 'CANCELLED' && selectedOrder.status !== 'COMPLETED' && (
@@ -407,7 +338,7 @@ export default function Orders() {
                                         className={cx('dangerBtn')}
                                         type="button"
                                         disabled={updatingId === selectedOrder.id}
-                                        onClick={() => updateOrderStatus(selectedOrder, 'CANCELLED')}
+                                        onClick={() => handleUpdateOrderStatus(selectedOrder, 'CANCELLED')}
                                     >
                                         Hủy đơn hàng
                                     </button>

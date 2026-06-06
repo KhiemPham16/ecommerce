@@ -1,19 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { toast } from 'sonner';
 
-import { axiosInstance as api } from '~/lib/axios';
+import {
+    formatDate,
+    getImageUrl,
+    getPostId,
+    normalizePostStatus,
+    postStatusLabels
+} from '~/lib/dashboardUtils';
+import { usePostStore } from '~/stores/usePostStore';
 
+import PostForm from './PostForm';
 import styles from './DashboardBlogs.module.scss';
 
 const cx = classNames.bind(styles);
 
 const postStatuses = ['DRAFT', 'PUBLISHED'];
-
-const statusLabels = {
-    DRAFT: 'Draft',
-    PUBLISHED: 'Public'
-};
 
 const initialFormData = {
     title: '',
@@ -26,81 +28,26 @@ const initialFormData = {
     status: 'DRAFT'
 };
 
-const getPostList = (payload) => {
-    if (Array.isArray(payload?.data)) {
-        return payload.data;
-    }
-
-    if (Array.isArray(payload?.data?.posts)) {
-        return payload.data.posts;
-    }
-
-    if (Array.isArray(payload?.posts)) {
-        return payload.posts;
-    }
-
-    return [];
-};
-
-const getPostData = (payload) => payload?.data?.post || payload?.data || payload?.post || payload;
-
-const normalizeStatus = (status) => {
-    const value = String(status || 'DRAFT').toUpperCase();
-    return value === 'PUBLISHED' || value === 'PUBLIC' ? 'PUBLISHED' : 'DRAFT';
-};
-
-const getPostId = (post) => post?.id || post?._id;
-
-const formatDate = (value) => {
-    if (!value) {
-        return '-';
-    }
-
-    return new Intl.DateTimeFormat('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(new Date(value));
-};
-
-const getImageUrl = (thumbnail) => {
-    if (!thumbnail) {
-        return '';
-    }
-
-    if (/^https?:\/\//i.test(thumbnail)) {
-        return thumbnail;
-    }
-
-    return `${import.meta.env.VITE_API_URL}${thumbnail.startsWith('/') ? thumbnail : `/${thumbnail}`}`;
-};
-
 export default function Blogs() {
-    const [posts, setPosts] = useState([]);
+    const {
+        posts,
+        selectedPost,
+        loading,
+        saving,
+        updatingId,
+        fetchPosts,
+        fetchPostDetail,
+        createPost,
+        updatePost,
+        deletePost,
+        changePostStatus,
+        clearSelectedPost
+    } = usePostStore();
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [updatingId, setUpdatingId] = useState(null);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
-    const [selectedPost, setSelectedPost] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
-
-    const fetchPosts = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/posts');
-            setPosts(getPostList(response.data));
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không tải được danh sách bài viết');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
         fetchPosts();
@@ -110,7 +57,7 @@ export default function Blogs() {
         const search = keyword.trim().toLowerCase();
 
         return posts.filter((post) => {
-            const status = normalizeStatus(post.status);
+            const status = normalizePostStatus(post.status);
             const matchesStatus = statusFilter === 'all' || status === statusFilter;
             const matchesKeyword =
                 !search ||
@@ -146,7 +93,7 @@ export default function Blogs() {
             coverImageUrl: post.coverImageUrl || post.thumbnail || post.coverImage || post.image || '',
             readMinutes: post.readMinutes ? String(post.readMinutes) : '3',
             featured: Boolean(post.featured),
-            status: normalizeStatus(post.status)
+            status: normalizePostStatus(post.status)
         });
         setIsOpenModal(true);
     };
@@ -171,24 +118,10 @@ export default function Blogs() {
             status: formData.status
         };
 
-        try {
-            setSaving(true);
+        const success = editingPost ? await updatePost(getPostId(editingPost), payload) : await createPost(payload);
 
-            if (editingPost) {
-                await api.patch(`/posts/${getPostId(editingPost)}`, payload);
-                toast.success('Cập nhật bài viết thành công');
-            } else {
-                await api.post('/posts', payload);
-                toast.success('Tạo bài viết thành công');
-            }
-
+        if (success) {
             closeModal();
-            fetchPosts();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không lưu được bài viết');
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -197,55 +130,23 @@ export default function Blogs() {
             return;
         }
 
-        try {
-            await api.delete(`/posts/${getPostId(post)}`);
-            toast.success('Xóa bài viết thành công');
-            fetchPosts();
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không xóa được bài viết');
-        }
+        await deletePost(getPostId(post));
     };
 
     const handleStatusChange = async (post, status) => {
-        if (normalizeStatus(post.status) === status) {
+        if (normalizePostStatus(post.status) === status) {
             return;
         }
 
-        try {
-            const postId = getPostId(post);
-            setUpdatingId(postId);
-            const response = await api.patch(`/posts/${postId}`, { status });
-            const updatedPost = getPostData(response.data);
-
-            setPosts((current) =>
-                current.map((item) => (getPostId(item) === postId ? { ...item, ...updatedPost, status } : item))
-            );
-            setSelectedPost((current) =>
-                getPostId(current) === postId ? { ...current, ...updatedPost, status } : current
-            );
-            toast.success(`Đã chuyển bài viết sang ${statusLabels[status]}`);
-        } catch (error) {
-            console.error(error);
-            toast.error(error?.response?.data?.message || 'Không cập nhật được trạng thái bài viết');
-        } finally {
-            setUpdatingId(null);
-        }
+        await changePostStatus(getPostId(post), status);
     };
 
     const openDetailModal = async (post) => {
-        setSelectedPost(post);
-
-        try {
-            const response = await api.get(`/posts/${post.slug || getPostId(post)}`);
-            setSelectedPost({ ...post, ...getPostData(response.data) });
-        } catch (error) {
-            console.error(error);
-        }
+        await fetchPostDetail(post);
     };
 
     const closeDetailModal = () => {
-        setSelectedPost(null);
+        clearSelectedPost();
     };
 
     return (
@@ -279,7 +180,7 @@ export default function Blogs() {
                     <option value="all">Tất cả trạng thái</option>
                     {postStatuses.map((status) => (
                         <option key={status} value={status}>
-                            {statusLabels[status]}
+                            {postStatusLabels[status]}
                         </option>
                     ))}
                 </select>
@@ -291,11 +192,11 @@ export default function Blogs() {
                     <span>Bài viết hiển thị</span>
                 </div>
                 <div>
-                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'DRAFT').length}</strong>
+                    <strong>{posts.filter((post) => normalizePostStatus(post.status) === 'DRAFT').length}</strong>
                     <span>Draft</span>
                 </div>
                 <div>
-                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'PUBLISHED').length}</strong>
+                    <strong>{posts.filter((post) => normalizePostStatus(post.status) === 'PUBLISHED').length}</strong>
                     <span>Public</span>
                 </div>
             </div>
@@ -328,7 +229,7 @@ export default function Blogs() {
                             ) : (
                                 filteredPosts.map((post) => {
                                     const postId = getPostId(post);
-                                    const status = normalizeStatus(post.status);
+                                    const status = normalizePostStatus(post.status);
                                     const thumbnail = post.coverImageUrl || post.thumbnail || post.coverImage || post.image;
 
                                     return (
@@ -357,7 +258,7 @@ export default function Blogs() {
                                                 >
                                                     {postStatuses.map((item) => (
                                                         <option key={item} value={item}>
-                                                            {statusLabels[item]}
+                                                            {postStatusLabels[item]}
                                                         </option>
                                                     ))}
                                                 </select>
@@ -396,84 +297,13 @@ export default function Blogs() {
                             </button>
                         </div>
 
-                        <form className={cx('form')} onSubmit={handleSubmit}>
-                            <label>
-                                Tiêu đề
-                                <input name="title" required value={formData.title} onChange={handleInputChange} />
-                            </label>
-
-                            <label>
-                                Mô tả ngắn
-                                <input name="excerpt" value={formData.excerpt} onChange={handleInputChange} />
-                            </label>
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Ảnh đại diện
-                                    <input
-                                        name="coverImageUrl"
-                                        placeholder="/uploads/posts/example.jpg"
-                                        value={formData.coverImageUrl}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label>
-                                    Trạng thái
-                                    <select name="status" value={formData.status} onChange={handleInputChange}>
-                                        <option value="DRAFT">Draft</option>
-                                        <option value="PUBLISHED">Public</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <label>
-                                Dòng giới thiệu
-                                <input name="dek" required value={formData.dek} onChange={handleInputChange} />
-                            </label>
-
-                            <div className={cx('formGrid')}>
-                                <label>
-                                    Thời gian đọc
-                                    <input
-                                        name="readMinutes"
-                                        type="number"
-                                        min="1"
-                                        required
-                                        value={formData.readMinutes}
-                                        onChange={handleInputChange}
-                                    />
-                                </label>
-                                <label className={cx('checkLabel')}>
-                                    <input
-                                        name="featured"
-                                        type="checkbox"
-                                        checked={formData.featured}
-                                        onChange={handleInputChange}
-                                    />
-                                    Bài viết nổi bật
-                                </label>
-                            </div>
-
-                            <label>
-                                Nội dung HTML
-                                <textarea
-                                    name="bodyHtml"
-                                    rows="10"
-                                    required
-                                    value={formData.bodyHtml}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
-
-                            <div className={cx('modalActions')}>
-                                <button type="button" onClick={closeModal}>
-                                    Hủy
-                                </button>
-                                <button className={cx('primaryBtn')} type="submit" disabled={saving}>
-                                    {saving ? 'Đang lưu...' : 'Lưu'}
-                                </button>
-                            </div>
-                        </form>
+                        <PostForm
+                            formData={formData}
+                            saving={saving}
+                            onChange={handleInputChange}
+                            onClose={closeModal}
+                            onSubmit={handleSubmit}
+                        />
                     </div>
                 </div>
             )}
@@ -506,8 +336,8 @@ export default function Blogs() {
                             )}
 
                             <div className={cx('detailMeta')}>
-                                <span className={cx('badge', normalizeStatus(selectedPost.status).toLowerCase())}>
-                                    {statusLabels[normalizeStatus(selectedPost.status)]}
+                                <span className={cx('badge', normalizePostStatus(selectedPost.status).toLowerCase())}>
+                                    {postStatusLabels[normalizePostStatus(selectedPost.status)]}
                                 </span>
                                 {selectedPost.slug && <span>{selectedPost.slug}</span>}
                             </div>
@@ -520,8 +350,8 @@ export default function Blogs() {
 
                             <div className={cx('modalActions')}>
                                 <select
-                                    className={cx('statusSelect', normalizeStatus(selectedPost.status).toLowerCase())}
-                                    value={normalizeStatus(selectedPost.status)}
+                                    className={cx('statusSelect', normalizePostStatus(selectedPost.status).toLowerCase())}
+                                    value={normalizePostStatus(selectedPost.status)}
                                     disabled={updatingId === getPostId(selectedPost)}
                                     onChange={(event) => handleStatusChange(selectedPost, event.target.value)}
                                 >
