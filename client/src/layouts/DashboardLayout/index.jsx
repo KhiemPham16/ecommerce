@@ -15,6 +15,7 @@ function getPageTitle(pathname) {
     if (pathname.startsWith('/dashboard/categories')) return 'Danh mục';
     if (pathname.startsWith('/dashboard/orders')) return 'Đơn hàng';
     if (pathname.startsWith('/dashboard/blogs')) return 'Bài viết';
+    if (pathname.startsWith('/dashboard/media')) return 'Media';
     return 'Dashboard';
 }
 

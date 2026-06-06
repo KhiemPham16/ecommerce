@@ -1,17 +1,12 @@
 import classNames from 'classnames/bind';
 
+import MediaPicker from '~/components/MediaPicker';
+
 import styles from './DashboardCustomers.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function CustomerForm({
-    editingCustomer,
-    formData,
-    saving,
-    onChange,
-    onClose,
-    onSubmit
-}) {
+export default function CustomerForm({ editingCustomer, formData, saving, onChange, onClose, onSubmit }) {
     return (
         <form className={cx('form')} onSubmit={onSubmit}>
             <div className={cx('formGrid')}>
@@ -62,15 +57,14 @@ export default function CustomerForm({
                         <option value="OTHER">Khác</option>
                     </select>
                 </label>
-                <label>
-                    Avatar URL
-                    <input
-                        name="avatarUrl"
-                        placeholder="/uploads/avatars/example.webp"
-                        value={formData.avatarUrl}
-                        onChange={onChange}
-                    />
-                </label>
+                <MediaPicker
+                    name="avatarUrl"
+                    label="Avatar"
+                    folder="avatars"
+                    placeholder="/uploads/media/avatars/example.webp"
+                    value={formData.avatarUrl}
+                    onChange={onChange}
+                />
             </div>
 
             <div className={cx('modalActions')}>

@@ -1,20 +1,13 @@
 import classNames from 'classnames/bind';
 
+import MediaPicker from '~/components/MediaPicker';
 import { roleLabels } from '~/lib/dashboardUtils';
 
 import styles from './DashboardEmployees.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function EmployeeForm({
-    editingEmployee,
-    formData,
-    roleOptions,
-    saving,
-    onChange,
-    onClose,
-    onSubmit
-}) {
+export default function EmployeeForm({ editingEmployee, formData, roleOptions, saving, onChange, onClose, onSubmit }) {
     return (
         <form className={cx('form')} onSubmit={onSubmit}>
             <div className={cx('formGrid')}>
@@ -77,15 +70,14 @@ export default function EmployeeForm({
                 </label>
             </div>
 
-            <label>
-                Avatar URL
-                <input
-                    name="avatarUrl"
-                    placeholder="/uploads/avatars/example.webp"
-                    value={formData.avatarUrl}
-                    onChange={onChange}
-                />
-            </label>
+            <MediaPicker
+                name="avatarUrl"
+                label="Avatar"
+                folder="avatars"
+                placeholder="/uploads/media/avatars/example.webp"
+                value={formData.avatarUrl}
+                onChange={onChange}
+            />
 
             <div className={cx('modalActions')}>
                 <button type="button" onClick={onClose}>

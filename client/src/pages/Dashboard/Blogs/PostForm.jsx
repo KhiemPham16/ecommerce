@@ -1,16 +1,12 @@
 import classNames from 'classnames/bind';
 
+import MediaPicker from '~/components/MediaPicker';
+
 import styles from './DashboardBlogs.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function PostForm({
-    formData,
-    saving,
-    onChange,
-    onClose,
-    onSubmit
-}) {
+export default function PostForm({ formData, saving, onChange, onClose, onSubmit }) {
     return (
         <form className={cx('form')} onSubmit={onSubmit}>
             <label>
@@ -24,15 +20,14 @@ export default function PostForm({
             </label>
 
             <div className={cx('formGrid')}>
-                <label>
-                    Ảnh đại diện
-                    <input
-                        name="coverImageUrl"
-                        placeholder="/uploads/posts/example.jpg"
-                        value={formData.coverImageUrl}
-                        onChange={onChange}
-                    />
-                </label>
+                <MediaPicker
+                    name="coverImageUrl"
+                    label="Ảnh đại diện"
+                    folder="posts"
+                    placeholder="/uploads/media/posts/example.jpg"
+                    value={formData.coverImageUrl}
+                    onChange={onChange}
+                />
                 <label>
                     Trạng thái
                     <select name="status" value={formData.status} onChange={onChange}>
@@ -50,14 +45,7 @@ export default function PostForm({
             <div className={cx('formGrid')}>
                 <label>
                     Thời gian đọc
-                    <input
-                        name="readMinutes"
-                        type="number"
-                        min="1"
-                        required
-                        value={formData.readMinutes}
-                        onChange={onChange}
-                    />
+                    <input name="readMinutes" type="number" min="1" required value={formData.readMinutes} onChange={onChange} />
                 </label>
                 <label className={cx('checkLabel')}>
                     <input name="featured" type="checkbox" checked={formData.featured} onChange={onChange} />

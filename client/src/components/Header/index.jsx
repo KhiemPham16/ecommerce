@@ -1,14 +1,19 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import styles from './Header.module.scss';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { FaSearch, FaShoppingCart } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 
 import { useAuthStore } from '~/stores/useAuthStore';
 
+import styles from './Header.module.scss';
+
 const cx = classNames.bind(styles);
 
 export default function Header() {
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { accessToken, user, fetchMe, logout } = useAuthStore();
+    const [keyword, setKeyword] = useState(searchParams.get('search') || '');
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
 
@@ -17,6 +22,10 @@ export default function Header() {
             fetchMe();
         }
     }, [accessToken, user, fetchMe]);
+
+    useEffect(() => {
+        setKeyword(searchParams.get('search') || '');
+    }, [searchParams]);
 
     useEffect(() => {
         if (!userMenuOpen) return;
@@ -43,9 +52,20 @@ export default function Header() {
         };
     }, [userMenuOpen]);
 
-    const displayName = useMemo(() => {
-        return user?.fullName || user?.email || 'User';
-    }, [user]);
+    const displayName = useMemo(() => user?.fullName || user?.email || 'User', [user]);
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+
+        const search = keyword.trim();
+
+        if (!search) {
+            navigate('/category');
+            return;
+        }
+
+        navigate(`/category?search=${encodeURIComponent(search)}`);
+    };
 
     const handleLogout = async () => {
         setUserMenuOpen(false);
@@ -56,16 +76,28 @@ export default function Header() {
         <div className={cx('header')}>
             <div className={cx('headerTop')}>
                 <div className={cx('headerTopLeft')}>
-                    <div className={cx('logo')}>Logo</div>
+                    <Link className={cx('logo')} to="/">
+                        Logo
+                    </Link>
 
-                    <div className={cx('search')}>
-                        <input type="text" placeholder="Sách lịch sử..." />
-                        <button>Search</button>
-                    </div>
+                    <form className={cx('search')} onSubmit={handleSearch}>
+                        <input
+                            type="search"
+                            placeholder="Tìm kiếm sản phẩm..."
+                            value={keyword}
+                            onChange={(event) => setKeyword(event.target.value)}
+                        />
+                        <button type="submit" aria-label="Tìm kiếm">
+                            <FaSearch />
+                        </button>
+                    </form>
                 </div>
 
                 <div className={cx('headerTopRight')}>
-                    <div className={cx('cart')}>Cart</div>
+                    <Link className={cx('cart')} to="/cart">
+                        <FaShoppingCart />
+                        <span>Giỏ hàng</span>
+                    </Link>
 
                     <div className={cx('user')}>
                         {user ? (
@@ -91,7 +123,7 @@ export default function Header() {
                                             role="menuitem"
                                             onClick={() => setUserMenuOpen(false)}
                                         >
-                                            Profile
+                                            Hồ sơ
                                         </Link>
                                         <Link
                                             className={cx('userMenuItem')}
@@ -124,23 +156,22 @@ export default function Header() {
             <nav className={cx('nav')}>
                 <ul>
                     <li>
-                        <Link to="/">Home</Link>
-                    </li>
-
-                    <li>
-                        <Link to="/category">Category</Link>
-                    </li>
-
-                    <li>
-                        <Link to="/blog">Blog</Link>
-                    </li>
-
-                    <li>
-                        <Link to="/contact">Contact</Link>
+                        <Link to="/">Trang chủ</Link>
                     </li>
                     <li>
-                        {user && ['ADMIN', 'MANAGER'].includes(user.role) && <Link to="/dashboard">Dashboard</Link>}
+                        <Link to="/category">Danh mục</Link>
                     </li>
+                    <li>
+                        <Link to="/blog">Tin tức</Link>
+                    </li>
+                    <li>
+                        <Link to="/contact">Liên hệ</Link>
+                    </li>
+                    {user && ['ADMIN', 'MANAGER'].includes(user.role) && (
+                        <li>
+                            <Link to="/dashboard">Dashboard</Link>
+                        </li>
+                    )}
                 </ul>
             </nav>
         </div>

@@ -1,17 +1,12 @@
 import classNames from 'classnames/bind';
 
+import MediaPicker from '~/components/MediaPicker';
+
 import styles from './DashboardProducts.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function ProductForm({
-    categories,
-    formData,
-    saving,
-    onChange,
-    onClose,
-    onSubmit
-}) {
+export default function ProductForm({ categories, formData, saving, onChange, onClose, onSubmit }) {
     return (
         <form className={cx('form')} onSubmit={onSubmit}>
             <label>
@@ -58,15 +53,14 @@ export default function ProductForm({
                 <input name="isbn" value={formData.isbn} onChange={onChange} />
             </label>
 
-            <label>
-                Ảnh đại diện
-                <input
-                    name="thumbnail"
-                    placeholder="/uploads/products/example.jpg"
-                    value={formData.thumbnail}
-                    onChange={onChange}
-                />
-            </label>
+            <MediaPicker
+                name="thumbnail"
+                label="Ảnh đại diện"
+                folder="products"
+                placeholder="/uploads/media/products/example.jpg"
+                value={formData.thumbnail}
+                onChange={onChange}
+            />
 
             <label>
                 Mô tả
