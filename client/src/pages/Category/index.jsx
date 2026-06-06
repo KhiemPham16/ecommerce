@@ -17,11 +17,16 @@ const allCategoryId = 'all';
 export default function Category() {
     const [searchParams] = useSearchParams();
     const searchKeyword = searchParams.get('search')?.trim() || '';
+    const categoryIdParam = searchParams.get('categoryId') || allCategoryId;
     const [categories, setCategories] = useState([]);
     const [products, setProducts] = useState([]);
-    const [selectedCategoryId, setSelectedCategoryId] = useState(allCategoryId);
+    const [selectedCategoryId, setSelectedCategoryId] = useState(categoryIdParam);
     const [loadingCategories, setLoadingCategories] = useState(false);
     const [loadingProducts, setLoadingProducts] = useState(false);
+
+    useEffect(() => {
+        setSelectedCategoryId(categoryIdParam);
+    }, [categoryIdParam]);
 
     useEffect(() => {
         const fetchCategories = async () => {

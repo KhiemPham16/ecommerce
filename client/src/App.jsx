@@ -37,6 +37,7 @@ export default function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/category" element={<Category />} />
                 <Route path="/cart" element={<ShoppingCart />} />
+                <Route path="/product/:slug" element={<ProductDetails />} />
                 <Route path="/auth" element={<AuthLayout />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
@@ -63,12 +64,6 @@ export default function App() {
                     <Route path="orders" element={<Orders />} />
                     <Route path="blogs" element={<Blogs />} />
                     <Route path="media" element={<Media />} />
-                </Route>
-            </Route>
-
-            <Route element={<ProtectedRoute />}>
-                <Route element={<SiteLayout />}>
-                    <Route path="/product/:slug" element={<ProductDetails />} />
                 </Route>
             </Route>
         </Routes>

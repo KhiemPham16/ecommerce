@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames/bind';
 
 import { useDashboardStore } from '~/stores/useDashboardStore';
@@ -233,6 +234,9 @@ export default function Dashboard() {
                 </div>
 
                 <div className={cp('actions')}>
+                    <Link className={cp('secondaryBtn')} to="/">
+                        Về giao diện người dùng
+                    </Link>
                     <button className={cp('secondaryBtn')} type="button" onClick={fetchOverview} disabled={loading}>
                         {loading ? 'Đang tải...' : 'Làm mới'}
                     </button>
