@@ -282,6 +282,12 @@
     font-weight: 800;
 }
 
+.checkLabel {
+    display: flex !important;
+    align-items: center;
+    gap: 8px !important;
+}
+
 .form textarea {
     min-height: 220px;
     resize: vertical;

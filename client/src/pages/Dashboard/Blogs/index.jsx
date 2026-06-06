@@ -8,19 +8,22 @@ import styles from './DashboardBlogs.module.scss';
 
 const cx = classNames.bind(styles);
 
-const postStatuses = ['draft', 'published'];
+const postStatuses = ['DRAFT', 'PUBLISHED'];
 
 const statusLabels = {
-    draft: 'Draft',
-    published: 'Public'
+    DRAFT: 'Draft',
+    PUBLISHED: 'Public'
 };
 
 const initialFormData = {
     title: '',
+    dek: '',
     excerpt: '',
-    content: '',
-    thumbnail: '',
-    status: 'draft'
+    bodyHtml: '',
+    coverImageUrl: '',
+    readMinutes: '3',
+    featured: false,
+    status: 'DRAFT'
 };
 
 const getPostList = (payload) => {
@@ -42,8 +45,8 @@ const getPostList = (payload) => {
 const getPostData = (payload) => payload?.data?.post || payload?.data || payload?.post || payload;
 
 const normalizeStatus = (status) => {
-    const value = String(status || 'draft').toLowerCase();
-    return value === 'published' || value === 'public' ? 'published' : 'draft';
+    const value = String(status || 'DRAFT').toUpperCase();
+    return value === 'PUBLISHED' || value === 'PUBLIC' ? 'PUBLISHED' : 'DRAFT';
 };
 
 const getPostId = (post) => post?.id || post?._id;
@@ -120,10 +123,10 @@ export default function Blogs() {
     }, [posts, keyword, statusFilter]);
 
     const handleInputChange = (event) => {
-        const { name, value } = event.target;
+        const { name, value, type, checked } = event.target;
         setFormData((current) => ({
             ...current,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -137,9 +140,12 @@ export default function Blogs() {
         setEditingPost(post);
         setFormData({
             title: post.title || '',
+            dek: post.dek || '',
             excerpt: post.excerpt || post.summary || '',
-            content: post.content || post.body || '',
-            thumbnail: post.thumbnail || post.coverImage || post.image || '',
+            bodyHtml: post.bodyHtml || post.content || post.body || '',
+            coverImageUrl: post.coverImageUrl || post.thumbnail || post.coverImage || post.image || '',
+            readMinutes: post.readMinutes ? String(post.readMinutes) : '3',
+            featured: Boolean(post.featured),
             status: normalizeStatus(post.status)
         });
         setIsOpenModal(true);
@@ -156,9 +162,12 @@ export default function Blogs() {
 
         const payload = {
             title: formData.title.trim(),
+            dek: formData.dek.trim(),
             excerpt: formData.excerpt.trim(),
-            content: formData.content.trim(),
-            thumbnail: formData.thumbnail.trim() || undefined,
+            bodyHtml: formData.bodyHtml.trim(),
+            coverImageUrl: formData.coverImageUrl.trim() || undefined,
+            readMinutes: Number(formData.readMinutes || 3),
+            featured: formData.featured,
             status: formData.status
         };
 
@@ -225,11 +234,10 @@ export default function Blogs() {
     };
 
     const openDetailModal = async (post) => {
-        const postId = getPostId(post);
         setSelectedPost(post);
 
         try {
-            const response = await api.get(`/posts/${postId}`);
+            const response = await api.get(`/posts/${post.slug || getPostId(post)}`);
             setSelectedPost({ ...post, ...getPostData(response.data) });
         } catch (error) {
             console.error(error);
@@ -283,11 +291,11 @@ export default function Blogs() {
                     <span>Bài viết hiển thị</span>
                 </div>
                 <div>
-                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'draft').length}</strong>
+                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'DRAFT').length}</strong>
                     <span>Draft</span>
                 </div>
                 <div>
-                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'published').length}</strong>
+                    <strong>{posts.filter((post) => normalizeStatus(post.status) === 'PUBLISHED').length}</strong>
                     <span>Public</span>
                 </div>
             </div>
@@ -321,7 +329,7 @@ export default function Blogs() {
                                 filteredPosts.map((post) => {
                                     const postId = getPostId(post);
                                     const status = normalizeStatus(post.status);
-                                    const thumbnail = post.thumbnail || post.coverImage || post.image;
+                                    const thumbnail = post.coverImageUrl || post.thumbnail || post.coverImage || post.image;
 
                                     return (
                                         <tr key={postId}>
@@ -342,7 +350,7 @@ export default function Blogs() {
                                             </td>
                                             <td>
                                                 <select
-                                                    className={cx('statusSelect', status)}
+                                                    className={cx('statusSelect', status.toLowerCase())}
                                                     value={status}
                                                     disabled={updatingId === postId}
                                                     onChange={(event) => handleStatusChange(post, event.target.value)}
@@ -403,28 +411,56 @@ export default function Blogs() {
                                 <label>
                                     Ảnh đại diện
                                     <input
-                                        name="thumbnail"
+                                        name="coverImageUrl"
                                         placeholder="/uploads/posts/example.jpg"
-                                        value={formData.thumbnail}
+                                        value={formData.coverImageUrl}
                                         onChange={handleInputChange}
                                     />
                                 </label>
                                 <label>
                                     Trạng thái
                                     <select name="status" value={formData.status} onChange={handleInputChange}>
-                                        <option value="draft">Draft</option>
-                                        <option value="published">Public</option>
+                                        <option value="DRAFT">Draft</option>
+                                        <option value="PUBLISHED">Public</option>
                                     </select>
                                 </label>
                             </div>
 
                             <label>
-                                Nội dung
+                                Dòng giới thiệu
+                                <input name="dek" required value={formData.dek} onChange={handleInputChange} />
+                            </label>
+
+                            <div className={cx('formGrid')}>
+                                <label>
+                                    Thời gian đọc
+                                    <input
+                                        name="readMinutes"
+                                        type="number"
+                                        min="1"
+                                        required
+                                        value={formData.readMinutes}
+                                        onChange={handleInputChange}
+                                    />
+                                </label>
+                                <label className={cx('checkLabel')}>
+                                    <input
+                                        name="featured"
+                                        type="checkbox"
+                                        checked={formData.featured}
+                                        onChange={handleInputChange}
+                                    />
+                                    Bài viết nổi bật
+                                </label>
+                            </div>
+
+                            <label>
+                                Nội dung HTML
                                 <textarea
-                                    name="content"
+                                    name="bodyHtml"
                                     rows="10"
                                     required
-                                    value={formData.content}
+                                    value={formData.bodyHtml}
                                     onChange={handleInputChange}
                                 />
                             </label>
@@ -456,16 +492,21 @@ export default function Blogs() {
                         </div>
 
                         <div className={cx('detailBody')}>
-                            {(selectedPost.thumbnail || selectedPost.coverImage || selectedPost.image) && (
+                            {(selectedPost.coverImageUrl || selectedPost.thumbnail || selectedPost.coverImage || selectedPost.image) && (
                                 <img
                                     className={cx('cover')}
-                                    src={getImageUrl(selectedPost.thumbnail || selectedPost.coverImage || selectedPost.image)}
+                                    src={getImageUrl(
+                                        selectedPost.coverImageUrl ||
+                                            selectedPost.thumbnail ||
+                                            selectedPost.coverImage ||
+                                            selectedPost.image
+                                    )}
                                     alt={selectedPost.title}
                                 />
                             )}
 
                             <div className={cx('detailMeta')}>
-                                <span className={cx('badge', normalizeStatus(selectedPost.status))}>
+                                <span className={cx('badge', normalizeStatus(selectedPost.status).toLowerCase())}>
                                     {statusLabels[normalizeStatus(selectedPost.status)]}
                                 </span>
                                 {selectedPost.slug && <span>{selectedPost.slug}</span>}
@@ -475,17 +516,17 @@ export default function Blogs() {
                                 <p className={cx('excerpt')}>{selectedPost.excerpt || selectedPost.summary}</p>
                             )}
 
-                            <div className={cx('content')}>{selectedPost.content || selectedPost.body || '-'}</div>
+                            <div className={cx('content')}>{selectedPost.bodyHtml || selectedPost.content || selectedPost.body || '-'}</div>
 
                             <div className={cx('modalActions')}>
                                 <select
-                                    className={cx('statusSelect', normalizeStatus(selectedPost.status))}
+                                    className={cx('statusSelect', normalizeStatus(selectedPost.status).toLowerCase())}
                                     value={normalizeStatus(selectedPost.status)}
                                     disabled={updatingId === getPostId(selectedPost)}
                                     onChange={(event) => handleStatusChange(selectedPost, event.target.value)}
                                 >
-                                    <option value="draft">Draft</option>
-                                    <option value="published">Public</option>
+                                    <option value="DRAFT">Draft</option>
+                                    <option value="PUBLISHED">Public</option>
                                 </select>
                                 <button type="button" onClick={() => openEditModal(selectedPost)}>
                                     Sửa bài viết
