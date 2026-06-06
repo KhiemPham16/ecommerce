@@ -1,6 +1,11 @@
 import { axiosInstance as api } from '~/lib/axios';
 
 export const postService = {
+    getPublicPosts: async () => {
+        const res = await api.get('/posts');
+        return res.data;
+    },
+
     getPosts: async () => {
         const res = await api.get('/posts/admin');
         return res.data;
