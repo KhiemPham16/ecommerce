@@ -6,6 +6,11 @@ export const productService = {
         return res.data;
     },
 
+    getProductById: async (id) => {
+        const res = await api.get(`/products/${id}`);
+        return res.data;
+    },
+
     createProduct: async (payload) => {
         const res = await api.post('/products', payload);
         return res.data;

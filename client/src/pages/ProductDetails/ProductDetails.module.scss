@@ -45,6 +45,18 @@ $color-danger: #d93a3a;
                 border-radius: 4px;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             }
+
+            .image-placeholder {
+                display: grid;
+                place-items: center;
+                width: 220px;
+                height: 300px;
+                border-radius: 10px;
+                background: #eef4ff;
+                color: $color-primary-blue;
+                font-size: 64px;
+                font-weight: 800;
+            }
         }
     }
 
@@ -118,6 +130,15 @@ $color-danger: #d93a3a;
             margin-bottom: 24px;
         }
 
+        .book-meta {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: $color-muted;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         .status-row {
             display: flex;
             align-items: center;
@@ -127,6 +148,10 @@ $color-danger: #d93a3a;
 
             .icon-check {
                 color: #10b981;
+            }
+
+            .icon-muted {
+                color: #999999;
             }
         }
 
@@ -155,6 +180,11 @@ $color-danger: #d93a3a;
                     &:hover {
                         background: #f1f1f3;
                     }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                        opacity: 0.45;
+                    }
                 }
 
                 span {
@@ -181,6 +211,11 @@ $color-danger: #d93a3a;
 
                 &:hover {
                     background: color.adjust($color-primary-blue, $lightness: -10%);
+                }
+
+                &:disabled {
+                    cursor: not-allowed;
+                    opacity: 0.6;
                 }
             }
         }
@@ -209,6 +244,29 @@ $color-danger: #d93a3a;
                 line-height: 1.7;
             }
         }
+    }
+}
+
+.stateBox {
+    display: grid;
+    place-items: center;
+    gap: 12px;
+    min-height: 320px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #ffffff;
+    color: $color-muted;
+    font-weight: 700;
+    text-align: center;
+
+    h2 {
+        margin: 0;
+        color: $color-dark;
+    }
+
+    a {
+        color: $color-primary-blue;
+        text-decoration: none;
     }
 }
 

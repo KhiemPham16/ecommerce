@@ -1,74 +1,74 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import { FaStar, FaShoppingCart, FaCheckCircle } from 'react-icons/fa';
+import { toast } from 'sonner';
+import { FaCheckCircle, FaShoppingCart, FaStar } from 'react-icons/fa';
+
+import { formatMoney, getImageUrl } from '~/lib/dashboardUtils';
+import { productService } from '~/services/productService';
+
 import styles from './ProductDetails.module.scss';
 
 const cx = classNames.bind(styles);
 
-const books = [
-    {
-        id: 1,
-        slug: 'nha-gia-kim',
-        title: 'Nhà Giả Kim',
-        genre: 'Tiểu thuyết',
-        price: 79000,
-        rating: 5,
-        image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500&auto=format&fit=crop&q=60'
-    },
-    {
-        id: 2,
-        slug: 'dac-nhan-tam',
-        title: 'Đắc Nhân Tâm',
-        genre: 'Tâm lý học',
-        price: 86000,
-        rating: 5,
-        image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=500&auto=format&fit=crop&q=60'
-    },
-    {
-        id: 3,
-        slug: 'luoc-su-loai-nguoi',
-        title: 'Lược Sử Loài Người',
-        genre: 'Lịch sử',
-        price: 135000,
-        rating: 4,
-        image: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=500&auto=format&fit=crop&q=60'
-    },
-    {
-        id: 4,
-        slug: 'clean-code',
-        title: 'Clean Code',
-        genre: 'Công nghệ',
-        price: 210000,
-        rating: 5,
-        image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&auto=format&fit=crop&q=60'
-    }
-];
-
 export default function ProductDetails() {
-    const { slug } = useParams();
-
+    const { slug: productId } = useParams();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const product = books.find((item) => item.slug === slug);
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setLoading(true);
+                const response = await productService.getProductById(productId);
+                setProduct(response.data || null);
+            } catch (error) {
+                console.error(error);
+                setProduct(null);
+                toast.error(error?.response?.data?.message || 'Không tải được chi tiết sản phẩm');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    if (!product) {
+        fetchProduct();
+    }, [productId]);
+
+    const handleQuantityChange = (type) => {
+        if (type === 'dec') {
+            setQuantity((prev) => Math.max(1, prev - 1));
+            return;
+        }
+
+        setQuantity((prev) => Math.min(Number(product?.stock || 1), prev + 1));
+    };
+
+    if (loading) {
         return (
-            <div className={cx('container')}>
-                <h2>Không tìm thấy sản phẩm</h2>
+            <div className={cx('detail-wrapper')}>
+                <div className={cx('container')}>
+                    <div className={cx('stateBox')}>Đang tải chi tiết sản phẩm...</div>
+                </div>
             </div>
         );
     }
 
-    const handleQuantityChange = (type) => {
-        if (type === 'dec' && quantity > 1) {
-            setQuantity((prev) => prev - 1);
-        }
+    if (!product) {
+        return (
+            <div className={cx('detail-wrapper')}>
+                <div className={cx('container')}>
+                    <div className={cx('stateBox')}>
+                        <h2>Không tìm thấy sản phẩm</h2>
+                        <Link to="/category">Quay lại danh mục</Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-        if (type === 'inc') {
-            setQuantity((prev) => prev + 1);
-        }
-    };
+    const inStock = Number(product.stock || 0) > 0;
+    const thumbnail = product.thumbnail;
 
     return (
         <div className={cx('detail-wrapper')}>
@@ -76,52 +76,63 @@ export default function ProductDetails() {
                 <div className={cx('main-info')}>
                     <div className={cx('image-column')}>
                         <div className={cx('main-image')}>
-                            <img src={product.image} alt={product.title} />
+                            {thumbnail ? (
+                                <img src={getImageUrl(thumbnail)} alt={product.title} />
+                            ) : (
+                                <div className={cx('image-placeholder')}>{product.title?.slice(0, 1) || '?'}</div>
+                            )}
                         </div>
                     </div>
 
                     <div className={cx('content-column')}>
-                        <span className={cx('tag')}>{product.genre}</span>
+                        <span className={cx('tag')}>{product.category?.name || 'Sản phẩm'}</span>
 
                         <h1 className={cx('product-title')}>{product.title}</h1>
 
                         <div className={cx('rating-row')}>
                             <div className={cx('stars')}>
-                                {[...Array(product.rating)].map((_, index) => (
+                                {[...Array(5)].map((_, index) => (
                                     <FaStar key={index} />
                                 ))}
                             </div>
 
-                            <span className={cx('reviews-count')}>({product.rating} sao)</span>
+                            <span className={cx('reviews-count')}>Sản phẩm từ kho sách</span>
                         </div>
 
                         <div className={cx('price-box')}>
-                            <span className={cx('current-price')}>{(product.price || 0).toLocaleString()}đ</span>
-
-                            {product.oldPrice && (
-                                <span className={cx('old-price')}>{product.oldPrice.toLocaleString()}đ</span>
-                            )}
+                            <span className={cx('current-price')}>{formatMoney(product.price)}</span>
                         </div>
 
-                        <p className={cx('short-desc')}>{product.description}</p>
+                        <p className={cx('short-desc')}>{product.description || 'Sản phẩm chưa có mô tả ngắn.'}</p>
+
+                        <div className={cx('book-meta')}>
+                            <span>Tác giả: {product.author || '-'}</span>
+                            <span>Nhà xuất bản: {product.publisher || '-'}</span>
+                            <span>ISBN: {product.isbn || '-'}</span>
+                        </div>
 
                         <div className={cx('status-row')}>
-                            <FaCheckCircle className={cx('icon-check')} />
+                            <FaCheckCircle className={cx(inStock ? 'icon-check' : 'icon-muted')} />
                             <span>
-                                Tình trạng: <strong>Còn hàng</strong>
+                                Tình trạng:{' '}
+                                <strong>{inStock ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}</strong>
                             </span>
                         </div>
 
                         <div className={cx('action-row')}>
                             <div className={cx('quantity-selector')}>
-                                <button onClick={() => handleQuantityChange('dec')}>-</button>
+                                <button type="button" onClick={() => handleQuantityChange('dec')} disabled={!inStock}>
+                                    -
+                                </button>
 
                                 <span>{quantity}</span>
 
-                                <button onClick={() => handleQuantityChange('inc')}>+</button>
+                                <button type="button" onClick={() => handleQuantityChange('inc')} disabled={!inStock}>
+                                    +
+                                </button>
                             </div>
 
-                            <button className={cx('btn-add-cart')}>
+                            <button className={cx('btn-add-cart')} type="button" disabled={!inStock}>
                                 <FaShoppingCart />
                                 Thêm vào giỏ hàng
                             </button>
@@ -133,7 +144,7 @@ export default function ProductDetails() {
                     <h2>Mô tả sản phẩm</h2>
 
                     <div className={cx('desc-content')}>
-                        <p>{product.description}</p>
+                        <p>{product.description || 'Sản phẩm chưa có mô tả chi tiết.'}</p>
                     </div>
                 </div>
             </div>
