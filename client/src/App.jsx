@@ -23,6 +23,7 @@ import Customers from '~/pages/Dashboard/Customers';
 import Products from '~/pages/Dashboard/Products';
 import Categories from '~/pages/Dashboard/Categories';
 import Orders from '~/pages/Dashboard/Orders';
+import Blogs from '~/pages/Dashboard/Blogs';
 export default function App() {
     return (
         <Routes>
@@ -55,6 +56,7 @@ export default function App() {
                     <Route path="products" element={<Products />} />
                     <Route path="categories" element={<Categories />} />
                     <Route path="orders" element={<Orders />} />
+                    <Route path="blogs" element={<Blogs />} />
                 </Route>
             </Route>
         </Routes>
