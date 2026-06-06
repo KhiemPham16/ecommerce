@@ -13,15 +13,15 @@ export const mediaService = {
 
     uploadMedia: async ({ file, alt, folder }) => {
         const formData = new FormData();
-        formData.append('file', file);
+        if (folder) {
+            formData.append('folder', folder);
+        }
 
         if (alt) {
             formData.append('alt', alt);
         }
 
-        if (folder) {
-            formData.append('folder', folder);
-        }
+        formData.append('file', file);
 
         const response = await api.post('/media/upload', formData);
         return response.data;
