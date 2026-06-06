@@ -1,84 +1,292 @@
-.wrap {
+.metricGrid {
     display: grid;
-    gap: 14px;
-}
-
-.quickGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
 }
 
-@media (max-width: 1100px) {
-    .quickGrid {
-        grid-template-columns: 1fr 1fr;
-    }
+.metricCard,
+.panel,
+.staffCard {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: #fff;
 }
 
-@media (max-width: 700px) {
-    .quickGrid {
+.metricCard {
+    display: grid;
+    gap: 6px;
+    padding: 14px;
+}
+
+.metricCard span,
+.metricCard small,
+.panelHeader p,
+.rankItem small,
+.stockItem small,
+.staffCard span {
+    color: rgba(0, 0, 0, 0.58);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.metricCard strong {
+    font-size: 23px;
+    line-height: 1.15;
+}
+
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 12px;
+}
+
+.panel {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+}
+
+.wide {
+    min-height: 330px;
+}
+
+.panelHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.panelHeader h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.panelHeader p {
+    margin: 4px 0 0;
+}
+
+.chart {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    gap: 10px;
+    min-height: 260px;
+}
+
+.barGroup {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    align-items: end;
+    gap: 6px;
+    min-width: 0;
+    text-align: center;
+}
+
+.barTrack {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f3f6fa;
+}
+
+.bar {
+    width: 100%;
+    min-height: 8px;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, #2a83e9, #75b7ff);
+}
+
+.barGroup strong {
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.barGroup span {
+    color: rgba(0, 0, 0, 0.58);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.statusList,
+.tableList,
+.staffGrid {
+    display: grid;
+    gap: 10px;
+}
+
+.statusItem,
+.rankItem,
+.stockItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 10px 12px;
+}
+
+.statusItem span {
+    color: rgba(0, 0, 0, 0.68);
+    font-weight: 800;
+}
+
+.statusItem strong {
+    font-size: 18px;
+}
+
+.rankItem {
+    justify-content: flex-start;
+}
+
+.rank {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 8px;
+    background: #eef4ff;
+    color: #2a83e9;
+    font-weight: 900;
+}
+
+.rankItem > div:nth-child(2),
+.stockItem > div {
+    min-width: 0;
+    flex: 1;
+}
+
+.rankItem strong,
+.rankItem small,
+.stockItem strong,
+.stockItem small {
+    display: block;
+}
+
+.rankItem strong,
+.stockItem strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.right {
+    text-align: right;
+}
+
+.okBadge,
+.warnBadge,
+.dangerBadge,
+.pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.okBadge {
+    background: #e7f8ee;
+    color: #10723d;
+}
+
+.warnBadge {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.dangerBadge {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.pill {
+    background: #eef4ff;
+    color: #2a83e9;
+}
+
+.staffGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.staffCard {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr 1fr;
+    gap: 12px;
+    padding: 12px;
+}
+
+.staffCard strong,
+.staffCard span {
+    display: block;
+}
+
+.staffCard > div {
+    min-width: 0;
+}
+
+.staffCard strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.empty {
+    border: 1px dashed rgba(0, 0, 0, 0.16);
+    border-radius: 8px;
+    color: rgba(0, 0, 0, 0.55);
+    padding: 18px;
+    text-align: center;
+}
+
+@media (max-width: 1180px) {
+    .metricGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mainGrid,
+    .staffGrid {
         grid-template-columns: 1fr;
     }
 }
 
-.quickCard {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 14px;
-    padding: 14px;
-    display: grid;
-    gap: 6px;
-}
+@media (max-width: 720px) {
+    .metricGrid,
+    .chart {
+        grid-template-columns: 1fr;
+    }
 
-.quickTitle {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.6);
-    font-weight: 700;
-}
+    .chart {
+        min-height: 0;
+    }
 
-.quickValue {
-    font-size: 24px;
-    font-weight: 900;
-}
+    .barGroup {
+        grid-template-columns: 100px 1fr 54px;
+        grid-template-rows: auto;
+        align-items: center;
+        text-align: left;
+    }
 
-.quickHint {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.55);
-}
+    .barTrack {
+        height: 28px;
+    }
 
-.sectionTitle {
-    font-size: 14px;
-    font-weight: 900;
-}
+    .bar {
+        width: var(--bar-width, 100%);
+        height: 100% !important;
+        border-radius: 8px;
+    }
 
-.sectionCard {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 14px;
-    padding: 14px;
-}
-
-.list {
-    margin-top: 10px;
-    display: grid;
-    gap: 10px;
-}
-
-.listItem {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.itemTitle {
-    font-weight: 800;
-}
-
-.itemMeta {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.6);
+    .staffCard {
+        grid-template-columns: 1fr;
+    }
 }
