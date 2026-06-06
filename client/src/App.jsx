@@ -12,6 +12,7 @@ import VerifyEmail from './pages/Auth/VerifyEmail';
 import Category from './pages/Category';
 import Account from './pages/Account';
 import AccountOrders from './pages/Account/Orders';
+import ShoppingCart from './pages/ShoppingCart';
 
 import SiteLayout from '~/layouts/SiteLayout';
 import DashboardLayout from '~/layouts/DashboardLayout';
@@ -24,6 +25,7 @@ import Products from '~/pages/Dashboard/Products';
 import Categories from '~/pages/Dashboard/Categories';
 import Orders from '~/pages/Dashboard/Orders';
 import Blogs from '~/pages/Dashboard/Blogs';
+import Media from '~/pages/Dashboard/Media';
 import ProductDetails from './pages/ProductDetails';
 
 export default function App() {
@@ -34,6 +36,7 @@ export default function App() {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/category" element={<Category />} />
+                <Route path="/cart" element={<ShoppingCart />} />
                 <Route path="/auth" element={<AuthLayout />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
@@ -59,6 +62,7 @@ export default function App() {
                     <Route path="categories" element={<Categories />} />
                     <Route path="orders" element={<Orders />} />
                     <Route path="blogs" element={<Blogs />} />
+                    <Route path="media" element={<Media />} />
                 </Route>
             </Route>
 

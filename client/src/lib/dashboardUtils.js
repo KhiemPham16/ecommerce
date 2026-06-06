@@ -72,6 +72,48 @@ export const getImageUrl = (path) => {
     return `${import.meta.env.VITE_API_URL}${path.startsWith('/') ? path : `/${path}`}`;
 };
 
+export const getMediaUrl = (media) => {
+    if (!media) {
+        return '';
+    }
+
+    if (typeof media === 'string') {
+        return getImageUrl(media);
+    }
+
+    if (media.fileName) {
+        return getImageUrl(`/uploads/media/${media.folder || 'common'}/${media.fileName}`);
+    }
+
+    return getImageUrl(media.url);
+};
+
+export const getMediaValue = (media) => {
+    if (!media) {
+        return '';
+    }
+
+    if (media.fileName) {
+        return `/uploads/media/${media.folder || 'common'}/${media.fileName}`;
+    }
+
+    return media.url || '';
+};
+
+export const formatFileSize = (value) => {
+    const size = Number(value || 0);
+
+    if (size >= 1024 * 1024) {
+        return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    if (size >= 1024) {
+        return `${Math.round(size / 1024)} KB`;
+    }
+
+    return `${size} B`;
+};
+
 export const normalizePostStatus = (status) => {
     const value = String(status || 'DRAFT').toUpperCase();
     return value === 'PUBLISHED' || value === 'PUBLIC' ? 'PUBLISHED' : 'DRAFT';

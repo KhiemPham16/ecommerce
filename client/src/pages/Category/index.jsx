@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import { FaStar, FaFilter } from 'react-icons/fa';
 import styles from './Category.module.scss';
@@ -49,10 +49,24 @@ const allBooks = [
 ];
 
 export default function Category() {
+    const [searchParams] = useSearchParams();
+    const searchKeyword = searchParams.get('search')?.trim() || '';
     const [selectedGenre, setSelectedGenre] = useState('Tất cả sách');
 
-    const filteredBooks =
-        selectedGenre === 'Tất cả sách' ? allBooks : allBooks.filter((book) => book.genre === selectedGenre);
+    const filteredBooks = useMemo(() => {
+        const keyword = searchKeyword.toLowerCase();
+
+        return allBooks.filter((book) => {
+            const matchesGenre = selectedGenre === 'Tất cả sách' || book.genre === selectedGenre;
+            const matchesKeyword =
+                !keyword ||
+                [book.title, book.genre].filter(Boolean).some((value) => value.toLowerCase().includes(keyword));
+
+            return matchesGenre && matchesKeyword;
+        });
+    }, [searchKeyword, selectedGenre]);
+
+    const heading = searchKeyword ? `Kết quả tìm kiếm: "${searchKeyword}"` : selectedGenre;
 
     return (
         <div className={cx('category-wrapper')}>
@@ -62,9 +76,9 @@ export default function Category() {
                         <FaFilter /> Bộ lọc sách
                     </h2>
                     <ul className={cx('genre-list')}>
-                        {genres.map((genre, index) => (
+                        {genres.map((genre) => (
                             <li
-                                key={index}
+                                key={genre}
                                 className={cx('genre-item', { active: selectedGenre === genre })}
                                 onClick={() => setSelectedGenre(genre)}
                             >
@@ -76,7 +90,7 @@ export default function Category() {
 
                 <main className={cx('content')}>
                     <div className={cx('content-header')}>
-                        <h1>{selectedGenre}</h1>
+                        <h1>{heading}</h1>
                         <p>Tìm thấy {filteredBooks.length} cuốn sách phù hợp</p>
                     </div>
 
@@ -99,7 +113,9 @@ export default function Category() {
 
                                     <div className={cx('price-row')}>
                                         <span className={cx('price')}>{book.price.toLocaleString()}đ</span>
-                                        <button className={cx('btn-add')}>Mua</button>
+                                        <button className={cx('btn-add')} type="button">
+                                            Mua
+                                        </button>
                                     </div>
                                 </div>
                             </Link>
