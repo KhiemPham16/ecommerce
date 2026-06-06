@@ -28,6 +28,27 @@ class PostService {
         });
     }
 
+    async getAdminPosts() {
+        return prisma.post.findMany({
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        fullName: true
+                    }
+                },
+                categories: {
+                    include: {
+                        category: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+    }
+
     async getPostBySlug(slug) {
         const post = await prisma.post.findUnique({
             where: {
