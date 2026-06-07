@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import {
-    formatDate,
-    getImageUrl,
-    getPostId,
-    normalizePostStatus,
-    postStatusLabels
-} from '~/lib/dashboardUtils';
+import { formatDate, getImageUrl, getPostId, normalizePostStatus, postStatusLabels } from '~/utils/dashboardUtils';
 import { usePostStore } from '~/stores/usePostStore';
 
 import PostForm from './PostForm';
@@ -230,7 +224,8 @@ export default function Blogs() {
                                 filteredPosts.map((post) => {
                                     const postId = getPostId(post);
                                     const status = normalizePostStatus(post.status);
-                                    const thumbnail = post.coverImageUrl || post.thumbnail || post.coverImage || post.image;
+                                    const thumbnail =
+                                        post.coverImageUrl || post.thumbnail || post.coverImage || post.image;
 
                                     return (
                                         <tr key={postId}>
@@ -273,7 +268,11 @@ export default function Blogs() {
                                                     <button type="button" onClick={() => openEditModal(post)}>
                                                         Sửa
                                                     </button>
-                                                    <button className={cx('danger')} type="button" onClick={() => handleDelete(post)}>
+                                                    <button
+                                                        className={cx('danger')}
+                                                        type="button"
+                                                        onClick={() => handleDelete(post)}
+                                                    >
                                                         Xóa
                                                     </button>
                                                 </div>
@@ -322,7 +321,10 @@ export default function Blogs() {
                         </div>
 
                         <div className={cx('detailBody')}>
-                            {(selectedPost.coverImageUrl || selectedPost.thumbnail || selectedPost.coverImage || selectedPost.image) && (
+                            {(selectedPost.coverImageUrl ||
+                                selectedPost.thumbnail ||
+                                selectedPost.coverImage ||
+                                selectedPost.image) && (
                                 <img
                                     className={cx('cover')}
                                     src={getImageUrl(
@@ -346,11 +348,16 @@ export default function Blogs() {
                                 <p className={cx('excerpt')}>{selectedPost.excerpt || selectedPost.summary}</p>
                             )}
 
-                            <div className={cx('content')}>{selectedPost.bodyHtml || selectedPost.content || selectedPost.body || '-'}</div>
+                            <div className={cx('content')}>
+                                {selectedPost.bodyHtml || selectedPost.content || selectedPost.body || '-'}
+                            </div>
 
                             <div className={cx('modalActions')}>
                                 <select
-                                    className={cx('statusSelect', normalizePostStatus(selectedPost.status).toLowerCase())}
+                                    className={cx(
+                                        'statusSelect',
+                                        normalizePostStatus(selectedPost.status).toLowerCase()
+                                    )}
                                     value={normalizePostStatus(selectedPost.status)}
                                     disabled={updatingId === getPostId(selectedPost)}
                                     onChange={(event) => handleStatusChange(selectedPost, event.target.value)}

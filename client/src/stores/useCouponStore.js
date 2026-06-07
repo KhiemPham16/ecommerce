@@ -6,10 +6,52 @@ import { couponService } from '~/services/couponService';
 export const useCouponStore = create((set, get) => ({
     coupons: [],
     selectedCoupon: null,
+
+    coupon: null,
+    discountAmount: 0,
+
     loading: false,
     saving: false,
+    applying: false,
 
     clearSelectedCoupon: () => set({ selectedCoupon: null }),
+    applyCoupon: async (code, totalAmount) => {
+        try {
+            if (!code?.trim()) {
+                toast.error('Vui lòng nhập mã giảm giá');
+                return false;
+            }
+
+            set({ applying: true });
+
+            const data = await couponService.validateCoupon({
+                code: code.trim(),
+                totalAmount
+            });
+
+            const result = data.data || data;
+
+            set({
+                coupon: result.coupon || result,
+                discountAmount: Number(result.discountAmount || 0)
+            });
+
+            toast.success('Áp dụng mã giảm giá thành công');
+            return true;
+        } catch (error) {
+            console.error(error);
+
+            set({
+                coupon: null,
+                discountAmount: 0
+            });
+
+            toast.error(error?.response?.data?.message || 'Mã giảm giá không hợp lệ');
+            return false;
+        } finally {
+            set({ applying: false });
+        }
+    },
 
     fetchCoupons: async () => {
         try {

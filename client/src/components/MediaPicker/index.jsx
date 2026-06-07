@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatFileSize, getMediaUrl, getMediaValue, getImageUrl } from '~/lib/dashboardUtils';
+import { formatFileSize, getMediaUrl, getMediaValue, getImageUrl } from '~/utils/dashboardUtils';
 import { useMediaStore } from '~/stores/useMediaStore';
 
 import styles from './MediaPicker.module.scss';
@@ -163,7 +163,12 @@ export default function MediaPicker({
                             ) : (
                                 <div className={cx('grid')}>
                                     {imageMedia.map((item) => (
-                                        <button className={cx('item')} type="button" key={item.id} onClick={() => handleSelect(item)}>
+                                        <button
+                                            className={cx('item')}
+                                            type="button"
+                                            key={item.id}
+                                            onClick={() => handleSelect(item)}
+                                        >
                                             <img src={getMediaUrl(item)} alt={item.alt || item.originalName || ''} />
                                             <strong>{item.alt || item.originalName || item.fileName}</strong>
                                             <span>

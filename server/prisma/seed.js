@@ -183,6 +183,7 @@ async function main() {
             author: 'Dale Carnegie',
             price: 120000,
             stock: 100,
+            thumbnail: '/uploads/media/products/dac-nhan-tam.png',
             categoryId: categories[1].id
         },
         {
@@ -191,6 +192,7 @@ async function main() {
             author: 'Robert C. Martin',
             price: 250000,
             stock: 50,
+            thumbnail: '/uploads/media/products/clean-code.png',
             categoryId: categories[2].id
         },
         {
@@ -199,6 +201,7 @@ async function main() {
             author: 'F8 Team',
             price: 180000,
             stock: 80,
+            thumbnail: '/uploads/media/products/js-pro.png',
             categoryId: categories[2].id
         },
         {
@@ -207,6 +210,7 @@ async function main() {
             author: 'J.K. Rowling',
             price: 200000,
             stock: 60,
+            thumbnail: '/uploads/media/products/harry-potter.png',
             categoryId: categories[0].id
         }
     ];
@@ -219,8 +223,7 @@ async function main() {
             update: {},
             create: {
                 ...productData,
-                description: `${productData.title} description`,
-                thumbnail: '/uploads/products/default.jpg'
+                description: `${productData.title} description`
             }
         });
 
@@ -344,7 +347,7 @@ async function main() {
             <p>Danh sách này phù hợp cho người muốn phát triển bản thân, học tập và nâng cấp tư duy.</p>
             <p>Một số đầu sách nổi bật gồm Đắc Nhân Tâm, Atomic Habits, Clean Code và Nhà Giả Kim.</p>
         `,
-            coverImageUrl: '/uploads/posts/books-2026.jpg',
+            coverImageUrl: '/uploads/media/posts/4321582bd3e68545c9bdb4c89d235aaa.jpg',
             readMinutes: 5,
             featured: true,
             publishedAt: new Date(),
@@ -360,7 +363,7 @@ async function main() {
             <p>Clean Code vẫn đáng đọc, đặc biệt với sinh viên IT và lập trình viên mới đi làm.</p>
             <p>AI có thể sinh code nhanh, nhưng tư duy đặt tên biến, tách hàm và tổ chức module vẫn là kỹ năng lõi.</p>
         `,
-            coverImageUrl: '/uploads/posts/clean-code.jpg',
+            coverImageUrl: '/uploads/media/posts/93a7e97ba6f72741fd0849bd712c84a9.jpeg',
             readMinutes: 4,
             featured: true,
             publishedAt: new Date(),
@@ -376,7 +379,7 @@ async function main() {
             <p>Mỗi ngày code một ít, đọc tài liệu một ít và sửa lỗi một ít sẽ tạo ra tiến bộ lớn sau vài tháng.</p>
             <p>Thói quen nhỏ nhưng đều đặn thường hiệu quả hơn việc học dồn trong vài ngày.</p>
         `,
-            coverImageUrl: '/uploads/posts/atomic-habits.jpg',
+            coverImageUrl: '/uploads/media/posts/de97344349f58b604309080a05ef913e.jpg',
             readMinutes: 6,
             featured: false,
             publishedAt: new Date(),

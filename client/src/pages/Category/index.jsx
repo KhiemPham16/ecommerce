@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { FaFilter, FaStar } from 'react-icons/fa';
-import { formatMoney, getImageUrl } from '~/lib/dashboardUtils';
+import { formatMoney, getImageUrl } from '~/utils/dashboardUtils';
 import { categoryService } from '~/services/categoryService';
 import { productService } from '~/services/productService';
 
@@ -74,9 +74,7 @@ export default function Category() {
     }, [productParams]);
 
     const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
-    const heading = searchKeyword
-        ? `Kết quả tìm kiếm: "${searchKeyword}"`
-        : selectedCategory?.name || 'Tất cả sách';
+    const heading = searchKeyword ? `Kết quả tìm kiếm: "${searchKeyword}"` : selectedCategory?.name || 'Tất cả sách';
 
     return (
         <div className={cx('category-wrapper')}>
@@ -127,7 +125,9 @@ export default function Category() {
                                         {product.thumbnail ? (
                                             <img src={getImageUrl(product.thumbnail)} alt={product.title} />
                                         ) : (
-                                            <span className={cx('thumb-placeholder')}>{product.title?.slice(0, 1) || '?'}</span>
+                                            <span className={cx('thumb-placeholder')}>
+                                                {product.title?.slice(0, 1) || '?'}
+                                            </span>
                                         )}
                                     </div>
 

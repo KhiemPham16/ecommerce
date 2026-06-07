@@ -388,3 +388,36 @@
         text-align: left;
     }
 }
+.paymentBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 120px;
+
+    padding: 8px 14px;
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.unpaid {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.failed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.refunded {
+    background: #e0e7ff;
+    color: #4338ca;
+}

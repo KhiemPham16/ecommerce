@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatDate, formatMoney, orderStatusLabels, paymentStatusLabels } from '~/lib/dashboardUtils';
+import { formatDate, formatMoney, orderStatusLabels, paymentStatusLabels } from '~/utils/dashboardUtils';
 import { useOrderStore } from '~/stores/useOrderStore';
 
 import styles from './DashboardOrders.module.scss';
 
 const cx = classNames.bind(styles);
+
+const paymentStatuses = ['UNPAID', 'PAID', 'FAILED', 'REFUNDED'];
 
 const orderStatuses = ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED'];
 
@@ -27,7 +29,7 @@ const getNextStatus = (status) => {
 };
 
 export default function Orders() {
-    const { orders, loading, updatingId, fetchOrders, updateOrderStatus } = useOrderStore();
+    const { orders, loading, updatingId, fetchOrders, updateOrderStatus, updatePaymentStatus } = useOrderStore();
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -109,7 +111,11 @@ export default function Orders() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select className={cx('select')} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <select
+                    className={cx('select')}
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value)}
+                >
                     <option value="all">Tất cả trạng thái</option>
                     {orderStatuses.map((status) => (
                         <option key={status} value={status}>
@@ -177,13 +183,21 @@ export default function Orders() {
                                                 </div>
                                             </td>
                                             <td>{formatMoney(order.finalAmount)}</td>
-                                            <td>{paymentStatusLabels[order.paymentStatus] || order.paymentStatus}</td>
+                                            <td>
+                                                <span
+                                                    className={cx('paymentBadge', order.paymentStatus?.toLowerCase())}
+                                                >
+                                                    {paymentStatusLabels[order.paymentStatus]}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <span className={cx('badge', order.status.toLowerCase())}>
                                                     {orderStatusLabels[order.status] || order.status}
                                                 </span>
                                             </td>
-                                            <td>{formatDate(order.createdAt, { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td>
+                                                {formatDate(order.createdAt, { hour: '2-digit', minute: '2-digit' })}
+                                            </td>
                                             <td>
                                                 <div className={cx('rowActions')}>
                                                     <button type="button" onClick={() => openDetailModal(order)}>
@@ -195,7 +209,9 @@ export default function Orders() {
                                                             disabled={updatingId === order.id}
                                                             onClick={() => handleUpdateOrderStatus(order, nextStatus)}
                                                         >
-                                                            {order.status === 'PENDING' ? 'Xác nhận' : orderStatusLabels[nextStatus]}
+                                                            {order.status === 'PENDING'
+                                                                ? 'Xác nhận'
+                                                                : orderStatusLabels[nextStatus]}
                                                         </button>
                                                     )}
                                                     {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
@@ -225,7 +241,9 @@ export default function Orders() {
                         <div className={cx('modalHeader')}>
                             <div>
                                 <h2>Chi tiết đơn hàng #{selectedOrder.id.slice(0, 8)}</h2>
-                                <span>{formatDate(selectedOrder.createdAt, { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span>
+                                    {formatDate(selectedOrder.createdAt, { hour: '2-digit', minute: '2-digit' })}
+                                </span>
                             </div>
                             <button type="button" onClick={closeDetailModal} aria-label="Đóng">
                                 ×
@@ -246,7 +264,11 @@ export default function Orders() {
                                     <p>{selectedOrder.address?.receiverName || '-'}</p>
                                     <span>{selectedOrder.address?.receiverPhone || '-'}</span>
                                     <span>
-                                        {[selectedOrder.address?.specificAddress, selectedOrder.address?.ward, selectedOrder.address?.provinceCity]
+                                        {[
+                                            selectedOrder.address?.specificAddress,
+                                            selectedOrder.address?.ward,
+                                            selectedOrder.address?.provinceCity
+                                        ]
                                             .filter(Boolean)
                                             .join(', ') || '-'}
                                     </span>
@@ -254,8 +276,40 @@ export default function Orders() {
 
                                 <section>
                                     <h3>Thanh toán</h3>
+
                                     <p>{selectedOrder.paymentMethod?.name || '-'}</p>
-                                    <span>{paymentStatusLabels[selectedOrder.paymentStatus] || selectedOrder.paymentStatus}</span>
+
+                                    <select
+                                        className={cx('statusSelect')}
+                                        value={selectedOrder.paymentStatus}
+                                        disabled={updatingId === selectedOrder.id}
+                                        onChange={async (event) => {
+                                            const paymentStatus = event.target.value;
+
+                                            if (!paymentStatus || selectedOrder.paymentStatus === paymentStatus) {
+                                                return;
+                                            }
+
+                                            const success = await updatePaymentStatus(selectedOrder, paymentStatus);
+
+                                            if (success) {
+                                                setSelectedOrder((current) =>
+                                                    current?.id === selectedOrder.id
+                                                        ? {
+                                                              ...current,
+                                                              paymentStatus
+                                                          }
+                                                        : current
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        {paymentStatuses.map((status) => (
+                                            <option key={status} value={status}>
+                                                {paymentStatusLabels[status]}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </section>
 
                                 <section>
@@ -326,7 +380,9 @@ export default function Orders() {
                                         className={cx('primaryBtn')}
                                         type="button"
                                         disabled={updatingId === selectedOrder.id}
-                                        onClick={() => handleUpdateOrderStatus(selectedOrder, getNextStatus(selectedOrder.status))}
+                                        onClick={() =>
+                                            handleUpdateOrderStatus(selectedOrder, getNextStatus(selectedOrder.status))
+                                        }
                                     >
                                         {selectedOrder.status === 'PENDING'
                                             ? 'Xác nhận đơn hàng'

@@ -390,6 +390,60 @@ class OrderService {
         });
     }
 
+    async updatePaymentStatus(orderId, paymentStatus) {
+        const nextStatus = paymentStatus.toUpperCase();
+
+        const allowedStatus = ['UNPAID', 'PAID', 'FAILED', 'REFUNDED'];
+
+        if (!allowedStatus.includes(nextStatus)) {
+            throw new AppError(400, 'Trạng thái thanh toán không hợp lệ');
+        }
+
+        const order = await prisma.order.findUnique({
+            where: {
+                id: orderId
+            }
+        });
+
+        if (!order) {
+            throw new AppError(404, 'Đơn hàng không tồn tại');
+        }
+
+        return prisma.order.update({
+            where: {
+                id: orderId
+            },
+            data: {
+                paymentStatus: nextStatus
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        phone: true
+                    }
+                },
+                address: true,
+                paymentMethod: true,
+                coupon: true,
+                items: {
+                    include: {
+                        product: {
+                            select: {
+                                id: true,
+                                title: true,
+                                slug: true,
+                                thumbnail: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     async cancelMyOrder(userId, orderId) {
         const order = await prisma.order.findFirst({
             where: {
@@ -435,7 +489,8 @@ class OrderService {
                     id: orderId
                 },
                 data: {
-                    status: 'CANCELLED'
+                    status: 'CANCELLED',
+                    paymentStatus: 'REFUNDED'
                 },
                 include: {
                     items: true,

@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 import { FaSearch } from 'react-icons/fa';
 
-import { formatDate, getImageUrl, getPostId, getPostList } from '~/lib/dashboardUtils';
+import { formatDate, getImageUrl, getPostId, getPostList } from '~/utils/dashboardUtils';
 import { postService } from '~/services/postService';
 
 import styles from './Blog.module.scss';
@@ -90,16 +90,22 @@ export default function Blog() {
                                         {post.coverImageUrl ? (
                                             <img src={getImageUrl(post.coverImageUrl)} alt={post.title} />
                                         ) : (
-                                            <span className={cx('thumb-placeholder')}>{post.title?.slice(0, 1) || '?'}</span>
+                                            <span className={cx('thumb-placeholder')}>
+                                                {post.title?.slice(0, 1) || '?'}
+                                            </span>
                                         )}
                                         <span className={cx('category-tag')}>{category}</span>
                                     </Link>
                                     <div className={cx('info')}>
-                                        <span className={cx('date')}>{formatDate(post.publishedAt || post.createdAt)}</span>
+                                        <span className={cx('date')}>
+                                            {formatDate(post.publishedAt || post.createdAt)}
+                                        </span>
                                         <Link className={cx('title')} to={`/blog/${post.slug}`}>
                                             {post.title}
                                         </Link>
-                                        <p className={cx('desc')}>{post.excerpt || post.dek || 'Bài viết từ BookStory.'}</p>
+                                        <p className={cx('desc')}>
+                                            {post.excerpt || post.dek || 'Bài viết từ BookStory.'}
+                                        </p>
                                         <Link to={`/blog/${post.slug}`} className={cx('btn-readmore')}>
                                             Đọc thêm &rarr;
                                         </Link>

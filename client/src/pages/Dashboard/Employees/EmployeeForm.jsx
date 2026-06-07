@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 
 import MediaPicker from '~/components/MediaPicker';
-import { roleLabels } from '~/lib/dashboardUtils';
+import { roleLabels } from '~/utils/dashboardUtils';
 
 import styles from './DashboardEmployees.module.scss';
 

@@ -4,8 +4,9 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 import { FaCheckCircle, FaShoppingCart, FaStar } from 'react-icons/fa';
 
-import { formatMoney, getImageUrl } from '~/lib/dashboardUtils';
+import { formatMoney, getImageUrl } from '~/utils/dashboardUtils';
 import { productService } from '~/services/productService';
+import { useCartStore } from '~/stores/useCartStore';
 
 import styles from './ProductDetails.module.scss';
 
@@ -13,6 +14,9 @@ const cx = classNames.bind(styles);
 
 export default function ProductDetails() {
     const { slug: productId } = useParams();
+
+    const { addToCart } = useCartStore();
+
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -42,6 +46,30 @@ export default function ProductDetails() {
         }
 
         setQuantity((prev) => Math.min(Number(product?.stock || 1), prev + 1));
+    };
+
+    const handleAddToCart = () => {
+        if (!product) return;
+
+        if (Number(product.stock || 0) <= 0) {
+            toast.error('Sản phẩm đã hết hàng');
+            return;
+        }
+
+        addToCart(
+            {
+                id: product.id,
+                title: product.title,
+                price: product.price,
+                thumbnail: product.thumbnail,
+                stock: product.stock,
+                category: product.category,
+                author: product.author,
+                publisher: product.publisher,
+                isbn: product.isbn
+            },
+            quantity
+        );
     };
 
     if (loading) {
@@ -114,8 +142,7 @@ export default function ProductDetails() {
                         <div className={cx('status-row')}>
                             <FaCheckCircle className={cx(inStock ? 'icon-check' : 'icon-muted')} />
                             <span>
-                                Tình trạng:{' '}
-                                <strong>{inStock ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}</strong>
+                                Tình trạng: <strong>{inStock ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}</strong>
                             </span>
                         </div>
 
@@ -132,7 +159,12 @@ export default function ProductDetails() {
                                 </button>
                             </div>
 
-                            <button className={cx('btn-add-cart')} type="button" disabled={!inStock}>
+                            <button
+                                className={cx('btn-add-cart')}
+                                type="button"
+                                disabled={!inStock}
+                                onClick={handleAddToCart}
+                            >
                                 <FaShoppingCart />
                                 Thêm vào giỏ hàng
                             </button>

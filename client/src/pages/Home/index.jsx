@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 import { FaRegHeart, FaStar } from 'react-icons/fa';
 
-import { formatDate, formatMoney, getImageUrl } from '~/lib/dashboardUtils';
+import { formatDate, formatMoney, getImageUrl } from '~/utils/dashboardUtils';
 import { categoryService } from '~/services/categoryService';
 import { postService } from '~/services/postService';
 import { productService } from '~/services/productService';
@@ -75,7 +75,8 @@ export default function Home() {
                     <span className={cx('hero-badge')}>Chào mừng đến với BookStory</span>
                     <h1 className={cx('hero-title')}>Khám phá thế giới qua những trang sách tinh hoa</h1>
                     <p className={cx('hero-desc')}>
-                        Tìm kiếm và sở hữu những tựa sách đang có trong hệ thống với dữ liệu sản phẩm được cập nhật trực tiếp.
+                        Tìm kiếm và sở hữu những tựa sách đang có trong hệ thống với dữ liệu sản phẩm được cập nhật trực
+                        tiếp.
                     </p>
                     <Link className={cx('hero-btn')} to="/category">
                         Mua ngay
@@ -104,7 +105,11 @@ export default function Home() {
                 ) : (
                     <div className={cx('category-grid')}>
                         {categories.slice(0, 6).map((category) => (
-                            <Link key={category.id} to={`/category?categoryId=${category.id}`} className={cx('category-card')}>
+                            <Link
+                                key={category.id}
+                                to={`/category?categoryId=${category.id}`}
+                                className={cx('category-card')}
+                            >
                                 <div className={cx('cat-thumb')}>
                                     <span>{category.name?.slice(0, 1) || '?'}</span>
                                 </div>
@@ -140,11 +145,15 @@ export default function Home() {
                                         {product.thumbnail ? (
                                             <img src={getImageUrl(product.thumbnail)} alt={product.title} />
                                         ) : (
-                                            <span className={cx('thumb-placeholder')}>{product.title?.slice(0, 1) || '?'}</span>
+                                            <span className={cx('thumb-placeholder')}>
+                                                {product.title?.slice(0, 1) || '?'}
+                                            </span>
                                         )}
                                     </Link>
                                     <div className={cx('book-info')}>
-                                        <p className={cx('book-author')}>{product.author || product.category?.name || 'BookStory'}</p>
+                                        <p className={cx('book-author')}>
+                                            {product.author || product.category?.name || 'BookStory'}
+                                        </p>
                                         <Link className={cx('book-title')} to={`/product/${product.id}`}>
                                             {product.title}
                                         </Link>
@@ -156,7 +165,9 @@ export default function Home() {
                                         <div className={cx('book-price-row')}>
                                             <div className={cx('price-box')}>
                                                 <span className={cx('price')}>{formatMoney(product.price)}</span>
-                                                <span className={cx('stock')}>{Number(product.stock || 0)} còn lại</span>
+                                                <span className={cx('stock')}>
+                                                    {Number(product.stock || 0)} còn lại
+                                                </span>
                                             </div>
                                             <Link className={cx('add-cart-btn')} to={`/product/${product.id}`}>
                                                 Thêm
@@ -174,7 +185,10 @@ export default function Home() {
                 <div className={cx('promo-content')}>
                     <div className={cx('promo-badge')}>BookStory</div>
                     <h2>Khám phá kho sách đang có sẵn</h2>
-                    <p>Danh mục và sản phẩm được đồng bộ trực tiếp từ hệ thống quản trị để bạn luôn thấy dữ liệu mới nhất.</p>
+                    <p>
+                        Danh mục và sản phẩm được đồng bộ trực tiếp từ hệ thống quản trị để bạn luôn thấy dữ liệu mới
+                        nhất.
+                    </p>
                     <Link className={cx('promo-btn')} to="/category">
                         Khám phá ngay
                     </Link>
@@ -199,11 +213,15 @@ export default function Home() {
                                     {post.coverImageUrl ? (
                                         <img src={getImageUrl(post.coverImageUrl)} alt={post.title} />
                                     ) : (
-                                        <span className={cx('thumb-placeholder')}>{post.title?.slice(0, 1) || '?'}</span>
+                                        <span className={cx('thumb-placeholder')}>
+                                            {post.title?.slice(0, 1) || '?'}
+                                        </span>
                                     )}
                                 </div>
                                 <div className={cx('blog-info')}>
-                                    <span className={cx('blog-date')}>{formatDate(post.publishedAt || post.createdAt)}</span>
+                                    <span className={cx('blog-date')}>
+                                        {formatDate(post.publishedAt || post.createdAt)}
+                                    </span>
                                     <h3>{post.title}</h3>
                                     <p>{post.excerpt || post.dek || 'Bài viết từ BookStory.'}</p>
                                     <Link to={`/blog/${post.slug}`} className={cx('blog-link')}>
