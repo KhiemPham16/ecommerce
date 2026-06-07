@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
-import { formatDate, genderLabels, getImageUrl, roleLabels, staffRoles } from '~/lib/dashboardUtils';
+import { formatDate, genderLabels, getImageUrl, roleLabels, staffRoles } from '~/utils/dashboardUtils';
 import { useAuthStore } from '~/stores/useAuthStore';
 import { useUserStore } from '~/stores/useUserStore';
 
@@ -157,7 +157,11 @@ export default function Employees() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select className={cx('select')} value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
+                <select
+                    className={cx('select')}
+                    value={roleFilter}
+                    onChange={(event) => setRoleFilter(event.target.value)}
+                >
                     <option value="all">Tất cả quyền</option>
                     {staffRoles.map((role) => (
                         <option key={role} value={role}>
@@ -215,7 +219,10 @@ export default function Employees() {
                                             <div className={cx('employeeCell')}>
                                                 <div className={cx('avatar')}>
                                                     {employee.avatarUrl ? (
-                                                        <img src={getImageUrl(employee.avatarUrl)} alt={employee.fullName} />
+                                                        <img
+                                                            src={getImageUrl(employee.avatarUrl)}
+                                                            alt={employee.fullName}
+                                                        />
                                                     ) : (
                                                         <span>{employee.fullName?.slice(0, 1) || '?'}</span>
                                                     )}

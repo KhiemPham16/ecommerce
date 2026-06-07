@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { toast } from 'sonner';
 
-import { getPostData, getPostId, getPostList, postStatusLabels } from '~/lib/dashboardUtils';
+import { getPostData, getPostId, getPostList, postStatusLabels } from '~/utils/dashboardUtils';
 import { postService } from '~/services/postService';
 
 export const usePostStore = create((set, get) => ({

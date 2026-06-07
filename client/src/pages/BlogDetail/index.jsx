@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
-import { formatDate, getImageUrl, getPostData } from '~/lib/dashboardUtils';
+import { formatDate, getImageUrl, getPostData } from '~/utils/dashboardUtils';
 import { postService } from '~/services/postService';
 
 import styles from './BlogDetail.module.scss';
@@ -91,7 +91,10 @@ export default function BlogDetail() {
                     </div>
                 )}
 
-                <div className={cx('content')} dangerouslySetInnerHTML={{ __html: content || '<p>Bài viết chưa có nội dung.</p>' }} />
+                <div
+                    className={cx('content')}
+                    dangerouslySetInnerHTML={{ __html: content || '<p>Bài viết chưa có nội dung.</p>' }}
+                />
 
                 <div className={cx('footer')}>
                     <Link to="/blog">← Quay lại danh sách bài viết</Link>

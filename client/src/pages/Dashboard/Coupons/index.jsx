@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatDate, formatMoney } from '~/lib/dashboardUtils';
+import { formatDate, formatMoney } from '~/utils/dashboardUtils';
 import { useCouponStore } from '~/stores/useCouponStore';
 
 import CouponForm from './CouponForm';
@@ -51,7 +51,9 @@ const buildPayload = (formData, isEditing) => {
         value: Number(formData.value),
         minOrderAmount: formData.minOrderAmount === '' ? null : Number(formData.minOrderAmount),
         maxDiscountAmount:
-            formData.type === 'PERCENT' && formData.maxDiscountAmount !== '' ? Number(formData.maxDiscountAmount) : null,
+            formData.type === 'PERCENT' && formData.maxDiscountAmount !== ''
+                ? Number(formData.maxDiscountAmount)
+                : null,
         usageLimit: formData.usageLimit === '' ? null : Number(formData.usageLimit),
         startsAt: formData.startsAt || null,
         expiresAt: formData.expiresAt,
@@ -91,14 +93,19 @@ export default function Coupons() {
             const matchesStatus = statusFilter === 'all' || String(Boolean(coupon.isActive)) === statusFilter;
             const matchesKeyword =
                 !search ||
-                [coupon.code, coupon.couponType, coupon.type].filter(Boolean).some((value) => value.toLowerCase().includes(search));
+                [coupon.code, coupon.couponType, coupon.type]
+                    .filter(Boolean)
+                    .some((value) => value.toLowerCase().includes(search));
 
             return matchesType && matchesStatus && matchesKeyword;
         });
     }, [coupons, keyword, statusFilter, typeFilter]);
 
     const activeCoupons = useMemo(() => coupons.filter((coupon) => coupon.isActive), [coupons]);
-    const expiredCoupons = useMemo(() => coupons.filter((coupon) => new Date(coupon.expiresAt) < new Date()), [coupons]);
+    const expiredCoupons = useMemo(
+        () => coupons.filter((coupon) => new Date(coupon.expiresAt) < new Date()),
+        [coupons]
+    );
 
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -185,13 +192,21 @@ export default function Coupons() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select className={cx('select')} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
+                <select
+                    className={cx('select')}
+                    value={typeFilter}
+                    onChange={(event) => setTypeFilter(event.target.value)}
+                >
                     <option value="all">Tất cả loại mã</option>
                     <option value="HOLIDAY">Holiday</option>
                     <option value="CUSTOM">Custom</option>
                     <option value="RANDOM">Random</option>
                 </select>
-                <select className={cx('select')} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                <select
+                    className={cx('select')}
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value)}
+                >
                     <option value="all">Tất cả trạng thái</option>
                     <option value="true">Đang hoạt động</option>
                     <option value="false">Đã tắt</option>
@@ -260,13 +275,17 @@ export default function Coupons() {
                                                 </div>
                                             </td>
                                             <td>
-                                                <span className={cx('badge', typeClass)}>{couponTypeLabels[couponType] || couponType}</span>
+                                                <span className={cx('badge', typeClass)}>
+                                                    {couponTypeLabels[couponType] || couponType}
+                                                </span>
                                             </td>
                                             <td>
                                                 <div className={cx('codeCell')}>
                                                     <strong>{discountTypeLabels[coupon.type] || coupon.type}</strong>
                                                     <span>
-                                                        {coupon.type === 'PERCENT' ? `${Number(coupon.value)}%` : formatMoney(coupon.value)}
+                                                        {coupon.type === 'PERCENT'
+                                                            ? `${Number(coupon.value)}%`
+                                                            : formatMoney(coupon.value)}
                                                     </span>
                                                 </div>
                                             </td>
@@ -275,7 +294,9 @@ export default function Coupons() {
                                                     <strong>Đơn từ {formatMoney(coupon.minOrderAmount)}</strong>
                                                     <span>
                                                         Tối đa:{' '}
-                                                        {coupon.maxDiscountAmount ? formatMoney(coupon.maxDiscountAmount) : '-'}
+                                                        {coupon.maxDiscountAmount
+                                                            ? formatMoney(coupon.maxDiscountAmount)
+                                                            : '-'}
                                                     </span>
                                                 </div>
                                             </td>
@@ -296,7 +317,11 @@ export default function Coupons() {
                                                     <button type="button" onClick={() => handleToggleStatus(coupon)}>
                                                         {coupon.isActive ? 'Tắt' : 'Bật'}
                                                     </button>
-                                                    <button className={cx('danger')} type="button" onClick={() => handleDelete(coupon)}>
+                                                    <button
+                                                        className={cx('danger')}
+                                                        type="button"
+                                                        onClick={() => handleDelete(coupon)}
+                                                    >
                                                         Xóa
                                                     </button>
                                                 </div>

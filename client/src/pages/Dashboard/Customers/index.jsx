@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatDate, formatMoney, genderLabels, getImageUrl, orderStatusLabels, paymentStatusLabels } from '~/lib/dashboardUtils';
+import {
+    formatDate,
+    formatMoney,
+    genderLabels,
+    getImageUrl,
+    orderStatusLabels,
+    paymentStatusLabels
+} from '~/utils/dashboardUtils';
 import { useOrderStore } from '~/stores/useOrderStore';
 import { useUserStore } from '~/stores/useUserStore';
 
@@ -154,7 +161,11 @@ export default function Customers() {
                     value={keyword}
                     onChange={(event) => setKeyword(event.target.value)}
                 />
-                <select className={cx('select')} value={genderFilter} onChange={(event) => setGenderFilter(event.target.value)}>
+                <select
+                    className={cx('select')}
+                    value={genderFilter}
+                    onChange={(event) => setGenderFilter(event.target.value)}
+                >
                     <option value="all">Tất cả giới tính</option>
                     <option value="MALE">Nam</option>
                     <option value="FEMALE">Nữ</option>
@@ -210,7 +221,10 @@ export default function Customers() {
                                             <div className={cx('customerCell')}>
                                                 <div className={cx('avatar')}>
                                                     {customer.avatarUrl ? (
-                                                        <img src={getImageUrl(customer.avatarUrl)} alt={customer.fullName} />
+                                                        <img
+                                                            src={getImageUrl(customer.avatarUrl)}
+                                                            alt={customer.fullName}
+                                                        />
                                                     ) : (
                                                         <span>{customer.fullName?.slice(0, 1) || '?'}</span>
                                                     )}
@@ -318,7 +332,9 @@ export default function Customers() {
                                                 <span className={cx('status', order.status.toLowerCase())}>
                                                     {orderStatusLabels[order.status] || order.status}
                                                 </span>
-                                                <span>{paymentStatusLabels[order.paymentStatus] || order.paymentStatus}</span>
+                                                <span>
+                                                    {paymentStatusLabels[order.paymentStatus] || order.paymentStatus}
+                                                </span>
                                                 <span>{order.items?.length || 0} sản phẩm</span>
                                             </div>
                                             {order.items?.length > 0 && (

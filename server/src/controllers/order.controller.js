@@ -68,6 +68,18 @@ class OrderController {
         }
     }
 
+    async updatePaymentStatus(req, res, next) {
+        try {
+            const order = await orderService.updatePaymentStatus(req.params.id, req.body.paymentStatus);
+
+            return res.success(200, order, {
+                message: 'Cập nhật trạng thái thanh toán thành công'
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async cancelMine(req, res, next) {
         try {
             const order = await orderService.cancelMyOrder(req.user.id, req.params.id);

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatDate, formatFileSize, getMediaUrl } from '~/lib/dashboardUtils';
+import { formatDate, formatFileSize, getMediaUrl } from '~/utils/dashboardUtils';
 import { useMediaStore } from '~/stores/useMediaStore';
 
 import styles from './DashboardMedia.module.scss';
@@ -15,8 +15,20 @@ const initialUploadData = {
 };
 
 export default function Media() {
-    const { media, selectedMedia, loading, saving, uploading, deletingId, fetchMedia, fetchMediaDetail, uploadMedia, updateMedia, deleteMedia, clearSelectedMedia } =
-        useMediaStore();
+    const {
+        media,
+        selectedMedia,
+        loading,
+        saving,
+        uploading,
+        deletingId,
+        fetchMedia,
+        fetchMediaDetail,
+        uploadMedia,
+        updateMedia,
+        deleteMedia,
+        clearSelectedMedia
+    } = useMediaStore();
     const [keyword, setKeyword] = useState('');
     const [typeFilter, setTypeFilter] = useState('IMAGE');
     const [folderFilter, setFolderFilter] = useState('all');
@@ -39,7 +51,8 @@ export default function Media() {
         const search = keyword.trim().toLowerCase();
 
         return media.filter((item) => {
-            const matchesType = typeFilter === 'all' || item.type === typeFilter || item.mimeType?.startsWith(typeFilter.toLowerCase());
+            const matchesType =
+                typeFilter === 'all' || item.type === typeFilter || item.mimeType?.startsWith(typeFilter.toLowerCase());
             const matchesFolder = folderFilter === 'all' || item.folder === folderFilter;
             const matchesKeyword =
                 !search ||
@@ -112,7 +125,9 @@ export default function Media() {
             <div className={cx('header')}>
                 <div>
                     <div className={cx('title')}>Thư viện Media</div>
-                    <div className={cx('subtitle')}>Quản lý hình ảnh, upload file và chọn ảnh dùng cho sản phẩm, blog, nhân viên.</div>
+                    <div className={cx('subtitle')}>
+                        Quản lý hình ảnh, upload file và chọn ảnh dùng cho sản phẩm, blog, nhân viên.
+                    </div>
                 </div>
             </div>
 
@@ -200,7 +215,12 @@ export default function Media() {
                     <div className={cx('empty')}>Chưa có media phù hợp.</div>
                 ) : (
                     filteredMedia.map((item) => (
-                        <button className={cx('mediaItem')} key={item.id} type="button" onClick={() => openDetail(item)}>
+                        <button
+                            className={cx('mediaItem')}
+                            key={item.id}
+                            type="button"
+                            onClick={() => openDetail(item)}
+                        >
                             <div className={cx('thumb')}>
                                 {item.type === 'IMAGE' || item.mimeType?.startsWith('image/') ? (
                                     <img src={getMediaUrl(item)} alt={item.alt || item.originalName || ''} />
@@ -232,7 +252,10 @@ export default function Media() {
                         <div className={cx('detailBody')}>
                             <div className={cx('preview')}>
                                 {selectedMedia.type === 'IMAGE' || selectedMedia.mimeType?.startsWith('image/') ? (
-                                    <img src={getMediaUrl(selectedMedia)} alt={selectedMedia.alt || selectedMedia.originalName || ''} />
+                                    <img
+                                        src={getMediaUrl(selectedMedia)}
+                                        alt={selectedMedia.alt || selectedMedia.originalName || ''}
+                                    />
                                 ) : (
                                     <span>{selectedMedia.type || 'FILE'}</span>
                                 )}
@@ -243,14 +266,18 @@ export default function Media() {
                                     Alt text
                                     <input
                                         value={editData.alt}
-                                        onChange={(event) => setEditData((current) => ({ ...current, alt: event.target.value }))}
+                                        onChange={(event) =>
+                                            setEditData((current) => ({ ...current, alt: event.target.value }))
+                                        }
                                     />
                                 </label>
                                 <label>
                                     Folder
                                     <input
                                         value={editData.folder}
-                                        onChange={(event) => setEditData((current) => ({ ...current, folder: event.target.value }))}
+                                        onChange={(event) =>
+                                            setEditData((current) => ({ ...current, folder: event.target.value }))
+                                        }
                                     />
                                 </label>
                                 <label>
@@ -266,7 +293,11 @@ export default function Media() {
                                 </div>
 
                                 <div className={cx('modalActions')}>
-                                    <button type="button" onClick={() => handleDelete(selectedMedia)} disabled={deletingId === selectedMedia.id}>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDelete(selectedMedia)}
+                                        disabled={deletingId === selectedMedia.id}
+                                    >
                                         {deletingId === selectedMedia.id ? 'Đang xóa...' : 'Xóa'}
                                     </button>
                                     <button className={cx('primaryBtn')} type="submit" disabled={saving}>

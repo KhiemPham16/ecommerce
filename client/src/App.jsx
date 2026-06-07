@@ -13,6 +13,7 @@ import VerifyEmail from './pages/Auth/VerifyEmail';
 import Category from './pages/Category';
 import Account from './pages/Account';
 import AccountOrders from './pages/Account/Orders';
+import AccountOrderDetails from './pages/Account/OrderDetails';
 import ShoppingCart from './pages/ShoppingCart';
 
 import SiteLayout from '~/layouts/SiteLayout';
@@ -29,6 +30,8 @@ import Blogs from '~/pages/Dashboard/Blogs';
 import Media from '~/pages/Dashboard/Media';
 import Coupons from '~/pages/Dashboard/Coupons';
 import ProductDetails from './pages/ProductDetails';
+import Pay from './pages/Pay';
+import Payments from './pages/PaymentConfirmation';
 
 export default function App() {
     return (
@@ -54,6 +57,7 @@ export default function App() {
                 <Route element={<SiteLayout />}>
                     <Route path="/account" element={<Account />} />
                     <Route path="/account/orders" element={<AccountOrders />} />
+                    <Route path="/account/orders/:id" element={<AccountOrderDetails />} />
                 </Route>
             </Route>
 
@@ -68,6 +72,14 @@ export default function App() {
                     <Route path="blogs" element={<Blogs />} />
                     <Route path="media" element={<Media />} />
                     <Route path="coupons" element={<Coupons />} />
+                </Route>
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+                <Route element={<SiteLayout />}>
+                    <Route path="/cart" element={<ShoppingCart />} />
+                    <Route path="/pay" element={<Pay />} />
+                    <Route path="/payments/:orderId" element={<Payments />} />
                 </Route>
             </Route>
         </Routes>

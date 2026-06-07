@@ -22,5 +22,6 @@ router.patch('/my-orders/:id/cancel', orderController.cancelMine);
 router.get('/', authorize('ADMIN', 'MANAGER'), orderController.index);
 
 router.patch('/:id/status', authorize('ADMIN', 'MANAGER'), orderController.updateStatus);
+router.patch('/:id/payment-status', authorize('ADMIN', 'MANAGER'), orderController.updatePaymentStatus);
 
 module.exports = router;
