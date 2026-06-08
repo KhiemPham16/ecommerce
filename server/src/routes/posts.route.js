@@ -13,10 +13,10 @@ router.get('/admin', authenticate, authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), po
 
 router.get('/:slug', postController.show);
 
-router.post('/', authenticate, authorize('ADMIN', 'MANAGER'), postController.store);
+router.post('/', authenticate, authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), postController.store);
 
-router.patch('/:id', authenticate, authorize('ADMIN', 'MANAGER'), postController.update);
+router.patch('/:id', authenticate, authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), postController.update);
 
-router.delete('/:id', authenticate, authorize('ADMIN', 'MANAGER'), postController.destroy);
+router.delete('/:id', authenticate, authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), postController.destroy);
 
 module.exports = router;

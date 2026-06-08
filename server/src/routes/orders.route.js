@@ -19,9 +19,9 @@ router.get('/my-orders/:id', orderController.showMine);
 router.patch('/my-orders/:id/cancel', orderController.cancelMine);
 
 // Admin / Manager
-router.get('/', authorize('ADMIN', 'MANAGER'), orderController.index);
+router.get('/', authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), orderController.index);
 
-router.patch('/:id/status', authorize('ADMIN', 'MANAGER'), orderController.updateStatus);
-router.patch('/:id/payment-status', authorize('ADMIN', 'MANAGER'), orderController.updatePaymentStatus);
+router.patch('/:id/status', authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), orderController.updateStatus);
+router.patch('/:id/payment-status', authorize('ADMIN', 'MANAGER', 'EMPLOYEE'), orderController.updatePaymentStatus);
 
 module.exports = router;
