@@ -174,25 +174,13 @@ async function main() {
 
     await prisma.paymentMethod.upsert({
         where: {
-            code: 'MOMO'
+            code: 'SePay'
         },
         update: {},
         create: {
-            name: 'Ví MoMo',
-            code: 'MOMO',
-            description: 'Thanh toán qua ví MoMo'
-        }
-    });
-
-    await prisma.paymentMethod.upsert({
-        where: {
-            code: 'VNPAY'
-        },
-        update: {},
-        create: {
-            name: 'VNPay',
-            code: 'VNPAY',
-            description: 'Thanh toán qua VNPay'
+            name: 'Chuyển khoản SePay',
+            code: 'SePay',
+            description: 'Thanh toán qua SePay'
         }
     });
 

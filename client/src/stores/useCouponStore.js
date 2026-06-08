@@ -15,6 +15,13 @@ export const useCouponStore = create((set, get) => ({
     applying: false,
 
     clearSelectedCoupon: () => set({ selectedCoupon: null }),
+
+    clearCoupon: () =>
+        set({
+            coupon: null,
+            discountAmount: 0
+        }),
+
     applyCoupon: async (code, totalAmount) => {
         try {
             if (!code?.trim()) {
