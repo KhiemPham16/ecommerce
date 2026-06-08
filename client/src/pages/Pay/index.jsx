@@ -22,10 +22,22 @@ const getPaymentIcon = (code = '') => {
     const normalizedCode = code.toUpperCase();
 
     if (normalizedCode.includes('COD')) return <FaTruck />;
-    if (normalizedCode.includes('BANK')) return <FaUniversity />;
+    if (normalizedCode.includes('BANK') || normalizedCode.includes('SEPAY')) return <FaUniversity />;
     if (normalizedCode.includes('MOMO') || normalizedCode.includes('ZALO')) return <FaWallet />;
 
     return <FaCreditCard />;
+};
+
+const isSepayMethod = (method) => {
+    const paymentText = `${method?.code || ''} ${method?.name || ''} ${method?.description || ''}`.toUpperCase();
+
+    return (
+        paymentText.includes('SEPAY') ||
+        paymentText.includes('BANK_TRANSFER') ||
+        paymentText.includes('BANK') ||
+        paymentText.includes('CHUYỂN KHOẢN') ||
+        paymentText.includes('NGÂN HÀNG')
+    );
 };
 
 export default function Pay() {
@@ -37,7 +49,7 @@ export default function Pay() {
     const { coupon, discountAmount, clearCoupon } = useCouponStore();
     const { address, fetchMyAddress, upsertMyAddress, saving: savingAddress } = useAddressStore();
     const { paymentMethods, fetchActivePaymentMethods } = usePaymentMethodStore();
-    const { createOrder, creating } = useOrderStore();
+    const { createOrder, creating, payingId } = useOrderStore();
 
     const [paymentMethodId, setPaymentMethodId] = useState('');
 
@@ -75,6 +87,11 @@ export default function Pay() {
         }
     }, [paymentMethods, paymentMethodId]);
 
+    const selectedPaymentMethod = useMemo(
+        () => paymentMethods.find((method) => method.id === paymentMethodId),
+        [paymentMethods, paymentMethodId]
+    );
+
     const subTotal = useMemo(
         () => items.reduce((sum, item) => sum + Number(item.price || 0) * item.quantity, 0),
         [items]
@@ -109,7 +126,7 @@ export default function Pay() {
         });
 
         if (!savedAddress?.id) return;
-        console.log('coupon before create order:', coupon);
+
         const order = await createOrder({
             addressId: savedAddress.id,
             paymentMethodId,
@@ -120,18 +137,35 @@ export default function Pay() {
                 quantity: item.quantity
             }))
         });
+        console.log('ORDER RESULT:', order);
 
         const orderId = order?.id || order?.orderId || order?.data?.id || order?.data?.orderId;
 
-        if (!orderId) return;
-
-        navigate(`/payments/${orderId}`, {
-            state: { order: { ...order, id: orderId } }
-        });
+        if (!orderId) {
+            toast.error('Không lấy được mã đơn hàng');
+            return;
+        }
 
         clearCart();
         clearCoupon();
+
+        if (isSepayMethod(selectedPaymentMethod)) {
+            navigate(`/sepay/${orderId}`);
+            return;
+        }
+
+        navigate('/payment-confirm', {
+            state: {
+                order: {
+                    ...order,
+                    id: orderId,
+                    paymentMethod: selectedPaymentMethod
+                }
+            }
+        });
     };
+
+    const submitting = creating || savingAddress || Boolean(payingId);
 
     return (
         <div className={cx('wrapper')}>
@@ -166,7 +200,6 @@ export default function Pay() {
 
                             <div className={cx('formGroup')}>
                                 <label>Email</label>
-
                                 <input value={user?.email || ''} disabled readOnly />
                             </div>
                         </div>
@@ -227,6 +260,7 @@ export default function Pay() {
                     {coupon && (
                         <div className={cx('couponApplied')}>
                             <span>Đã áp dụng: {coupon.code}</span>
+
                             <button type="button" onClick={clearCoupon}>
                                 Bỏ mã
                             </button>
@@ -255,13 +289,8 @@ export default function Pay() {
                         <strong>{formatPrice(total)}</strong>
                     </div>
 
-                    <button
-                        type="button"
-                        className={cx('submitBtn')}
-                        onClick={handleSubmitOrder}
-                        disabled={creating || savingAddress}
-                    >
-                        {creating || savingAddress ? 'Đang xử lý...' : 'HOÀN TẤT ĐẶT HÀNG'}
+                    <button type="button" className={cx('submitBtn')} onClick={handleSubmitOrder} disabled={submitting}>
+                        {submitting ? 'Đang xử lý...' : 'HOÀN TẤT ĐẶT HÀNG'}
                         <FaArrowRight />
                     </button>
                 </aside>

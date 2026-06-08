@@ -11,6 +11,7 @@ export const useOrderStore = create((set, get) => ({
     loading: false,
     creating: false,
     updatingId: null,
+    payingId: null,
 
     createOrder: async (payload) => {
         try {
@@ -31,6 +32,45 @@ export const useOrderStore = create((set, get) => ({
             return null;
         } finally {
             set({ creating: false });
+        }
+    },
+
+    createSepayCheckout: async (orderId) => {
+        try {
+            set({ payingId: orderId });
+
+            const data = await orderService.createSepayCheckout(orderId);
+            const checkoutData = data.data;
+
+            if (!checkoutData?.checkoutURL || !checkoutData?.checkoutFormFields) {
+                toast.error('Dữ liệu thanh toán không hợp lệ');
+                return false;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = checkoutData.checkoutURL;
+
+            Object.entries(checkoutData.checkoutFormFields).forEach(([key, value]) => {
+                const input = document.createElement('input');
+
+                input.type = 'hidden';
+                input.name = key;
+                input.value = String(value);
+
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+
+            return true;
+        } catch (error) {
+            console.error(error);
+            toast.error(error?.response?.data?.message || 'Không tạo được thanh toán SePay');
+            return false;
+        } finally {
+            set({ payingId: null });
         }
     },
 
@@ -152,7 +192,7 @@ export const useOrderStore = create((set, get) => ({
             set({ updatingId: null });
         }
     },
-    
+
     updateOrderStatus: async (order, status) => {
         if (!status || order.status === status) {
             return false;

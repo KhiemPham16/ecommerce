@@ -32,6 +32,7 @@ import Coupons from '~/pages/Dashboard/Coupons';
 import ProductDetails from './pages/ProductDetails';
 import Pay from './pages/Pay';
 import Payments from './pages/PaymentConfirmation';
+import Sepay from './pages/Sepay';
 
 export default function App() {
     return (
@@ -79,7 +80,8 @@ export default function App() {
                 <Route element={<SiteLayout />}>
                     <Route path="/cart" element={<ShoppingCart />} />
                     <Route path="/pay" element={<Pay />} />
-                    <Route path="/payments/:orderId" element={<Payments />} />
+                    <Route path="/sepay/:orderId" element={<Sepay />} />
+                    <Route path="/payment-confirm" element={<Payments />} />
                 </Route>
             </Route>
         </Routes>

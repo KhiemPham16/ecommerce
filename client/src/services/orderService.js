@@ -16,6 +16,11 @@ export const orderService = {
         return res.data;
     },
 
+    createSepayCheckout: async (orderId) => {
+        const response = await api.post(`/payment/sepay/orders/${orderId}/checkout`);
+        return response.data;
+    },
+
     cancelMyOrder: async (id) => {
         const res = await api.patch(`/orders/my-orders/${id}/cancel`);
         return res.data;
