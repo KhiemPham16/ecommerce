@@ -29,6 +29,7 @@ import Orders from '~/pages/Dashboard/Orders';
 import Blogs from '~/pages/Dashboard/Blogs';
 import Media from '~/pages/Dashboard/Media';
 import Coupons from '~/pages/Dashboard/Coupons';
+import PaymentMethods from '~/pages/Dashboard/PaymentMethods';
 import ProductDetails from './pages/ProductDetails';
 import Pay from './pages/Pay';
 import Payments from './pages/PaymentConfirmation';
@@ -62,7 +63,7 @@ export default function App() {
                 </Route>
             </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']} />}>
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'EMPLOYEE']} />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
                     <Route index element={<Dashboard />} />
                     <Route path="employees" element={<Employees />} />
@@ -73,6 +74,7 @@ export default function App() {
                     <Route path="blogs" element={<Blogs />} />
                     <Route path="media" element={<Media />} />
                     <Route path="coupons" element={<Coupons />} />
+                    <Route path="payment-methods" element={<PaymentMethods />} />
                 </Route>
             </Route>
 

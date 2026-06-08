@@ -29,6 +29,7 @@ export default function Sidebar() {
         if (location.pathname.startsWith('/dashboard/blogs')) return 'Quản lý bài viết';
         if (location.pathname.startsWith('/dashboard/media')) return 'Quản lý media';
         if (location.pathname.startsWith('/dashboard/coupons')) return 'Quản lý mã giảm giá';
+        if (location.pathname.startsWith('/dashboard/payment-methods')) return 'Quản lý phương thức thanh toán';
         return 'Tổng quan';
     }, [location.pathname]);
 
@@ -55,6 +56,7 @@ export default function Sidebar() {
                 <SidebarLink to="/dashboard/blogs">Bài viết</SidebarLink>
                 <SidebarLink to="/dashboard/media">Media</SidebarLink>
                 <SidebarLink to="/dashboard/coupons">Mã giảm giá</SidebarLink>
+                <SidebarLink to="/dashboard/payment-methods">Phương thức thanh toán</SidebarLink>
             </nav>
 
             <div className={cx('sidebarFooter')}>

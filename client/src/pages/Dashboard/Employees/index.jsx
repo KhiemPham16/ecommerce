@@ -6,7 +6,7 @@ import { formatDate, genderLabels, getImageUrl, roleLabels, staffRoles } from '~
 import { useAuthStore } from '~/stores/useAuthStore';
 import { useUserStore } from '~/stores/useUserStore';
 
-import EmployeeForm from './EmployeeForm';
+import EmployeeForm from './EmployeeForm.jsx';
 import styles from './DashboardEmployees.module.scss';
 
 const cx = classNames.bind(styles);
@@ -20,6 +20,8 @@ const initialFormData = {
     gender: '',
     avatarUrl: ''
 };
+
+const assignableRoles = ['EMPLOYEE', 'MANAGER'];
 
 export default function Employees() {
     const currentUser = useAuthStore((state) => state.user);
@@ -52,12 +54,21 @@ export default function Employees() {
     }, [employees, keyword, roleFilter]);
 
     const roleOptions = useMemo(() => {
-        if (currentUser?.role === 'ADMIN') {
-            return staffRoles;
-        }
-
-        return ['EMPLOYEE'];
+        if (currentUser?.role === 'ADMIN') return assignableRoles;
+        if (currentUser?.role === 'MANAGER') return ['EMPLOYEE'];
+        return [];
     }, [currentUser?.role]);
+
+    const canCreateEmployee = currentUser?.role === 'ADMIN' || currentUser?.role === 'MANAGER';
+    const canEditEmployee = (employee) =>
+        currentUser?.role === 'ADMIN'
+            ? assignableRoles.includes(employee.role)
+            : currentUser?.role === 'MANAGER' && employee.role === 'EMPLOYEE';
+    const canChangeRole = (employee) =>
+        currentUser?.role === 'ADMIN' &&
+        employee.id !== currentUser?.id &&
+        assignableRoles.includes(employee.role);
+    const canLockEmployee = (employee) => employee.id !== currentUser?.id && canEditEmployee(employee);
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -68,22 +79,32 @@ export default function Employees() {
     };
 
     const openCreateModal = () => {
+        if (!canCreateEmployee) {
+            toast.error('Bạn không có quyền tạo nhân viên');
+            return;
+        }
+
         setEditingEmployee(null);
         setFormData({
             ...initialFormData,
-            role: roleOptions[0] || 'EMPLOYEE'
+            role: 'EMPLOYEE'
         });
         setIsOpenModal(true);
     };
 
     const openEditModal = (employee) => {
+        if (!canEditEmployee(employee)) {
+            toast.error('Bạn không có quyền cập nhật tài khoản này');
+            return;
+        }
+
         setEditingEmployee(employee);
         setFormData({
             fullName: employee.fullName || '',
             email: employee.email || '',
             phone: employee.phone || '',
             password: '',
-            role: employee.role || 'EMPLOYEE',
+            role: assignableRoles.includes(employee.role) ? employee.role : 'EMPLOYEE',
             gender: employee.gender || '',
             avatarUrl: employee.avatarUrl || ''
         });
@@ -96,6 +117,14 @@ export default function Employees() {
         setFormData(initialFormData);
     };
 
+    const getAllowedPayloadRole = () => {
+        if (currentUser?.role === 'ADMIN' && assignableRoles.includes(formData.role)) {
+            return formData.role;
+        }
+
+        return 'EMPLOYEE';
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -103,7 +132,7 @@ export default function Employees() {
             fullName: formData.fullName.trim(),
             email: formData.email.trim(),
             phone: formData.phone.trim(),
-            role: formData.role,
+            role: getAllowedPayloadRole(),
             gender: formData.gender || undefined,
             avatarUrl: formData.avatarUrl.trim() || undefined
         };
@@ -121,15 +150,39 @@ export default function Employees() {
         }
     };
 
-    const handleLockEmployee = async (employee) => {
-        if (employee.id === currentUser?.id) {
-            toast.error('Không thể khóa tài khoản đang đăng nhập');
+    const handleChangeRole = async (employee, role) => {
+        if (role === employee.role) return;
+
+        if (!canChangeRole(employee)) {
+            toast.error('Chỉ quản trị viên mới được phân quyền nhân viên và quản lý');
             return;
         }
 
-        if (!window.confirm(`Khóa tài khoản "${employee.fullName}"?`)) {
+        if (!assignableRoles.includes(role)) {
+            toast.error('Chỉ được phân quyền Nhân viên hoặc Quản lý');
             return;
         }
+
+        await updateUser(
+            employee.id,
+            {
+                fullName: employee.fullName,
+                phone: employee.phone,
+                gender: employee.gender || undefined,
+                avatarUrl: employee.avatarUrl || undefined,
+                role
+            },
+            'Cập nhật quyền nhân viên thành công'
+        );
+    };
+
+    const handleLockEmployee = async (employee) => {
+        if (!canLockEmployee(employee)) {
+            toast.error('Không thể khóa tài khoản này');
+            return;
+        }
+
+        if (!window.confirm(`Khóa tài khoản "${employee.fullName}"?`)) return;
 
         await deleteUser(employee.id, 'Đã khóa tài khoản nhân viên');
     };
@@ -147,6 +200,12 @@ export default function Employees() {
                 <button className={cx('primaryBtn')} type="button" onClick={openCreateModal}>
                     Thêm nhân viên
                 </button>
+            </div>
+
+            <div className={cx('permissionNote')}>
+                <strong>Phân quyền:</strong> Chỉ quản trị viên được phân quyền Nhân viên và Quản lý. Quản lý chỉ được tạo
+                và cập nhật tài khoản Nhân viên, không được chỉ định nhân viên khác làm Quản lý. Không ai được tự thay
+                đổi quyền của bản thân.
             </div>
 
             <div className={cx('toolbar')}>
@@ -177,6 +236,10 @@ export default function Employees() {
                     <span>Nhân viên hiển thị</span>
                 </div>
                 <div>
+                    <strong>{employees.filter((employee) => employee.role === 'ADMIN').length}</strong>
+                    <span>Quản trị viên</span>
+                </div>
+                <div>
                     <strong>{employees.filter((employee) => employee.role === 'MANAGER').length}</strong>
                     <span>Quản lý</span>
                 </div>
@@ -194,6 +257,7 @@ export default function Employees() {
                                 <th>Nhân viên</th>
                                 <th>Liên hệ</th>
                                 <th>Quyền</th>
+                                <th>Phân quyền nhanh</th>
                                 <th>Giới tính</th>
                                 <th>Ngày tạo</th>
                                 <th>Hành động</th>
@@ -202,13 +266,13 @@ export default function Employees() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td className={cx('empty')} colSpan="6">
+                                    <td className={cx('empty')} colSpan="7">
                                         Đang tải danh sách nhân viên...
                                     </td>
                                 </tr>
                             ) : filteredEmployees.length === 0 ? (
                                 <tr>
-                                    <td className={cx('empty')} colSpan="6">
+                                    <td className={cx('empty')} colSpan="7">
                                         Không có nhân viên phù hợp.
                                     </td>
                                 </tr>
@@ -244,17 +308,39 @@ export default function Employees() {
                                                 {roleLabels[employee.role]}
                                             </span>
                                         </td>
+                                        <td>
+                                            {canChangeRole(employee) ? (
+                                                <select
+                                                    className={cx('permissionSelect')}
+                                                    value={employee.role}
+                                                    disabled={saving}
+                                                    onChange={(event) => handleChangeRole(employee, event.target.value)}
+                                                >
+                                                    {assignableRoles.map((role) => (
+                                                        <option key={role} value={role}>
+                                                            {roleLabels[role]}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <span className={cx('permissionLocked')}>Không có quyền</span>
+                                            )}
+                                        </td>
                                         <td>{genderLabels[employee.gender] || '-'}</td>
                                         <td>{formatDate(employee.createdAt)}</td>
                                         <td>
                                             <div className={cx('rowActions')}>
-                                                <button type="button" onClick={() => openEditModal(employee)}>
+                                                <button
+                                                    type="button"
+                                                    disabled={!canEditEmployee(employee)}
+                                                    onClick={() => openEditModal(employee)}
+                                                >
                                                     Sửa
                                                 </button>
                                                 <button
                                                     className={cx('danger')}
                                                     type="button"
-                                                    disabled={employee.id === currentUser?.id}
+                                                    disabled={!canLockEmployee(employee)}
                                                     onClick={() => handleLockEmployee(employee)}
                                                 >
                                                     Khóa
