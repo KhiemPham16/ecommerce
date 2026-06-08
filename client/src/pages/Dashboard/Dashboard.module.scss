@@ -1,21 +1,33 @@
 .metricGrid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    gap: 16px;
 }
 
 .metricCard,
 .panel,
 .staffCard {
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 10px;
     background: #fff;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
 }
 
 .metricCard {
+    position: relative;
     display: grid;
-    gap: 6px;
-    padding: 14px;
+    gap: 8px;
+    min-height: 118px;
+    overflow: hidden;
+    padding: 18px;
+}
+
+.metricCard::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #2a83e9;
 }
 
 .metricCard span,
@@ -24,30 +36,36 @@
 .rankItem small,
 .stockItem small,
 .staffCard span {
-    color: rgba(0, 0, 0, 0.58);
+    color: rgba(15, 23, 42, 0.6);
     font-size: 13px;
     font-weight: 700;
 }
 
+.metricCard > span {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 .metricCard strong {
-    font-size: 23px;
+    color: #0f172a;
+    font-size: 25px;
     line-height: 1.15;
 }
 
 .mainGrid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 12px;
+    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+    gap: 16px;
 }
 
 .panel {
     display: grid;
-    gap: 14px;
-    padding: 14px;
+    gap: 16px;
+    padding: 18px;
 }
 
 .wide {
-    min-height: 330px;
+    min-height: 350px;
 }
 
 .panelHeader {
@@ -55,30 +73,37 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    padding-bottom: 14px;
 }
 
 .panelHeader h2 {
     margin: 0;
-    font-size: 16px;
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 850;
 }
 
 .panelHeader p {
-    margin: 4px 0 0;
+    margin: 5px 0 0;
 }
 
 .chart {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: end;
-    gap: 10px;
-    min-height: 260px;
+    gap: 12px;
+    min-height: 270px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+    padding: 12px;
 }
 
 .barGroup {
     display: grid;
     grid-template-rows: 1fr auto auto;
     align-items: end;
-    gap: 6px;
+    gap: 7px;
     min-width: 0;
     text-align: center;
 }
@@ -87,30 +112,33 @@
     position: relative;
     display: flex;
     align-items: flex-end;
-    height: 180px;
+    height: 188px;
     overflow: hidden;
-    border-radius: 8px;
-    background: #f3f6fa;
+    border: 1px solid rgba(42, 131, 233, 0.1);
+    border-radius: 10px;
+    background: #edf5ff;
 }
 
 .bar {
     width: 100%;
     min-height: 8px;
-    border-radius: 8px 8px 0 0;
-    background: linear-gradient(180deg, #2a83e9, #75b7ff);
+    border-radius: 10px 10px 0 0;
+    background: linear-gradient(180deg, #2a83e9, #83c2ff);
+    box-shadow: 0 -6px 18px rgba(42, 131, 233, 0.18);
 }
 
 .barGroup strong {
     overflow: hidden;
+    color: #0f172a;
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .barGroup span {
-    color: rgba(0, 0, 0, 0.58);
+    color: rgba(15, 23, 42, 0.58);
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 850;
 }
 
 .statusList,
@@ -127,19 +155,20 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 10px;
     background: #f8fafc;
-    padding: 10px 12px;
+    padding: 12px;
 }
 
 .statusItem span {
-    color: rgba(0, 0, 0, 0.68);
-    font-weight: 800;
+    color: rgba(15, 23, 42, 0.72);
+    font-weight: 850;
 }
 
 .statusItem strong {
-    font-size: 18px;
+    color: #2a83e9;
+    font-size: 20px;
 }
 
 .rankItem {
@@ -149,10 +178,10 @@
 .rank {
     display: grid;
     place-items: center;
-    width: 30px;
-    height: 30px;
-    flex: 0 0 30px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 10px;
     background: #eef4ff;
     color: #2a83e9;
     font-weight: 900;
@@ -174,6 +203,7 @@
 .rankItem strong,
 .stockItem strong {
     overflow: hidden;
+    color: #0f172a;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -189,7 +219,7 @@
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    padding: 5px 9px;
+    padding: 6px 10px;
     font-size: 12px;
     font-weight: 900;
 }
@@ -222,7 +252,7 @@
     display: grid;
     grid-template-columns: 1.3fr 0.7fr 1fr;
     gap: 12px;
-    padding: 12px;
+    padding: 14px;
 }
 
 .staffCard strong,
@@ -236,16 +266,19 @@
 
 .staffCard strong {
     overflow: hidden;
+    color: #0f172a;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .empty {
-    border: 1px dashed rgba(0, 0, 0, 0.16);
-    border-radius: 8px;
-    color: rgba(0, 0, 0, 0.55);
-    padding: 18px;
+    border: 1px dashed rgba(15, 23, 42, 0.2);
+    border-radius: 10px;
+    background: #f8fafc;
+    color: rgba(15, 23, 42, 0.55);
+    padding: 20px;
     text-align: center;
+    font-weight: 750;
 }
 
 @media (max-width: 1180px) {
@@ -270,7 +303,7 @@
     }
 
     .barGroup {
-        grid-template-columns: 100px 1fr 54px;
+        grid-template-columns: 104px 1fr 54px;
         grid-template-rows: auto;
         align-items: center;
         text-align: left;

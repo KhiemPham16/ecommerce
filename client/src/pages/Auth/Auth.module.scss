@@ -113,6 +113,16 @@
   text-decoration: underline;
 }
 
+.textButton {
+  border: 0;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.75);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
 .note {
   font-size: 13px;
   color: rgba(0, 0, 0, 0.65);

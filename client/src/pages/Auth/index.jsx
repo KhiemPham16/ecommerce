@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import styles from './Auth.module.scss';
 import classNames from 'classnames/bind';

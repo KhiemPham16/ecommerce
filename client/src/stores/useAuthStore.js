@@ -140,9 +140,11 @@ export const useAuthStore = create(
                     await authService.forgotPassword(email);
 
                     toast.success('Vui lòng kiểm tra email để đặt lại mật khẩu');
+                    return true;
                 } catch (error) {
                     console.error(error);
                     toast.error(error?.response?.data?.message || 'Gửi yêu cầu thất bại');
+                    return false;
                 } finally {
                     set({ loading: false });
                 }
@@ -155,9 +157,11 @@ export const useAuthStore = create(
                     await authService.resetPassword(email, otp, newPassword);
 
                     toast.success('Đặt lại mật khẩu thành công');
+                    return true;
                 } catch (error) {
                     console.error(error);
                     toast.error(error?.response?.data?.message || 'Đặt lại mật khẩu thất bại');
+                    return false;
                 } finally {
                     set({ loading: false });
                 }
