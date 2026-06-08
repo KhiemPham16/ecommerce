@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'sonner';
-import { FaCheckCircle, FaRegStar, FaShoppingCart, FaStar, FaUserCircle } from 'react-icons/fa';
+import { FaCartPlus, FaCheckCircle, FaRegStar, FaShoppingBag, FaStar, FaUserCircle } from 'react-icons/fa';
 
 import { formatDate, formatMoney, getImageUrl } from '~/utils/dashboardUtils';
 import { productService } from '~/services/productService';
@@ -38,6 +38,7 @@ function RatingStars({ value = 0, interactive = false, onChange }) {
 }
 
 export default function ProductDetails() {
+    const navigate = useNavigate();
     const { slug: productId } = useParams();
     const { accessToken, user } = useAuthStore();
     const { addToCart } = useCartStore();
@@ -161,28 +162,39 @@ export default function ProductDetails() {
         setQuantity((prev) => Math.min(Number(product?.stock || 1), prev + 1));
     };
 
-    const handleAddToCart = () => {
-        if (!product) return;
+    const buildCartProduct = (targetProduct) => ({
+        id: targetProduct.id,
+        title: targetProduct.title,
+        price: targetProduct.price,
+        thumbnail: targetProduct.thumbnail,
+        stock: targetProduct.stock,
+        category: targetProduct.category,
+        author: targetProduct.author,
+        publisher: targetProduct.publisher,
+        isbn: targetProduct.isbn
+    });
 
-        if (Number(product.stock || 0) <= 0) {
+    const handleAddToCart = (targetProduct = product, amount = quantity) => {
+        if (!targetProduct) return;
+
+        if (Number(targetProduct.stock || 0) <= 0) {
             toast.error('Sản phẩm đã hết hàng');
             return;
         }
 
-        addToCart(
-            {
-                id: product.id,
-                title: product.title,
-                price: product.price,
-                thumbnail: product.thumbnail,
-                stock: product.stock,
-                category: product.category,
-                author: product.author,
-                publisher: product.publisher,
-                isbn: product.isbn
-            },
-            quantity
-        );
+        addToCart(buildCartProduct(targetProduct), amount);
+    };
+
+    const handleBuyNow = (targetProduct = product, amount = quantity) => {
+        if (!targetProduct) return;
+
+        if (Number(targetProduct.stock || 0) <= 0) {
+            toast.error('Sản phẩm đã hết hàng');
+            return;
+        }
+
+        addToCart(buildCartProduct(targetProduct), amount);
+        navigate('/cart');
     };
 
     const handleSubmitReview = async (event) => {
@@ -331,9 +343,14 @@ export default function ProductDetails() {
                                 </button>
                             </div>
 
-                            <button className={cx('btn-add-cart')} type="button" disabled={!inStock} onClick={handleAddToCart}>
-                                <FaShoppingCart />
+                            <button className={cx('btn-add-cart')} type="button" disabled={!inStock} onClick={() => handleAddToCart()}>
+                                <FaCartPlus />
                                 Thêm vào giỏ hàng
+                            </button>
+
+                            <button className={cx('btn-buy-now')} type="button" disabled={!inStock} onClick={() => handleBuyNow()}>
+                                <FaShoppingBag />
+                                Mua ngay
                             </button>
                         </div>
                     </div>
@@ -491,22 +508,47 @@ export default function ProductDetails() {
                         <div className={cx('muted-box')}>Chưa có sản phẩm cùng danh mục.</div>
                     ) : (
                         <div className={cx('related-grid')}>
-                            {relatedProducts.map((item) => (
-                                <Link key={item.id} to={`/product/${item.id}`} className={cx('related-card')}>
-                                    <div className={cx('related-thumb')}>
-                                        {item.thumbnail ? (
-                                            <img src={getImageUrl(item.thumbnail)} alt={item.title} />
-                                        ) : (
-                                            <span>{item.title?.slice(0, 1) || '?'}</span>
-                                        )}
-                                    </div>
+                            {relatedProducts.slice(0, 4).map((item) => (
+                                <article key={item.id} className={cx('related-card')}>
+                                    <Link to={`/product/${item.id}`} className={cx('related-link')}>
+                                        <div className={cx('related-thumb')}>
+                                            {item.thumbnail ? (
+                                                <img src={getImageUrl(item.thumbnail)} alt={item.title} />
+                                            ) : (
+                                                <span>{item.title?.slice(0, 1) || '?'}</span>
+                                            )}
+                                        </div>
 
-                                    <div className={cx('related-info')}>
-                                        <span>{item.category?.name || product.category?.name || 'Sản phẩm'}</span>
-                                        <h3>{item.title}</h3>
-                                        <strong>{formatMoney(item.price)}</strong>
+                                        <div className={cx('related-info')}>
+                                            <span>{item.category?.name || product.category?.name || 'Sản phẩm'}</span>
+                                            <h3>{item.title}</h3>
+                                            <strong>{formatMoney(item.price)}</strong>
+                                        </div>
+                                    </Link>
+
+                                    <div className={cx('related-actions')}>
+                                        <button
+                                            className={cx('related-action-btn', 'cart-btn')}
+                                            type="button"
+                                            onClick={() => handleAddToCart(item, 1)}
+                                            title="Thêm vào giỏ hàng"
+                                            aria-label="Thêm vào giỏ hàng"
+                                        >
+                                            <FaCartPlus />
+                                        </button>
+
+                                        <button
+                                            className={cx('related-action-btn', 'buy-btn')}
+                                            type="button"
+                                            onClick={() => handleBuyNow(item, 1)}
+                                            title="Mua ngay"
+                                            aria-label="Mua ngay"
+                                        >
+                                            <FaShoppingBag />
+                                            <span>Mua</span>
+                                        </button>
                                     </div>
-                                </Link>
+                                </article>
                             ))}
                         </div>
                     )}

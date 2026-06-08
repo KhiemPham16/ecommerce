@@ -141,7 +141,8 @@ $color-danger: #d93a3a;
 
         .action-row {
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
             width: 100%;
 
             .quantity-selector {
@@ -178,11 +179,10 @@ $color-danger: #d93a3a;
                 }
             }
 
-            .btn-add-cart {
-                background: $color-primary-blue;
-                color: white;
-                border: none;
+            .btn-add-cart,
+            .btn-buy-now {
                 padding: 0 35px;
+                min-height: 46px;
                 font-size: 15px;
                 font-weight: 700;
                 border-radius: 8px;
@@ -190,15 +190,36 @@ $color-danger: #d93a3a;
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                transition: background 0.2s;
-
-                &:hover {
-                    background: color.adjust($color-primary-blue, $lightness: -10%);
-                }
+                transition:
+                    background 0.2s,
+                    color 0.2s,
+                    border-color 0.2s;
 
                 &:disabled {
                     cursor: not-allowed;
                     opacity: 0.6;
+                }
+            }
+
+            .btn-add-cart {
+                background: #ffffff;
+                color: $color-primary-blue;
+                border: 1px solid rgba(42, 131, 233, 0.35);
+
+                &:hover {
+                    background: rgba(42, 131, 233, 0.08);
+                    border-color: $color-primary-blue;
+                }
+            }
+
+            .btn-buy-now {
+                background: $color-primary-blue;
+                color: white;
+                border: 1px solid $color-primary-blue;
+
+                &:hover {
+                    background: color.adjust($color-primary-blue, $lightness: -10%);
+                    border-color: color.adjust($color-primary-blue, $lightness: -10%);
                 }
             }
         }
@@ -511,13 +532,13 @@ $color-danger: #d93a3a;
 
 .related-card {
     display: grid;
-    grid-template-rows: 210px 1fr;
-    border: 1px solid #eeeeee;
+    grid-template-rows: 140px minmax(132px, auto) auto;
+    min-height: 340px;
+    border: 1px solid rgba(42, 131, 233, 0.35);
     border-radius: 8px;
     overflow: hidden;
     background: #ffffff;
     color: inherit;
-    text-decoration: none;
     transition:
         transform 0.2s,
         box-shadow 0.2s,
@@ -525,9 +546,16 @@ $color-danger: #d93a3a;
 
     &:hover {
         transform: translateY(-3px);
-        border-color: rgba(42, 131, 233, 0.35);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
+        border-color: rgba(42, 131, 233, 0.75);
+        box-shadow: 0 14px 28px rgba(42, 131, 233, 0.12);
     }
+}
+
+.related-link {
+    color: inherit;
+    display: grid;
+    grid-template-rows: 140px minmax(132px, auto);
+    text-decoration: none;
 }
 
 .related-thumb {
@@ -538,7 +566,7 @@ $color-danger: #d93a3a;
 
     img {
         max-width: 100%;
-        max-height: 100%;
+        max-height: 108px;
         object-fit: contain;
         border-radius: 4px;
     }
@@ -560,6 +588,7 @@ $color-danger: #d93a3a;
     display: grid;
     gap: 8px;
     padding: 14px;
+    align-content: start;
 
     span {
         color: $color-primary-blue;
@@ -568,16 +597,64 @@ $color-danger: #d93a3a;
     }
 
     h3 {
-        min-height: 44px;
+        min-height: 42px;
         color: $color-dark;
         font-size: 15px;
         line-height: 1.45;
         margin: 0;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
     }
 
     strong {
         color: $color-danger;
         font-size: 16px;
+        align-self: end;
+    }
+}
+
+.related-actions {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 8px;
+    padding: 0 14px 14px;
+    align-self: end;
+}
+
+.related-action-btn {
+    min-height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(42, 131, 233, 0.35);
+    background: #ffffff;
+    color: $color-primary-blue;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    transition:
+        background 0.2s,
+        color 0.2s,
+        border-color 0.2s;
+
+    &:hover {
+        background: rgba(42, 131, 233, 0.08);
+        border-color: $color-primary-blue;
+    }
+
+    &.buy-btn {
+        background: $color-primary-blue;
+        color: #ffffff;
+        border-color: $color-primary-blue;
+
+        &:hover {
+            background: color.adjust($color-primary-blue, $lightness: -10%);
+            border-color: color.adjust($color-primary-blue, $lightness: -10%);
+        }
     }
 }
 
