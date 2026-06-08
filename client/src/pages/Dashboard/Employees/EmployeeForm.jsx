@@ -8,6 +8,8 @@ import styles from './DashboardEmployees.module.scss';
 const cx = classNames.bind(styles);
 
 export default function EmployeeForm({ editingEmployee, formData, roleOptions, saving, onChange, onClose, onSubmit }) {
+    const canChooseRole = roleOptions.length > 1;
+
     return (
         <form className={cx('form')} onSubmit={onSubmit}>
             <div className={cx('formGrid')}>
@@ -48,27 +50,33 @@ export default function EmployeeForm({ editingEmployee, formData, roleOptions, s
                 </label>
             )}
 
-            <div className={cx('formGrid')}>
-                <label>
-                    Quyền
-                    <select name="role" required value={formData.role} onChange={onChange}>
-                        {roleOptions.map((role) => (
-                            <option key={role} value={role}>
-                                {roleLabels[role]}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Giới tính
-                    <select name="gender" value={formData.gender} onChange={onChange}>
-                        <option value="">Chưa chọn</option>
-                        <option value="MALE">Nam</option>
-                        <option value="FEMALE">Nữ</option>
-                        <option value="OTHER">Khác</option>
-                    </select>
-                </label>
+            <div className={cx('permissionBox')}>
+                <div>
+                    <strong>Phân quyền tài khoản</strong>
+                    <span>
+                        {canChooseRole
+                            ? 'Quản trị viên được chọn quyền Nhân viên hoặc Quản lý.'
+                            : 'Quản lý chỉ được tạo và cập nhật tài khoản Nhân viên, không được cấp quyền Quản lý.'}
+                    </span>
+                </div>
+                <select name="role" required value={formData.role} onChange={onChange} disabled={!canChooseRole}>
+                    {roleOptions.map((role) => (
+                        <option key={role} value={role}>
+                            {roleLabels[role]}
+                        </option>
+                    ))}
+                </select>
             </div>
+
+            <label>
+                Giới tính
+                <select name="gender" value={formData.gender} onChange={onChange}>
+                    <option value="">Chưa chọn</option>
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                    <option value="OTHER">Khác</option>
+                </select>
+            </label>
 
             <MediaPicker
                 name="avatarUrl"

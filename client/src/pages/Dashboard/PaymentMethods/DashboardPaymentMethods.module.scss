@@ -27,21 +27,10 @@
     gap: 10px;
 }
 
-.permissionNote {
-    border: 1px solid rgba(42, 131, 233, 0.18);
-    border-radius: 8px;
-    background: rgba(42, 131, 233, 0.08);
-    color: #1d73d6;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-weight: 700;
-}
-
 .input,
 .select,
 .form input,
-.form select,
-.permissionSelect {
+.form textarea {
     border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 8px;
     background: #fff;
@@ -49,8 +38,12 @@
     font: inherit;
 }
 
+.form textarea {
+    resize: vertical;
+}
+
 .input {
-    min-width: min(360px, 100%);
+    min-width: min(340px, 100%);
 }
 
 .select {
@@ -111,7 +104,7 @@
 
 .table {
     width: 100%;
-    min-width: 1040px;
+    min-width: 980px;
     border-collapse: collapse;
     text-align: left;
 }
@@ -135,45 +128,24 @@
     border-bottom: 0;
 }
 
-.employeeCell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.employeeCell strong,
-.employeeCell span,
-.contact span {
-    display: block;
-}
-
-.employeeCell span,
-.contact span + span {
-    margin-top: 3px;
-    color: rgba(0, 0, 0, 0.58);
-    font-size: 13px;
-}
-
-.avatar {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-    overflow: hidden;
+.code {
+    display: inline-flex;
     border-radius: 8px;
-    background: #eef4ff;
-    color: #2a83e9;
-    font-weight: 900;
+    background: rgba(42, 131, 233, 0.08);
+    color: #1d73d6;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.description {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.roleBadge {
+.badge {
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
@@ -182,45 +154,19 @@
     font-weight: 800;
 }
 
-.admin {
-    background: #fff1f2;
-    color: #be123c;
-}
-
-.manager {
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.employee {
-    background: #ecfdf3;
+.active {
+    background: #e7f8ee;
     color: #10723d;
 }
 
-.permissionSelect {
-    min-width: 170px;
-    font-weight: 700;
-}
-
-.permissionSelect:disabled {
-    background: #f3f4f6;
-    color: rgba(0, 0, 0, 0.48);
-    cursor: not-allowed;
-}
-
-.permissionLocked {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
+.inactive {
     background: #f2f3f5;
     color: #667085;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 800;
 }
 
 .rowActions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
@@ -239,11 +185,6 @@
 .modalActions .primaryBtn {
     background: #2a83e9;
     color: #fff;
-}
-
-.rowActions button:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
 }
 
 .rowActions .danger {
@@ -269,7 +210,7 @@
 }
 
 .modalContent {
-    width: min(680px, 100%);
+    width: min(560px, 100%);
     max-height: calc(100vh - 36px);
     overflow-y: auto;
     border-radius: 8px;
@@ -293,7 +234,7 @@
 
 .form {
     display: grid;
-    gap: 12px;
+    gap: 14px;
     padding: 16px;
 }
 
@@ -305,49 +246,10 @@
     font-weight: 800;
 }
 
-.form input:disabled {
-    background: #f3f4f6;
-    color: rgba(0, 0, 0, 0.55);
-}
-
-.form select:disabled {
-    background: #f3f4f6;
-    color: rgba(0, 0, 0, 0.55);
-    cursor: not-allowed;
-}
-
-.permissionBox {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    gap: 12px;
+.checkLabel {
+    display: flex !important;
     align-items: center;
-    border: 1px solid rgba(42, 131, 233, 0.18);
-    border-radius: 8px;
-    background: rgba(42, 131, 233, 0.08);
-    padding: 12px;
-}
-
-.permissionBox strong,
-.permissionBox span {
-    display: block;
-}
-
-.permissionBox strong {
-    color: #1d73d6;
-    font-size: 14px;
-}
-
-.permissionBox span {
-    margin-top: 4px;
-    color: rgba(0, 0, 0, 0.62);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.formGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 8px !important;
 }
 
 .modalActions {
@@ -358,15 +260,13 @@
     padding-top: 14px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
     .header {
         align-items: stretch;
         flex-direction: column;
     }
 
-    .summary,
-    .formGrid,
-    .permissionBox {
+    .summary {
         grid-template-columns: 1fr;
     }
 }
