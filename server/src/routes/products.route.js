@@ -4,8 +4,8 @@ const router = express.Router();
 
 const productController = require('~/controllers/product.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
-const { authorize } = require('~/middlewares/rbac');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
+const { authorize } = require('~/middlewares/rbac.middleware');
 
 router.get('/', productController.index);
 router.get('/:id', productController.show);

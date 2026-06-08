@@ -5,6 +5,20 @@ require('module-alias/register');
 
 const prisma = require('~/libs/prisma');
 
+const getMimeType = (fileName) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+
+    if (ext === 'png') return 'image/png';
+    if (ext === 'webp') return 'image/webp';
+    if (ext === 'gif') return 'image/gif';
+
+    return 'image/jpeg';
+};
+
+const getFileNameFromUrl = (url) => {
+    return url.split('/').pop();
+};
+
 async function main() {
     prisma.initPrisma();
 
@@ -88,6 +102,16 @@ async function main() {
     }
 
     console.log('Seed users completed');
+
+    const admin = await prisma.user.findUnique({
+        where: {
+            email: 'admin@bookstore.com'
+        }
+    });
+
+    if (!admin) {
+        throw new Error('Admin user not found');
+    }
 
     const categories = [];
 
@@ -220,7 +244,10 @@ async function main() {
             where: {
                 slug: productData.slug
             },
-            update: {},
+            update: {
+                ...productData,
+                description: `${productData.title} description`
+            },
             create: {
                 ...productData,
                 description: `${productData.title} description`
@@ -231,6 +258,34 @@ async function main() {
     }
 
     console.log('Seed products completed');
+
+    await prisma.media.deleteMany({
+        where: {
+            folder: 'products'
+        }
+    });
+
+    await prisma.media.createMany({
+        data: products
+            .filter((product) => product.thumbnail)
+            .map((product) => {
+                const fileName = getFileNameFromUrl(product.thumbnail);
+
+                return {
+                    fileName,
+                    originalName: fileName,
+                    mimeType: getMimeType(fileName),
+                    size: 0,
+                    url: product.thumbnail,
+                    type: 'IMAGE',
+                    alt: product.title,
+                    folder: 'products',
+                    uploadedById: admin.id
+                };
+            })
+    });
+
+    console.log('Seed product media completed');
 
     const coupon50k = await prisma.coupon.upsert({
         where: {
@@ -326,16 +381,6 @@ async function main() {
 
     console.log('Seed orders completed');
 
-    const admin = await prisma.user.findUnique({
-        where: {
-            email: 'admin@bookstore.com'
-        }
-    });
-
-    if (!admin) {
-        throw new Error('Admin user not found');
-    }
-
     const postSeeds = [
         {
             title: 'Top 10 cuốn sách nên đọc năm 2026',
@@ -343,10 +388,10 @@ async function main() {
             dek: 'Những cuốn sách đáng đọc nhất năm 2026.',
             excerpt: 'Gợi ý những cuốn sách phù hợp cho sinh viên, dân văn phòng và người mới bắt đầu đọc sách.',
             bodyHtml: `
-            <h2>Top 10 cuốn sách nên đọc năm 2026</h2>
-            <p>Danh sách này phù hợp cho người muốn phát triển bản thân, học tập và nâng cấp tư duy.</p>
-            <p>Một số đầu sách nổi bật gồm Đắc Nhân Tâm, Atomic Habits, Clean Code và Nhà Giả Kim.</p>
-        `,
+                <h2>Top 10 cuốn sách nên đọc năm 2026</h2>
+                <p>Danh sách này phù hợp cho người muốn phát triển bản thân, học tập và nâng cấp tư duy.</p>
+                <p>Một số đầu sách nổi bật gồm Đắc Nhân Tâm, Atomic Habits, Clean Code và Nhà Giả Kim.</p>
+            `,
             coverImageUrl: '/uploads/media/posts/4321582bd3e68545c9bdb4c89d235aaa.jpg',
             readMinutes: 5,
             featured: true,
@@ -359,10 +404,10 @@ async function main() {
             dek: 'Đánh giá Clean Code trong thời đại AI.',
             excerpt: 'Clean Code vẫn là một cuốn sách nền tảng giúp lập trình viên viết code dễ đọc, dễ bảo trì hơn.',
             bodyHtml: `
-            <h2>Clean Code có còn đáng đọc?</h2>
-            <p>Clean Code vẫn đáng đọc, đặc biệt với sinh viên IT và lập trình viên mới đi làm.</p>
-            <p>AI có thể sinh code nhanh, nhưng tư duy đặt tên biến, tách hàm và tổ chức module vẫn là kỹ năng lõi.</p>
-        `,
+                <h2>Clean Code có còn đáng đọc?</h2>
+                <p>Clean Code vẫn đáng đọc, đặc biệt với sinh viên IT và lập trình viên mới đi làm.</p>
+                <p>AI có thể sinh code nhanh, nhưng tư duy đặt tên biến, tách hàm và tổ chức module vẫn là kỹ năng lõi.</p>
+            `,
             coverImageUrl: '/uploads/media/posts/93a7e97ba6f72741fd0849bd712c84a9.jpeg',
             readMinutes: 4,
             featured: true,
@@ -375,10 +420,10 @@ async function main() {
             dek: 'Áp dụng Atomic Habits để học lập trình hiệu quả.',
             excerpt: 'Học lập trình không cần học quá nhiều một ngày, quan trọng là duy trì thói quen đều đặn.',
             bodyHtml: `
-            <h2>Atomic Habits và việc học lập trình</h2>
-            <p>Mỗi ngày code một ít, đọc tài liệu một ít và sửa lỗi một ít sẽ tạo ra tiến bộ lớn sau vài tháng.</p>
-            <p>Thói quen nhỏ nhưng đều đặn thường hiệu quả hơn việc học dồn trong vài ngày.</p>
-        `,
+                <h2>Atomic Habits và việc học lập trình</h2>
+                <p>Mỗi ngày code một ít, đọc tài liệu một ít và sửa lỗi một ít sẽ tạo ra tiến bộ lớn sau vài tháng.</p>
+                <p>Thói quen nhỏ nhưng đều đặn thường hiệu quả hơn việc học dồn trong vài ngày.</p>
+            `,
             coverImageUrl: '/uploads/media/posts/de97344349f58b604309080a05ef913e.jpg',
             readMinutes: 6,
             featured: false,
@@ -387,8 +432,10 @@ async function main() {
         }
     ];
 
+    const posts = [];
+
     for (const postData of postSeeds) {
-        await prisma.post.upsert({
+        const post = await prisma.post.upsert({
             where: {
                 slug: postData.slug
             },
@@ -401,9 +448,39 @@ async function main() {
                 authorId: admin.id
             }
         });
+
+        posts.push(post);
     }
 
     console.log('Seed posts completed');
+
+    await prisma.media.deleteMany({
+        where: {
+            folder: 'posts'
+        }
+    });
+
+    await prisma.media.createMany({
+        data: posts
+            .filter((post) => post.coverImageUrl)
+            .map((post) => {
+                const fileName = getFileNameFromUrl(post.coverImageUrl);
+
+                return {
+                    fileName,
+                    originalName: fileName,
+                    mimeType: getMimeType(fileName),
+                    size: 0,
+                    url: post.coverImageUrl,
+                    type: 'IMAGE',
+                    alt: post.title,
+                    folder: 'posts',
+                    uploadedById: admin.id
+                };
+            })
+    });
+
+    console.log('Seed post media completed');
 
     console.log('Seed completed');
 }

@@ -4,7 +4,7 @@ const router = express.Router();
 
 const addressController = require('~/controllers/address.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
 
 router.use(authenticate);
 

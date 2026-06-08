@@ -4,11 +4,11 @@ const router = express.Router();
 
 const userController = require('~/controllers/user.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
 
-const { authorize } = require('~/middlewares/rbac');
+const { authorize } = require('~/middlewares/rbac.middleware');
 
-const { uploadAvatar } = require('~/middlewares/uploadAvatar');
+const { uploadAvatar } = require('~/middlewares/uploadAvatar.middleware');
 
 router.get('/me', authenticate, userController.me);
 router.patch('/me', authenticate, userController.updateMe);

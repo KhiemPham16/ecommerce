@@ -10,8 +10,8 @@ const path = require('path');
 
 const prisma = require('~/libs/prisma');
 const { registerRoutes } = require('~/routes');
-const { responseMiddleware } = require('~/middlewares/response');
-const { errorHandler } = require('~/middlewares/errorHandler');
+const { responseMiddleware } = require('~/middlewares/response.middleware');
+const { errorHandler } = require('~/middlewares/errorHandler.middleware');
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 

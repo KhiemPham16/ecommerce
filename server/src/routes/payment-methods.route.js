@@ -4,8 +4,8 @@ const router = express.Router();
 
 const paymentMethodController = require('~/controllers/paymentMethod.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
-const { authorize } = require('~/middlewares/rbac');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
+const { authorize } = require('~/middlewares/rbac.middleware');
 
 // Public / customer checkout
 router.get('/active', paymentMethodController.active);

@@ -3,12 +3,11 @@ const path = require('path');
 
 const prisma = require('~/libs/prisma');
 const { AppError } = require('~/errors/AppError');
+const { validateUploadMediaPayload } = require('~/validators/media.validator');
 
 class MediaService {
     async uploadMedia(userId, file, data) {
-        if (!file) {
-            throw new AppError(400, 'File là bắt buộc');
-        }
+        validateUploadMediaPayload(file);
 
         const { alt, folder } = data;
 
