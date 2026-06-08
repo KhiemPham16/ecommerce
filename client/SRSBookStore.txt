@@ -1,0 +1,226 @@
+SRS BOOKSTORE
+Software Requirements Specification
+
+1. Gioi thieu
+
+1.1 Muc dich
+Tai lieu SRSBookStore mo ta yeu cau phan mem cho he thong thuong mai dien tu ban sach BookStore/BookStory. He thong bao gom giao dien khach hang, khu vuc tai khoan nguoi dung va dashboard quan tri de quan ly san pham, danh muc, don hang, nhan vien, khach hang, bai viet, media, ma giam gia va thong ke tong quan.
+
+1.2 Pham vi
+He thong cho phep khach hang xem danh muc sach, tim kiem san pham, xem chi tiet san pham, doc blog, xem gio hang va quan ly tai khoan. Nguoi quan tri/quan ly co the truy cap dashboard de quan ly du lieu van hanh cua cua hang. Backend cung cap API REST cho frontend su dung.
+
+1.3 Doi tuong su dung
+- Khach hang: xem san pham, tim kiem, doc blog, quan ly tai khoan va don hang.
+- Nhan vien: tham gia xu ly nghiep vu theo quyen duoc cap.
+- Quan ly: quan ly san pham, don hang, khach hang, media, ma giam gia, bai viet.
+- Quan tri vien: co toan quyen quan ly dashboard, nhan vien va cau hinh van hanh.
+
+2. Mo ta tong quan he thong
+
+2.1 Kien truc tong quan
+- Frontend: React, React Router, Zustand, Axios, SCSS module.
+- Backend: Node.js, Express, Prisma, REST API.
+- Xac thuc: JWT access token, refresh token, cookie/session theo cau hinh backend.
+- Luu tru media: upload file va phuc vu file qua duong dan /uploads.
+
+2.2 Cac phan he chinh
+- Giao dien khach hang: Home, Category, Product Details, Blog, Blog Detail, Contact, Cart, Account.
+- Dashboard: Overview, Employees, Products, Categories, Customers, Orders, Blogs, Media, Coupons.
+- Dich vu API frontend: authService, productService, categoryService, orderService, postService, mediaService, couponService, userService, dashboardService.
+- Store frontend: useAuthStore, useProductStore, useCategoryStore, useOrderStore, usePostStore, useMediaStore, useCouponStore, useUserStore, useDashboardStore.
+
+3. Yeu cau chuc nang
+
+3.1 Xac thuc va phan quyen
+- Nguoi dung co the dang ky, dang nhap, quen mat khau, dat lai mat khau va xac minh email.
+- He thong phai luu trang thai dang nhap tren frontend.
+- Dashboard chi cho phep ADMIN va MANAGER truy cap cac trang quan tri chinh.
+- Cac chuc nang backend nhay cam phai kiem tra authenticate va authorize.
+
+3.2 Trang chu
+- Trang chu phai hien thi danh muc that tu backend.
+- Trang chu phai hien thi san pham dang ban tu backend.
+- Trang chu phai hien thi bai viet da publish tu backend.
+- Cac danh muc tren trang chu phai dieu huong sang trang Category voi categoryId tuong ung.
+- Cac san pham tren trang chu phai dieu huong sang Product Details.
+
+3.3 Danh muc san pham
+- Trang Category phai lay danh muc that tu API categories.
+- Chi hien thi danh muc dang active.
+- Trang Category phai lay san pham that tu API products.
+- Ho tro loc san pham theo categoryId.
+- Ho tro tim kiem san pham theo keyword tu Header.
+- San pham phai hien thi ten, anh thumbnail, danh muc, gia va nut mua.
+
+3.4 Chi tiet san pham
+- Khi bam san pham, he thong dieu huong sang /product/:id.
+- Trang Product Details phai goi API products/:id.
+- Hien thi anh, ten, danh muc, gia, tac gia, nha xuat ban, ISBN, mo ta, ton kho.
+- Cho phep tang/giam so luong trong gioi han ton kho.
+- Neu san pham khong ton tai, hien thi trang thai khong tim thay.
+
+3.5 Blog va chi tiet blog
+- Trang Blog phai lay bai viet publish tu API posts.
+- Danh sach blog phai sap xep bai moi nhat len dau theo publishedAt hoac createdAt.
+- Ho tro tim kiem bai viet theo tieu de, mo ta, slug, tac gia.
+- Moi bai viet phai co link sang /blog/:slug.
+- Trang Blog Detail phai goi API posts/:slug.
+- Hien thi tieu de, cover, tac gia, ngay dang, thoi gian doc, danh muc va noi dung HTML.
+
+3.6 Header
+- Logo BookSTORY phai dieu huong ve trang chu.
+- Header phai co o tim kiem san pham.
+- Nut tim kiem su dung icon search.
+- Khi tim kiem, dieu huong sang /category?search=keyword.
+- Nut gio hang dieu huong sang /cart.
+- Neu user la ADMIN hoac MANAGER, hien thi link Dashboard.
+
+3.7 Footer
+- Logo Footer dieu huong ve trang chu.
+- Footer phai lay danh muc that tu backend.
+- Link danh muc trong Footer dieu huong sang /category?categoryId=id.
+- Neu khong co danh muc, hien thi link fallback "Tat ca sach".
+
+3.8 Dashboard tong quan
+- Dashboard tong quan phai hien thi thong ke doanh thu.
+- Hien thi thong ke don hang theo trang thai.
+- Hien thi san pham ban chay.
+- Hien thi san pham ton kho thap.
+- Hien thi doanh thu theo thoi gian.
+- Hien thi thong ke nhan vien ban hang neu backend co du lieu lien ket.
+- Co nut "Ve giao dien nguoi dung" dieu huong ve trang chu.
+
+3.9 Quan ly nhan vien
+- Xem danh sach nhan vien.
+- Them nhan vien moi.
+- Cap nhat thong tin nhan vien.
+- Tim kiem nhan vien theo ten, email, so dien thoai.
+- Phan quyen nhan vien theo role.
+- Khoa/xoa tai khoan nhan vien.
+- Khong cho khoa tai khoan dang dang nhap.
+
+3.10 Quan ly khach hang
+- Xem danh sach khach hang.
+- Them khach hang.
+- Cap nhat khach hang.
+- Tim kiem khach hang.
+- Xem lich su mua hang theo khach hang.
+
+3.11 Quan ly danh muc dashboard
+- Xem danh sach danh muc.
+- Them danh muc.
+- Cap nhat danh muc.
+- Xoa danh muc.
+- Bat/tat trang thai danh muc.
+
+3.12 Quan ly san pham dashboard
+- Xem danh sach san pham.
+- Them san pham.
+- Cap nhat san pham.
+- Xoa san pham.
+- Tim kiem va loc theo trang thai.
+- Chon anh san pham tu Media Picker.
+
+3.13 Quan ly don hang
+- Xem danh sach don hang.
+- Xem chi tiet don hang.
+- Xac nhan don hang.
+- Cap nhat trang thai don hang.
+- Huy don hang.
+- Trang thai don hang gom: PENDING, CONFIRMED, SHIPPING, COMPLETED, CANCELLED.
+- Giao dien hien thi nhan tieng Viet: Cho xac nhan, Dang xu ly, Dang giao hang, Hoan thanh, Da huy.
+
+3.14 Quan ly bai viet dashboard
+- Tao bai viet.
+- Xem danh sach bai viet.
+- Xem chi tiet bai viet.
+- Cap nhat bai viet.
+- Xoa bai viet.
+- Cap nhat trang thai DRAFT/PUBLISHED bang dropdown.
+- Chon anh dai dien tu Media Picker.
+
+3.15 Quan ly Media
+- Upload media qua API /media/upload.
+- Xem thu vien media.
+- Tim kiem media theo ten, alt, folder.
+- Loc media theo loai va folder.
+- Xem chi tiet media.
+- Cap nhat alt va folder.
+- Xoa media.
+- Media Picker cho phep chon anh trong cac form Product, Blog, Employee, Customer.
+
+3.16 Quan ly ma giam gia
+- Xem danh sach ma giam gia.
+- Them ma giam gia.
+- Cap nhat ma giam gia.
+- Xoa ma giam gia.
+- Bat/tat trang thai ma giam gia.
+- Tim kiem va loc theo loai ma, trang thai.
+- Ho tro 3 loai couponType: holiday, custom, random.
+- Holiday tu sinh ma theo ngay het han.
+- Random tu sinh ma ngau nhien.
+- Custom cho phep nhap ma thu cong.
+- Ho tro kieu giam PERCENT va FIXED.
+
+4. Yeu cau du lieu
+
+4.1 San pham
+- id, title, slug, categoryId, author, publisher, isbn, description, thumbnail, images, price, stock, isFeatured, isActive, createdAt, updatedAt.
+
+4.2 Danh muc
+- id, name, slug, isActive, createdAt, updatedAt.
+
+4.3 Don hang
+- id, userId, addressId, paymentMethodId, couponId, totalAmount, discountAmount, finalAmount, status, paymentStatus, note, items, createdAt, updatedAt.
+
+4.4 Bai viet
+- id, slug, title, dek, excerpt, bodyHtml, coverImageUrl, readMinutes, featured, status, publishedAt, authorId, categories, createdAt, updatedAt.
+
+4.5 Media
+- id, fileName, originalName, mimeType, size, url, type, alt, folder, uploadedById, createdAt, updatedAt.
+
+4.6 Coupon
+- id, couponType, code, type, value, minOrderAmount, maxDiscountAmount, usageLimit, usedCount, startsAt, expiresAt, isActive, createdAt, updatedAt.
+
+5. Yeu cau phi chuc nang
+
+5.1 Hieu nang
+- Trang danh sach nen lay gioi han du lieu hop ly.
+- Frontend can hien thi loading khi dang goi API.
+- Cac thao tac tao/sua/xoa can cap nhat lai danh sach sau khi thanh cong.
+
+5.2 Bao mat
+- API quan tri phai yeu cau xac thuc.
+- Cac route dashboard phai kiem tra role.
+- Token phai duoc gui qua Authorization header khi co accessToken.
+- Khong hien thi chuc nang dashboard cho user khong co quyen.
+
+5.3 Kha dung
+- Giao dien phai responsive tren desktop va mobile.
+- Nut hanh dong trong form phai co noi dung ro rang, vi du "Xac nhan".
+- Cac trang danh sach phai co trang thai rong khi khong co du lieu.
+- Loi API phai duoc thong bao bang toast.
+
+5.4 Bao tri
+- Frontend phai tach page, form, service, store va helper dung chung.
+- Cac page dashboard khong goi API truc tiep neu da co store tuong ung.
+- Cac helper format tien, ngay, anh nen dung chung trong dashboardUtils.
+
+6. Rang buoc va gia dinh
+
+- Backend dang dung route REST voi prefix /api/v1.
+- Frontend dung bien moi truong VITE_API_URL de tao baseURL.
+- Media duoc phuc vu qua duong dan /uploads.
+- Product Details hien dung id san pham trong route /product/:id.
+- Blog Detail hien dung slug trong route /blog/:slug.
+- Mot so chuc nang nhu gio hang va thanh toan co the can tiep tuc hoan thien trong cac giai doan sau.
+
+7. Tieu chi chap nhan
+
+- Khach hang co the xem trang chu, danh muc, chi tiet san pham, blog va chi tiet blog bang du lieu that tu backend.
+- Header co the tim kiem san pham va dieu huong dung.
+- Footer hien thi danh muc that va dieu huong dung.
+- Admin/Manager co the truy cap dashboard va quan ly cac module chinh.
+- Form CRUD co nut xac nhan ro rang va hien thi trang thai dang xu ly.
+- Lint va build frontend phai pass sau moi thay doi lon.
+
