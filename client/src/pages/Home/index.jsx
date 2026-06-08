@@ -170,7 +170,7 @@ export default function Home() {
                                                 </span>
                                             </div>
                                             <Link className={cx('add-cart-btn')} to={`/product/${product.id}`}>
-                                                Thêm
+                                                Xem chi tiết
                                             </Link>
                                         </div>
                                     </div>

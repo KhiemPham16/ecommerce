@@ -100,7 +100,7 @@
 .product-card {
     background: #ffffff;
     border-radius: 12px;
-    border: 1px solid #eeeeee;
+    border: 1px solid rgba(42, 131, 233, 0.35);
     padding: 16px;
     display: flex;
     flex-direction: column;
@@ -110,7 +110,16 @@
 
     &:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        border-color: rgba(42, 131, 233, 0.75);
+        box-shadow: 0 10px 25px rgba(42, 131, 233, 0.12);
+    }
+
+    .product-link {
+        color: inherit;
+        text-decoration: none;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
     }
 
     .thumb {
@@ -185,19 +194,48 @@
                 font-weight: 700;
                 color: #d93a3a;
             }
+        }
+    }
 
-            .btn-add {
-                background: #2a83e9;
-                color: white;
-                border: none;
-                padding: 6px 14px;
-                border-radius: 6px;
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                &:hover {
-                    background: #1d73d6;
-                }
+    .product-actions {
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 8px;
+        margin-top: 14px;
+
+        .action-btn {
+            min-height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(42, 131, 233, 0.35);
+            background: #ffffff;
+            color: #2a83e9;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            transition:
+                background 0.2s,
+                color 0.2s,
+                border-color 0.2s;
+
+            &:hover {
+                background: rgba(42, 131, 233, 0.08);
+                border-color: #2a83e9;
+            }
+        }
+
+        .buy-btn {
+            background: #2a83e9;
+            color: #ffffff;
+            border-color: #2a83e9;
+
+            &:hover {
+                background: #1d73d6;
+                color: #ffffff;
+                border-color: #1d73d6;
             }
         }
     }
