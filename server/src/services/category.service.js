@@ -2,6 +2,7 @@ const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
 const { generateUniqueCategorySlug } = require('~/utils/slugify');
+const { validateCreateCategoryPayload } = require('~/validators/category.validator');
 
 class CategoryService {
     async getCategories() {
@@ -27,9 +28,7 @@ class CategoryService {
     }
 
     async createCategory(name) {
-        if (!name) {
-            throw new AppError(400, 'Tên danh mục là bắt buộc');
-        }
+        validateCreateCategoryPayload(name);
 
         const existed = await prisma.category.findUnique({
             where: {

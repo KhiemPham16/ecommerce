@@ -1,6 +1,7 @@
 const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
+const { validateCreatePaymentMethodPayload } = require('~/validators/paymentMethod.validator');
 
 class PaymentMethodService {
     async getPaymentMethods() {
@@ -39,9 +40,7 @@ class PaymentMethodService {
     async createPaymentMethod(data) {
         const { name, code, description, isActive } = data;
 
-        if (!name || !code) {
-            throw new AppError(400, 'Thiếu thông tin phương thức thanh toán');
-        }
+        validateCreatePaymentMethodPayload(data);
 
         const normalizedCode = code.toUpperCase().trim();
 

@@ -4,10 +4,10 @@ const router = express.Router();
 
 const mediaController = require('~/controllers/media.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
-const { authorize } = require('~/middlewares/rbac');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
+const { authorize } = require('~/middlewares/rbac.middleware');
 // const upload = require('~/middlewares/uploadAvatar');
-const { uploadMedia } = require('~/middlewares/uploadMedia');
+const { uploadMedia } = require('~/middlewares/uploadMedia.middleware');
 
 router.use(authenticate);
 

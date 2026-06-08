@@ -1,6 +1,7 @@
 const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
+const { validateCreateCouponPayload, validateCouponPayload } = require('~/validators/coupon.validator');
 
 class CouponService {
     generateHolidayCode(expiresAt) {
@@ -73,9 +74,7 @@ class CouponService {
             isActive
         } = data;
 
-        if (!couponType || !type || value === undefined || !expiresAt) {
-            throw new AppError(400, 'Thiếu thông tin mã giảm giá');
-        }
+        validateCreateCouponPayload(data);
 
         let couponCode;
 
@@ -88,15 +87,7 @@ class CouponService {
         }
 
         if (couponType === 'custom') {
-            if (!code) {
-                throw new AppError(400, 'Vui lòng nhập mã coupon');
-            }
-
             couponCode = code;
-        }
-
-        if (!couponCode) {
-            throw new AppError(400, 'Loại mã coupon không hợp lệ');
         }
 
         couponCode = await this.makeUniqueCode(couponCode);
@@ -187,13 +178,7 @@ class CouponService {
     }
 
     async validateCoupon(code, totalAmount) {
-        if (!code) {
-            throw new AppError(400, 'Mã coupon là bắt buộc');
-        }
-
-        if (totalAmount === undefined || totalAmount < 0) {
-            throw new AppError(400, 'Tổng tiền đơn hàng không hợp lệ');
-        }
+        validateCouponPayload(code, totalAmount);
 
         const coupon = await prisma.coupon.findFirst({
             where: {

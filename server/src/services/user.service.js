@@ -6,6 +6,7 @@ const authConfig = require('~/configs/auth.config');
 
 const { AppError } = require('~/errors/AppError');
 const { generateUsername } = require('~/utils/generateUsername');
+const { validateUpdateAvatarPayload, validateCreateUserPayload } = require('~/validators/user.validator');
 
 class UserService {
     async getMe(userId) {
@@ -49,9 +50,7 @@ class UserService {
     }
 
     async updateAvatar(userId, file) {
-        if (!file) {
-            throw new AppError(400, 'Avatar là bắt buộc');
-        }
+        validateUpdateAvatarPayload(file);
 
         const user = await prisma.user.update({
             where: {
@@ -106,9 +105,7 @@ class UserService {
     async createUser(data) {
         const { fullName, email, password, phone, role } = data;
 
-        if (!fullName || !email || !password || !phone) {
-            throw new AppError(400, 'Thiếu thông tin bắt buộc');
-        }
+        validateCreateUserPayload(data);
 
         const duplicate = await prisma.user.findFirst({
             where: {

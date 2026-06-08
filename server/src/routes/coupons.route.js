@@ -4,8 +4,8 @@ const router = express.Router();
 
 const couponController = require('~/controllers/coupon.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
-const { authorize } = require('~/middlewares/rbac');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
+const { authorize } = require('~/middlewares/rbac.middleware');
 
 router.post('/validate', couponController.validate);
 

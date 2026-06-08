@@ -9,6 +9,15 @@ const mailService = require('~/services/mail.service');
 const authConfig = require('~/configs/auth.config');
 const { dateAfterExpiresIn } = require('~/utils/expiresIn');
 const { generateUsername } = require('~/utils/generateUsername');
+const {
+    validateToken,
+    validateRegisterPayload,
+    validateLoginPayload,
+    validateRefreshToken,
+    validateForgotPasswordPayload,
+    validateResetPasswordPayload,
+    validateChangePasswordPayload
+} = require('~/validators/auth.validator');
 
 const { AppError } = require('~/errors/AppError');
 const appConfig = require('~/configs/app.config');
@@ -19,9 +28,7 @@ class AuthService {
     }
 
     async verifyEmail(token) {
-        if (!token) {
-            throw new AppError(400, 'Token không tồn tại');
-        }
+        validateToken(token);
 
         const user = await prisma.user.findFirst({
             where: {
@@ -53,9 +60,7 @@ class AuthService {
     }
 
     async register(fullName, email, password, phone) {
-        if (!password || !email || !fullName || !phone) {
-            throw new AppError(400, 'Thiếu thông tin bắt buộc');
-        }
+        validateRegisterPayload(fullName, email, password, phone);
 
         const duplicate = await prisma.user.findFirst({
             where: {
@@ -102,9 +107,7 @@ class AuthService {
     }
 
     async login(email, password) {
-        if (!email || !password) {
-            throw new AppError(400, 'Thiếu thông tin bắt buộc');
-        }
+        validateLoginPayload(email, password);
 
         const user = await prisma.user.findUnique({
             where: {
@@ -187,9 +190,7 @@ class AuthService {
     }
 
     async refreshToken(refreshToken) {
-        if (!refreshToken) {
-            throw new AppError(401, 'Token không tồn tại');
-        }
+        validateRefreshToken(refreshToken);
 
         const session = await prisma.session.findUnique({
             where: {
@@ -238,9 +239,7 @@ class AuthService {
     }
 
     async forgotPassword(email) {
-        if (!email) {
-            throw new AppError(400, 'Email là bắt buộc');
-        }
+        validateForgotPasswordPayload(email);
 
         const user = await prisma.user.findUnique({
             where: {
@@ -275,9 +274,7 @@ class AuthService {
     }
 
     async resetPassword(email, otp, newPassword) {
-        if (!email || !otp || !newPassword) {
-            throw new AppError(400, 'Thiếu thông tin bắt buộc');
-        }
+        validateResetPasswordPayload(email, otp, newPassword);
 
         const user = await prisma.user.findFirst({
             where: {
@@ -318,13 +315,7 @@ class AuthService {
     }
 
     async changePassword(userId, currentPassword, newPassword, confirmNewPassword) {
-        if (!currentPassword || !newPassword || !confirmNewPassword) {
-            throw new AppError(400, 'Thiếu thông tin bắt buộc');
-        }
-
-        if (newPassword !== confirmNewPassword) {
-            throw new AppError(400, 'Xác nhận mật khẩu mới không khớp');
-        }
+        validateChangePasswordPayload(currentPassword, newPassword, confirmNewPassword);
 
         const user = await prisma.user.findUnique({
             where: {

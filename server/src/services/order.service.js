@@ -1,6 +1,11 @@
 const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
+const {
+    validateCreateOrderPayload,
+    validateOrderStatusPayload,
+    validatePaymentStatusPayload
+} = require('~/validators/order.validator');
 
 class OrderService {
     normalizeStatus(status) {
@@ -10,17 +15,7 @@ class OrderService {
     async createOrder(userId, data) {
         const { addressId, paymentMethodId, items, couponCode, note } = data;
 
-        if (!items || !Array.isArray(items) || items.length === 0) {
-            throw new AppError(400, 'Giỏ hàng trống');
-        }
-
-        if (!addressId) {
-            throw new AppError(400, 'Vui lòng chọn địa chỉ giao hàng');
-        }
-
-        if (!paymentMethodId) {
-            throw new AppError(400, 'Vui lòng chọn phương thức thanh toán');
-        }
+        validateCreateOrderPayload(data);
 
         const address = await prisma.address.findFirst({
             where: {
@@ -48,10 +43,6 @@ class OrderService {
         let totalAmount = 0;
 
         for (const item of items) {
-            if (!item.productId || !item.quantity || item.quantity < 1) {
-                throw new AppError(400, 'Sản phẩm trong giỏ hàng không hợp lệ');
-            }
-
             const product = await prisma.product.findFirst({
                 where: {
                     id: item.productId,
@@ -298,11 +289,9 @@ class OrderService {
     async updateStatus(orderId, status) {
         const nextStatus = this.normalizeStatus(status);
 
-        const allowedStatus = ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED'];
+        validateOrderStatusPayload(nextStatus);
 
-        if (!allowedStatus.includes(nextStatus)) {
-            throw new AppError(400, 'Trạng thái đơn hàng không hợp lệ');
-        }
+        const allowedStatus = ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED'];
 
         const order = await prisma.order.findUnique({
             where: {
@@ -393,11 +382,9 @@ class OrderService {
     async updatePaymentStatus(orderId, paymentStatus) {
         const nextStatus = paymentStatus.toUpperCase();
 
-        const allowedStatus = ['UNPAID', 'PAID', 'FAILED', 'REFUNDED'];
+        validatePaymentStatusPayload(nextStatus);
 
-        if (!allowedStatus.includes(nextStatus)) {
-            throw new AppError(400, 'Trạng thái thanh toán không hợp lệ');
-        }
+        const allowedStatus = ['UNPAID', 'PAID', 'FAILED', 'REFUNDED'];
 
         const order = await prisma.order.findUnique({
             where: {

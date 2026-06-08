@@ -4,8 +4,8 @@ const router = express.Router();
 
 const orderController = require('~/controllers/order.controller');
 
-const { authenticate } = require('~/middlewares/authenticate');
-const { authorize } = require('~/middlewares/rbac');
+const { authenticate } = require('~/middlewares/authenticate.middleware');
+const { authorize } = require('~/middlewares/rbac.middleware');
 
 router.use(authenticate);
 

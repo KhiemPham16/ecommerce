@@ -2,6 +2,7 @@ const prisma = require('~/libs/prisma');
 
 const { AppError } = require('~/errors/AppError');
 const { generateUniqueSlugPrisma } = require('~/utils/slugify');
+const { validateCreateProductPayload } = require('~/validators/product.validator');
 
 class ProductService {
     async getProducts(query) {
@@ -111,9 +112,7 @@ class ProductService {
             isActive
         } = data;
 
-        if (!title || !categoryId || !author || price === undefined) {
-            throw new AppError(400, 'Thiếu thông tin sản phẩm');
-        }
+        validateCreateProductPayload(data);
 
         const category = await prisma.category.findFirst({
             where: {

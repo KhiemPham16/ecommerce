@@ -1,4 +1,5 @@
 const prisma = require('~/libs/prisma');
+const { validateCreateReviewPayload, validateUpdateReviewPayload } = require('~/validators/review.validator');
 
 const createError = (status, message) => {
     const error = new Error(message);
@@ -48,13 +49,7 @@ class ReviewService {
     async createReview(userId, data) {
         const { productId, orderId, rating, comment } = data;
 
-        if (!productId || !orderId || !rating) {
-            throw createError(400, 'Thiếu productId, orderId hoặc rating');
-        }
-
-        if (rating < 1 || rating > 5) {
-            throw createError(400, 'Rating phải từ 1 đến 5');
-        }
+        validateCreateReviewPayload(data);
 
         const order = await prisma.order.findFirst({
             where: {
@@ -154,9 +149,7 @@ class ReviewService {
     async updateReview(userId, reviewId, data) {
         const { rating, comment } = data;
 
-        if (rating && (rating < 1 || rating > 5)) {
-            throw createError(400, 'Rating phải từ 1 đến 5');
-        }
+        validateUpdateReviewPayload(data);
 
         const review = await prisma.review.findFirst({
             where: {
