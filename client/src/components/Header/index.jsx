@@ -160,7 +160,7 @@ export default function Header() {
                     <li>
                         <Link to="/contact">Liên hệ</Link>
                     </li>
-                    {user && ['ADMIN', 'MANAGER'].includes(user.role) && (
+                    {user && ['ADMIN', 'MANAGER','EMPLOYEE'].includes(user.role) && (
                         <li>
                             <Link to="/dashboard">Dashboard</Link>
                         </li>

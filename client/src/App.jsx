@@ -19,6 +19,8 @@ import ShoppingCart from './pages/ShoppingCart';
 import SiteLayout from '~/layouts/SiteLayout';
 import DashboardLayout from '~/layouts/DashboardLayout';
 import ProtectedRoute from '~/components/ProtectedRoute';
+import DashboardRouteGuard from '~/components/DashboardRouteGuard';
+import { dashboardRoutes } from '~/utils/dashboardPermissions';
 
 import Dashboard from '~/pages/Dashboard';
 import Employees from '~/pages/Dashboard/Employees';
@@ -36,6 +38,8 @@ import Payments from './pages/PaymentConfirmation';
 import Sepay from './pages/Sepay';
 
 export default function App() {
+    const routeByPath = Object.fromEntries(dashboardRoutes.map((route) => [route.path, route]));
+
     return (
         <Routes>
             <Route element={<SiteLayout />}>
@@ -65,16 +69,86 @@ export default function App() {
 
             <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'MANAGER', 'EMPLOYEE']} />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="employees" element={<Employees />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="categories" element={<Categories />} />
-                    <Route path="orders" element={<Orders />} />
-                    <Route path="blogs" element={<Blogs />} />
-                    <Route path="media" element={<Media />} />
-                    <Route path="coupons" element={<Coupons />} />
-                    <Route path="payment-methods" element={<PaymentMethods />} />
+                    <Route
+                        index
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard']}>
+                                <Dashboard />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="employees"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/employees']}>
+                                <Employees />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="customers"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/customers']}>
+                                <Customers />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="products"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/products']}>
+                                <Products />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="categories"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/categories']}>
+                                <Categories />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="orders"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/orders']}>
+                                <Orders />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="blogs"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/blogs']}>
+                                <Blogs />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="media"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/media']}>
+                                <Media />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="coupons"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/coupons']}>
+                                <Coupons />
+                            </DashboardRouteGuard>
+                        }
+                    />
+                    <Route
+                        path="payment-methods"
+                        element={
+                            <DashboardRouteGuard route={routeByPath['/dashboard/payment-methods']}>
+                                <PaymentMethods />
+                            </DashboardRouteGuard>
+                        }
+                    />
                 </Route>
             </Route>
 
