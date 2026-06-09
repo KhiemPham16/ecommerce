@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { formatFileSize, getMediaUrl, getMediaValue, getImageUrl } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useMediaStore } from '~/stores/useMediaStore';
 
 import styles from './MediaPicker.module.scss';
@@ -24,6 +25,7 @@ export default function MediaPicker({
         alt: '',
         folder
     });
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         if (isOpen) {
@@ -32,7 +34,7 @@ export default function MediaPicker({
     }, [fetchMedia, isOpen]);
 
     const imageMedia = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return media
             .filter((item) => item.type === 'IMAGE' || item.mimeType?.startsWith('image/'))
@@ -45,7 +47,7 @@ export default function MediaPicker({
                     .filter(Boolean)
                     .some((text) => text.toLowerCase().includes(search));
             });
-    }, [keyword, media]);
+    }, [debouncedKeyword, media]);
 
     const emitChange = (nextValue) => {
         onChange({

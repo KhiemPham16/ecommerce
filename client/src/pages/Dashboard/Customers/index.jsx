@@ -9,6 +9,7 @@ import {
     orderStatusLabels,
     paymentStatusLabels
 } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useOrderStore } from '~/stores/useOrderStore';
 import { useUserStore } from '~/stores/useUserStore';
 
@@ -35,6 +36,7 @@ export default function Customers() {
     const [editingCustomer, setEditingCustomer] = useState(null);
     const [historyCustomer, setHistoryCustomer] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchUsers();
@@ -43,7 +45,7 @@ export default function Customers() {
     const customers = useMemo(() => users.filter((user) => user.role === 'CUSTOMER'), [users]);
 
     const filteredCustomers = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return customers.filter((customer) => {
             const matchesGender = genderFilter === 'all' || customer.gender === genderFilter;
@@ -55,7 +57,7 @@ export default function Customers() {
 
             return matchesGender && matchesKeyword;
         });
-    }, [customers, keyword, genderFilter]);
+    }, [customers, debouncedKeyword, genderFilter]);
 
     const customerOrders = useMemo(() => {
         if (!historyCustomer) {

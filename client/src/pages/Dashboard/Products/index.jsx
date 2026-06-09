@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
+import useDebounce from '~/hooks/useDebounce';
 import { useProductStore } from '~/stores/useProductStore';
 
 import ProductForm from './ProductForm';
@@ -58,14 +59,15 @@ export default function Products() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     const productParams = useMemo(
         () => ({
-            keyword: keyword.trim() || undefined,
+            keyword: debouncedKeyword.trim() || undefined,
             isActive: statusFilter === 'all' ? undefined : statusFilter,
             limit: 100
         }),
-        [keyword, statusFilter]
+        [debouncedKeyword, statusFilter]
     );
 
     useEffect(() => {

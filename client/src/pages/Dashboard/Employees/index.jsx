@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
 import { formatDate, genderLabels, getImageUrl, roleLabels, staffRoles } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useAuthStore } from '~/stores/useAuthStore';
 import { useUserStore } from '~/stores/useUserStore';
 
@@ -31,6 +32,7 @@ export default function Employees() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchUsers();
@@ -39,7 +41,7 @@ export default function Employees() {
     const employees = useMemo(() => users.filter((user) => staffRoles.includes(user.role)), [users]);
 
     const filteredEmployees = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return employees.filter((employee) => {
             const matchesRole = roleFilter === 'all' || employee.role === roleFilter;
@@ -51,7 +53,7 @@ export default function Employees() {
 
             return matchesRole && matchesKeyword;
         });
-    }, [employees, keyword, roleFilter]);
+    }, [employees, debouncedKeyword, roleFilter]);
 
     const roleOptions = useMemo(() => {
         if (currentUser?.role === 'ADMIN') return assignableRoles;

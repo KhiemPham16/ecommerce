@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
+import useDebounce from '~/hooks/useDebounce';
 import { useCategoryStore } from '~/stores/useCategoryStore';
 
 import CategoryForm from './CategoryForm';
@@ -41,13 +42,14 @@ export default function Categories() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchCategories();
     }, [fetchCategories]);
 
     const filteredCategories = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return categories.filter((category) => {
             const matchesKeyword =
@@ -58,7 +60,7 @@ export default function Categories() {
 
             return matchesKeyword && matchesStatus;
         });
-    }, [categories, keyword, statusFilter]);
+    }, [categories, debouncedKeyword, statusFilter]);
 
     const openCreateModal = () => {
         setEditingCategory(null);

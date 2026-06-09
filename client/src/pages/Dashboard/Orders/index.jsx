@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { formatDate, formatMoney, orderStatusLabels, paymentStatusLabels } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useOrderStore } from '~/stores/useOrderStore';
 
 import styles from './DashboardOrders.module.scss';
@@ -33,13 +34,14 @@ export default function Orders() {
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchOrders();
     }, [fetchOrders]);
 
     const filteredOrders = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return orders.filter((order) => {
             const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
@@ -58,7 +60,7 @@ export default function Orders() {
 
             return matchesStatus && matchesKeyword;
         });
-    }, [orders, keyword, statusFilter]);
+    }, [orders, debouncedKeyword, statusFilter]);
 
     const totalRevenue = useMemo(
         () =>

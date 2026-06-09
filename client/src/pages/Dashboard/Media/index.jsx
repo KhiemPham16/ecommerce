@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { formatDate, formatFileSize, getMediaUrl } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useMediaStore } from '~/stores/useMediaStore';
 
 import styles from './DashboardMedia.module.scss';
@@ -37,6 +38,7 @@ export default function Media() {
         alt: '',
         folder: ''
     });
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchMedia();
@@ -48,7 +50,7 @@ export default function Media() {
     );
 
     const filteredMedia = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return media.filter((item) => {
             const matchesType =
@@ -62,7 +64,7 @@ export default function Media() {
 
             return matchesType && matchesFolder && matchesKeyword;
         });
-    }, [folderFilter, keyword, media, typeFilter]);
+    }, [folderFilter, debouncedKeyword, media, typeFilter]);
 
     const handleUpload = async (event) => {
         event.preventDefault();
