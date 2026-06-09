@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { formatDate, getImageUrl, getPostId, normalizePostStatus, postStatusLabels } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { usePostStore } from '~/stores/usePostStore';
 
 import PostForm from './PostForm';
@@ -42,13 +43,14 @@ export default function Blogs() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingPost, setEditingPost] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchPosts();
     }, [fetchPosts]);
 
     const filteredPosts = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return posts.filter((post) => {
             const status = normalizePostStatus(post.status);
@@ -61,7 +63,7 @@ export default function Blogs() {
 
             return matchesStatus && matchesKeyword;
         });
-    }, [posts, keyword, statusFilter]);
+    }, [posts, debouncedKeyword, statusFilter]);
 
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;

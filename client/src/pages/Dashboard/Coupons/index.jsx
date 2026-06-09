@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { formatDate, formatMoney } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { useCouponStore } from '~/stores/useCouponStore';
 
 import CouponForm from './CouponForm';
@@ -79,13 +80,14 @@ export default function Coupons() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchCoupons();
     }, [fetchCoupons]);
 
     const filteredCoupons = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return coupons.filter((coupon) => {
             const couponType = normalizeCouponType(coupon.couponType);
@@ -99,7 +101,7 @@ export default function Coupons() {
 
             return matchesType && matchesStatus && matchesKeyword;
         });
-    }, [coupons, keyword, statusFilter, typeFilter]);
+    }, [coupons, debouncedKeyword, statusFilter, typeFilter]);
 
     const activeCoupons = useMemo(() => coupons.filter((coupon) => coupon.isActive), [coupons]);
     const expiredCoupons = useMemo(

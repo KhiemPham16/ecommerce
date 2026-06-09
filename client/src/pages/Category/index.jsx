@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { FaCartPlus, FaFilter, FaShoppingBag, FaStar } from 'react-icons/fa';
 import { formatMoney, getImageUrl } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { categoryService } from '~/services/categoryService';
 import { productService } from '~/services/productService';
 import { useCartStore } from '~/stores/useCartStore';
@@ -26,6 +27,7 @@ export default function Category() {
     const [selectedCategoryId, setSelectedCategoryId] = useState(categoryIdParam);
     const [loadingCategories, setLoadingCategories] = useState(false);
     const [loadingProducts, setLoadingProducts] = useState(false);
+    const debouncedSearchKeyword = useDebounce(searchKeyword, 500);
 
     useEffect(() => {
         setSelectedCategoryId(categoryIdParam);
@@ -51,12 +53,12 @@ export default function Category() {
 
     const productParams = useMemo(
         () => ({
-            keyword: searchKeyword || undefined,
+            keyword: debouncedSearchKeyword || undefined,
             categoryId: selectedCategoryId === allCategoryId ? undefined : selectedCategoryId,
             isActive: 'true',
             limit: 100
         }),
-        [searchKeyword, selectedCategoryId]
+        [debouncedSearchKeyword, selectedCategoryId]
     );
 
     useEffect(() => {

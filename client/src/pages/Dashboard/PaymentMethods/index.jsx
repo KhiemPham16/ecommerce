@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
 import { formatDate } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { usePaymentMethodStore } from '~/stores/usePaymentMethodStore';
 
 import styles from './DashboardPaymentMethods.module.scss';
@@ -34,13 +35,14 @@ export default function PaymentMethods() {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [editingMethod, setEditingMethod] = useState(null);
     const [formData, setFormData] = useState(initialFormData);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         fetchPaymentMethods();
     }, [fetchPaymentMethods]);
 
     const filteredMethods = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         return paymentMethods.filter((method) => {
             const matchesKeyword =
@@ -52,7 +54,7 @@ export default function PaymentMethods() {
 
             return matchesKeyword && matchesStatus;
         });
-    }, [keyword, paymentMethods, statusFilter]);
+    }, [debouncedKeyword, paymentMethods, statusFilter]);
 
     const activeCount = useMemo(() => paymentMethods.filter((method) => method.isActive).length, [paymentMethods]);
     const inactiveCount = paymentMethods.length - activeCount;

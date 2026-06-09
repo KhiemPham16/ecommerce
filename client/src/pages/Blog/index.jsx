@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { FaSearch } from 'react-icons/fa';
 
 import { formatDate, getImageUrl, getPostId, getPostList } from '~/utils/dashboardUtils';
+import useDebounce from '~/hooks/useDebounce';
 import { postService } from '~/services/postService';
 
 import styles from './Blog.module.scss';
@@ -15,6 +16,7 @@ export default function Blog() {
     const [posts, setPosts] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [loading, setLoading] = useState(false);
+    const debouncedKeyword = useDebounce(keyword, 500);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -40,7 +42,7 @@ export default function Blog() {
     }, []);
 
     const filteredPosts = useMemo(() => {
-        const search = keyword.trim().toLowerCase();
+        const search = debouncedKeyword.trim().toLowerCase();
 
         if (!search) {
             return posts;
@@ -51,7 +53,7 @@ export default function Blog() {
                 .filter(Boolean)
                 .some((value) => value.toLowerCase().includes(search))
         );
-    }, [keyword, posts]);
+    }, [debouncedKeyword, posts]);
 
     return (
         <div className={cx('blog-wrapper')}>
