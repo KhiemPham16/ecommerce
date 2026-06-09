@@ -138,3 +138,24 @@ export const getPostList = (payload) => {
 export const getPostData = (payload) => payload?.data?.post || payload?.data || payload?.post || payload;
 
 export const getPostId = (post) => post?.id || post?._id;
+
+export const getPostContent = (post) => post?.bodyHtml || post?.content || post?.body || '';
+
+export const getPostCover = (post) => post?.coverImageUrl || post?.thumbnail || post?.coverImage || post?.image || '';
+
+export const isFeaturedPost = (post) =>
+    post?.featured === true || post?.featured === 'true' || post?.featured === 1 || post?.featured === '1';
+
+export const sortPostsByFeaturedAndDate = (posts) =>
+    [...posts].sort((a, b) => {
+        const featuredDiff = Number(isFeaturedPost(b)) - Number(isFeaturedPost(a));
+
+        if (featuredDiff !== 0) {
+            return featuredDiff;
+        }
+
+        return (
+            new Date(b.publishedAt || b.createdAt || 0).getTime() -
+            new Date(a.publishedAt || a.createdAt || 0).getTime()
+        );
+    });

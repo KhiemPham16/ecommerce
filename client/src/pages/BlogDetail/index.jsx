@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 
-import { formatDate, getImageUrl, getPostData } from '~/utils/dashboardUtils';
+import { formatDate, getImageUrl, getPostContent, getPostCover, getPostData } from '~/utils/dashboardUtils';
 import { postService } from '~/services/postService';
 
 import styles from './BlogDetail.module.scss';
@@ -57,7 +57,8 @@ export default function BlogDetail() {
     }
 
     const categories = post.categories?.map((item) => item.category?.name).filter(Boolean) || [];
-    const content = post.bodyHtml || post.content || post.body || '';
+    const content = getPostContent(post);
+    const coverImage = getPostCover(post);
 
     return (
         <article className={cx('detailWrapper')}>
@@ -85,9 +86,9 @@ export default function BlogDetail() {
                     )}
                 </header>
 
-                {post.coverImageUrl && (
+                {coverImage && (
                     <div className={cx('cover')}>
-                        <img src={getImageUrl(post.coverImageUrl)} alt={post.title} />
+                        <img src={getImageUrl(coverImage)} alt={post.title} />
                     </div>
                 )}
 

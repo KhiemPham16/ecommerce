@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import styles from './Auth.module.scss';
 import classNames from 'classnames/bind';
+
 import { useAuthStore } from '~/stores/useAuthStore';
+
+import styles from './Auth.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -11,10 +13,9 @@ export default function ForgotPassword() {
     const navigate = useNavigate();
     const { forgotPassword, loading } = useAuthStore();
     const [email, setEmail] = useState('');
-    const [sentEmail, setSentEmail] = useState('');
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
         const trimmedEmail = email.trim();
 
@@ -26,13 +27,8 @@ export default function ForgotPassword() {
         const success = await forgotPassword(trimmedEmail);
 
         if (success) {
-            setSentEmail(trimmedEmail);
+            navigate(`/auth/reset-password?email=${encodeURIComponent(trimmedEmail)}`);
         }
-    };
-
-    const goToResetPassword = () => {
-        const targetEmail = sentEmail || email.trim();
-        navigate(`/auth/reset-password${targetEmail ? `?email=${encodeURIComponent(targetEmail)}` : ''}`);
     };
 
     return (
@@ -51,12 +47,6 @@ export default function ForgotPassword() {
                 />
             </div>
 
-            {sentEmail && (
-                <p className={cx('success')}>
-                    OTP đã được gửi đến {sentEmail}. Vui lòng kiểm tra email và nhập mã trong 30 phút.
-                </p>
-            )}
-
             <button className={cx('button')} type="submit" disabled={loading}>
                 {loading ? 'Đang gửi OTP...' : 'Gửi OTP'}
             </button>
@@ -65,9 +55,9 @@ export default function ForgotPassword() {
                 <Link className={cx('link')} to="/auth/login">
                     Quay lại đăng nhập
                 </Link>
-                <button className={cx('textButton')} type="button" onClick={goToResetPassword}>
+                <Link className={cx('link')} to="/auth/reset-password">
                     Tôi đã có OTP
-                </button>
+                </Link>
             </div>
         </form>
     );
