@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'sonner';
 import { FaRegHeart, FaStar } from 'react-icons/fa';
 
-import { formatDate, formatMoney, getImageUrl } from '~/utils/dashboardUtils';
+import { formatDate, formatMoney, getImageUrl, getPostCover, getPostList, sortPostsByFeaturedAndDate } from '~/utils/dashboardUtils';
 import { categoryService } from '~/services/categoryService';
 import { postService } from '~/services/postService';
 import { productService } from '~/services/productService';
@@ -35,7 +35,7 @@ export default function Home() {
 
                 setCategories((categoryResponse.data || []).filter((category) => category.isActive));
                 setProducts(productResponse.data || []);
-                setPosts(postResponse.data || []);
+                setPosts(sortPostsByFeaturedAndDate(getPostList(postResponse)));
             } catch (error) {
                 console.error(error);
                 toast.error(error?.response?.data?.message || 'Không tải được dữ liệu trang chủ');
@@ -66,7 +66,7 @@ export default function Home() {
         return (featured.length > 0 ? featured : products).slice(0, 8);
     }, [products]);
 
-    const latestPosts = useMemo(() => posts.slice(0, 3), [posts]);
+    const latestPosts = useMemo(() => sortPostsByFeaturedAndDate(posts).slice(0, 3), [posts]);
 
     return (
         <div className={cx('home-wrapper')}>
@@ -210,8 +210,8 @@ export default function Home() {
                         {latestPosts.map((post) => (
                             <article key={post.id} className={cx('blog-card')}>
                                 <div className={cx('blog-thumb')}>
-                                    {post.coverImageUrl ? (
-                                        <img src={getImageUrl(post.coverImageUrl)} alt={post.title} />
+                                    {getPostCover(post) ? (
+                                        <img src={getImageUrl(getPostCover(post))} alt={post.title} />
                                     ) : (
                                         <span className={cx('thumb-placeholder')}>
                                             {post.title?.slice(0, 1) || '?'}

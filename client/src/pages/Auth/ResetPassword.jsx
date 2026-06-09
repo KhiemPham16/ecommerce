@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import styles from './Auth.module.scss';
 import classNames from 'classnames/bind';
+
 import { useAuthStore } from '~/stores/useAuthStore';
+
+import styles from './Auth.module.scss';
 
 const cx = classNames.bind(styles);
 
 export default function ResetPassword() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { resetPassword, loading } = useAuthStore();
+    const { forgotPassword, resetPassword, loading } = useAuthStore();
     const [formData, setFormData] = useState({
         email: searchParams.get('email') || '',
         otp: '',
@@ -18,6 +20,7 @@ export default function ResetPassword() {
         confirmPassword: ''
     });
     const [isCompleted, setIsCompleted] = useState(false);
+    const [lastSentEmail, setLastSentEmail] = useState(searchParams.get('email') || '');
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -28,8 +31,27 @@ export default function ResetPassword() {
         }));
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleResendOtp = async () => {
+        const email = formData.email.trim();
+
+        if (!email) {
+            toast.error('Vui lòng nhập email để gửi lại OTP');
+            return;
+        }
+
+        const success = await forgotPassword(email);
+
+        if (success) {
+            setLastSentEmail(email);
+            setFormData((prev) => ({
+                ...prev,
+                otp: ''
+            }));
+        }
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
         const email = formData.email.trim();
         const otp = formData.otp.trim();
@@ -59,7 +81,7 @@ export default function ResetPassword() {
 
     return (
         <form className={cx('form')} onSubmit={handleSubmit}>
-            <p className={cx('note')}>Nhập email, OTP và mật khẩu mới để hoàn tất đặt lại mật khẩu.</p>
+            <p className={cx('note')}>Nhập OTP đã gửi đến email và mật khẩu mới để hoàn tất đặt lại mật khẩu.</p>
 
             <div className={cx('field')}>
                 <label className={cx('label')}>Email</label>
@@ -74,6 +96,10 @@ export default function ResetPassword() {
                 />
             </div>
 
+            {lastSentEmail && (
+                <p className={cx('success')}>OTP đã được gửi đến {lastSentEmail}. Nếu chưa nhận được, bạn có thể gửi lại.</p>
+            )}
+
             <div className={cx('field')}>
                 <label className={cx('label')}>OTP</label>
                 <input
@@ -86,6 +112,13 @@ export default function ResetPassword() {
                     inputMode="numeric"
                     maxLength={6}
                 />
+            </div>
+
+            <div className={cx('rowBetween')}>
+                <span className={cx('note')}>Không nhận được OTP?</span>
+                <button className={cx('textButton')} type="button" onClick={handleResendOtp} disabled={loading}>
+                    {loading ? 'Đang gửi lại...' : 'Gửi lại OTP'}
+                </button>
             </div>
 
             <div className={cx('field')}>

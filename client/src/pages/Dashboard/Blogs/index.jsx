@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 
-import { formatDate, getImageUrl, getPostId, normalizePostStatus, postStatusLabels } from '~/utils/dashboardUtils';
+import {
+    formatDate,
+    getImageUrl,
+    getPostContent,
+    getPostCover,
+    getPostId,
+    normalizePostStatus,
+    postStatusLabels
+} from '~/utils/dashboardUtils';
 import useDebounce from '~/hooks/useDebounce';
 import { usePostStore } from '~/stores/usePostStore';
 
@@ -226,8 +234,7 @@ export default function Blogs() {
                                 filteredPosts.map((post) => {
                                     const postId = getPostId(post);
                                     const status = normalizePostStatus(post.status);
-                                    const thumbnail =
-                                        post.coverImageUrl || post.thumbnail || post.coverImage || post.image;
+                                    const thumbnail = getPostCover(post);
 
                                     return (
                                         <tr key={postId}>
@@ -323,18 +330,10 @@ export default function Blogs() {
                         </div>
 
                         <div className={cx('detailBody')}>
-                            {(selectedPost.coverImageUrl ||
-                                selectedPost.thumbnail ||
-                                selectedPost.coverImage ||
-                                selectedPost.image) && (
+                            {getPostCover(selectedPost) && (
                                 <img
                                     className={cx('cover')}
-                                    src={getImageUrl(
-                                        selectedPost.coverImageUrl ||
-                                            selectedPost.thumbnail ||
-                                            selectedPost.coverImage ||
-                                            selectedPost.image
-                                    )}
+                                    src={getImageUrl(getPostCover(selectedPost))}
                                     alt={selectedPost.title}
                                 />
                             )}
@@ -350,9 +349,12 @@ export default function Blogs() {
                                 <p className={cx('excerpt')}>{selectedPost.excerpt || selectedPost.summary}</p>
                             )}
 
-                            <div className={cx('content')}>
-                                {selectedPost.bodyHtml || selectedPost.content || selectedPost.body || '-'}
-                            </div>
+                            <div
+                                className={cx('content')}
+                                dangerouslySetInnerHTML={{
+                                    __html: getPostContent(selectedPost) || '<p>Bài viết chưa có nội dung.</p>'
+                                }}
+                            />
 
                             <div className={cx('modalActions')}>
                                 <select
