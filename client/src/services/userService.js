@@ -19,5 +19,23 @@ export const userService = {
     deleteUser: async (id) => {
         const res = await api.delete(`/users/${id}`);
         return res.data;
+    },
+
+    updateMe: async (payload) => {
+        const res = await api.patch('/users/me', payload);
+        return res.data;
+    },
+
+    updateMyAvatar: async (file) => {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        const res = await api.patch('/users/me/avatar', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        return res.data;
     }
 };
