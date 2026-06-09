@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'sonner';
 import { authService } from '~/services/authService';
+import { userService } from '~/services/userService';
 
 export const useAuthStore = create(
     persist(
@@ -125,9 +126,11 @@ export const useAuthStore = create(
                     await authService.changePassword(oldPassword, newPassword);
 
                     toast.success('Đổi mật khẩu thành công');
+                    return true;
                 } catch (error) {
                     console.error(error);
                     toast.error(error?.response?.data?.message || 'Đổi mật khẩu thất bại');
+                    return false;
                 } finally {
                     set({ loading: false });
                 }
@@ -161,6 +164,44 @@ export const useAuthStore = create(
                 } catch (error) {
                     console.error(error);
                     toast.error(error?.response?.data?.message || 'Đặt lại mật khẩu thất bại');
+                    return false;
+                } finally {
+                    set({ loading: false });
+                }
+            },
+
+            updateProfile: async (payload) => {
+                try {
+                    set({ loading: true });
+
+                    const data = await userService.updateMe(payload);
+                    const user = data.data || data.user || data;
+
+                    set({ user });
+                    toast.success(data.message || 'Cập nhật thông tin thành công');
+                    return true;
+                } catch (error) {
+                    console.error(error);
+                    toast.error(error?.response?.data?.message || 'Không cập nhật được thông tin');
+                    return false;
+                } finally {
+                    set({ loading: false });
+                }
+            },
+
+            updateAvatar: async (file) => {
+                try {
+                    set({ loading: true });
+
+                    const data = await userService.updateMyAvatar(file);
+                    const user = data.data || data.user || data;
+
+                    set({ user });
+                    toast.success(data.message || 'Cập nhật avatar thành công');
+                    return true;
+                } catch (error) {
+                    console.error(error);
+                    toast.error(error?.response?.data?.message || 'Không cập nhật được avatar');
                     return false;
                 } finally {
                     set({ loading: false });
