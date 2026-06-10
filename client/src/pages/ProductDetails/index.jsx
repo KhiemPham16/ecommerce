@@ -317,8 +317,6 @@ export default function ProductDetails() {
                             <span className={cx('current-price')}>{formatMoney(product.price)}</span>
                         </div>
 
-                        <p className={cx('short-desc')}>{product.description || 'Sản phẩm chưa có mô tả ngắn.'}</p>
-
                         <div className={cx('book-meta')}>
                             <span>Tác giả: {product.author || '-'}</span>
                             <span>Nhà xuất bản: {product.publisher || '-'}</span>
