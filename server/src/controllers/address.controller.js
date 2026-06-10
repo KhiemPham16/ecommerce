@@ -1,4 +1,5 @@
 const addressService = require('~/services/address.service');
+const { validateUpsertAddressPayload } = require('~/validators/address.validator');
 
 class AddressController {
     async me(req, res, next) {
@@ -16,6 +17,8 @@ class AddressController {
 
     async upsertMe(req, res, next) {
         try {
+            validateUpsertAddressPayload(req.body);
+
             const address = await addressService.upsertMyAddress(req.user.id, req.body);
 
             return res.status(200).json({

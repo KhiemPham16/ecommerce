@@ -81,6 +81,16 @@ export default function Pay() {
         }
     }, [address]);
 
+    // autofill phone from logged-in user if no saved address; keep editable
+    useEffect(() => {
+        if (!address && user?.phone) {
+            setFormData((prev) => ({
+                ...prev,
+                receiverPhone: prev.receiverPhone || user.phone || ''
+            }));
+        }
+    }, [user, address]);
+
     useEffect(() => {
         if (!paymentMethodId && paymentMethods.length > 0) {
             setPaymentMethodId(paymentMethods[0].id);
