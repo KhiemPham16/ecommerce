@@ -6,16 +6,17 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-const { connectDB } = require('~/libs/mongodb');
+const prisma = require('~/libs/prisma');
 const { registerRoutes } = require('~/routes');
-const { responseMiddleware } = require('~/middlewares/response');
-const { errorHandler } = require('~/middlewares/errorHandler');
+const { responseMiddleware } = require('~/middlewares/response.middleware');
+const { errorHandler } = require('~/middlewares/errorHandler.middleware');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
 
 async function bootstrap() {
-    await connectDB();
+    prisma.initPrisma();
 
     const app = express();
     const port = process.env.PORT || 3000;
@@ -24,7 +25,7 @@ async function bootstrap() {
 
     app.use(
         cors({
-            origin: process.env.CORS_ORIGIN,
+            origin: process.env.FRONTEND_URL,
             credentials: true
         })
     );
@@ -36,22 +37,13 @@ async function bootstrap() {
         })
     );
 
+    const swaggerDocument = JSON.parse(fs.readFileSync('./src/swagger.json', 'utf8'));
+
     app.use(express.json());
     app.use(cookieParser());
     app.use(morgan('common'));
 
-    const limiter = rateLimit({
-        windowMs: 15 * 60 * 1000,
-        max: 100,
-        standardHeaders: true,
-        legacyHeaders: false,
-        message: {
-            success: false,
-            message: 'Quá nhiều yêu cầu, vui lòng thử lại sau'
-        }
-    });
-
-    app.use('/api/v1', limiter);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 

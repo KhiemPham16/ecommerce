@@ -1,0 +1,799 @@
+SRS BOOKSTORE / BOOKSTORY
+Software Requirements Specification
+
+Phien ban tai lieu: 2.0
+Ngay cap nhat: 08/06/2026
+
+============================================================
+1. GIOI THIEU
+============================================================
+
+1.1 Muc dich
+Tai lieu SRSBookStore mo ta yeu cau phan mem cho he thong thuong mai dien tu ban sach BookStore/BookStory. Tai lieu nay dung de thong nhat pham vi chuc nang, vai tro nguoi dung, yeu cau du lieu, yeu cau giao dien va tieu chi chap nhan cua du an.
+
+He thong bao gom:
+- Giao dien khach hang.
+- Khu vuc tai khoan nguoi dung.
+- Dashboard quan tri.
+- Cac module quan ly san pham, danh muc, don hang, nhan vien, khach hang, bai viet, media, ma giam gia va phuong thuc thanh toan.
+
+1.2 Pham vi
+He thong cho phep khach hang:
+- Xem trang chu bang du lieu that tu backend.
+- Xem danh muc san pham.
+- Tim kiem san pham.
+- Xem chi tiet san pham.
+- Them san pham vao gio hang.
+- Mua ngay va dieu huong den gio hang/thanh toan.
+- Doc blog va chi tiet blog.
+- Dang ky, dang nhap, quen mat khau, dat lai mat khau.
+- Quan ly tai khoan va xem lich su don hang.
+- Danh gia san pham neu da mua san pham.
+
+He thong cho phep nguoi dung noi bo:
+- Truy cap dashboard theo dung quyen.
+- Quan ly du lieu van hanh cua cua hang.
+- An cac tinh nang khong co quyen tren giao dien.
+- Chan truy cap truc tiep URL dashboard neu khong du quyen.
+
+1.3 Doi tuong su dung
+- Khach hang: xem sach, tim kiem, dat hang, doc blog, quan ly tai khoan, danh gia san pham da mua.
+- Nhan vien: quan ly san pham, bai viet, media, xem don hang, cap nhat status va paymentStatus don hang.
+- Quan ly: quan ly cac module van hanh, tao nhan vien moi, nhung khong duoc tu thay doi quyen ban than va khong duoc chi dinh nguoi khac lam MANAGER neu khong du quyen.
+- Quan tri vien: co toan quyen tren dashboard, bao gom phan quyen nhan vien va quan ly.
+
+1.4 Dinh nghia viet tat
+- SRS: Software Requirements Specification.
+- FE: Frontend.
+- BE: Backend.
+- API: Application Programming Interface.
+- CRUD: Create, Read, Update, Delete.
+- JWT: JSON Web Token.
+- UI: User Interface.
+- UX: User Experience.
+
+============================================================
+2. MO TA TONG QUAN HE THONG
+============================================================
+
+2.1 Kien truc tong quan
+- Frontend: React, React Router, Zustand, Axios, SCSS Module, Vite.
+- Backend: Node.js, Express, Prisma, REST API.
+- Database: phu thuoc cau hinh backend hien tai.
+- Xac thuc: access token, refresh token va API /users/me.
+- Media: upload va quan ly file qua route media cua backend.
+- Thanh toan: ho tro trang thai thanh toan va luong xac nhan thanh toan theo backend.
+
+2.2 Cac phan he chinh
+- Public site: Home, Category, Product Details, Blog, Blog Detail, Contact.
+- User flow: Auth, Forgot Password, Reset Password, Account, Account Orders, Cart, Pay, Sepay, Payment Confirmation.
+- Dashboard: Overview, Employees, Products, Categories, Customers, Orders, Blogs/Posts, Media, Coupons, Payment Methods.
+- Shared FE layer: services, stores, utils, reusable form components, media picker, protected route.
+
+2.3 Nguyen tac thiet ke frontend
+- Page dashboard nen tach theo module cha.
+- Service xu ly viec goi API.
+- Store xu ly state, loading, saving va action bat dong bo.
+- Form CRUD nen tach rieng thanh component/page con trong folder module.
+- UI khong hien nut/chuc nang neu nguoi dung khong co quyen.
+- Route dashboard phai co guard chan truy cap truc tiep.
+- Cac nut trong form create/edit phai co noi dung ro rang nhu "Xac nhan".
+- Mau chu cua button phai dam bao doc duoc, khong bi trang tren nen trang.
+- Mau chu dao cua cac nut mua/them gio hang la #2A83E9.
+
+============================================================
+3. VAI TRO VA PHAN QUYEN
+============================================================
+
+3.1 Vai tro
+- CUSTOMER: nguoi dung mua hang.
+- EMPLOYEE: nhan vien cua cua hang.
+- MANAGER: quan ly cua cua hang.
+- ADMIN: quan tri vien he thong.
+
+3.2 Quyen dashboard tong quan
+- ADMIN duoc truy cap toan bo module dashboard.
+- MANAGER duoc truy cap cac module van hanh chinh va co the tao nhan vien moi theo gioi han quyen.
+- EMPLOYEE chi duoc truy cap cac module duoc cap quyen.
+- CUSTOMER khong duoc truy cap dashboard.
+
+3.3 Quyen dashboard chi tiet
+- Overview: ADMIN, MANAGER.
+- Employees: ADMIN, MANAGER.
+- Products: ADMIN, MANAGER, EMPLOYEE.
+- Categories: ADMIN, MANAGER.
+- Customers: ADMIN, MANAGER.
+- Orders: ADMIN, MANAGER, EMPLOYEE.
+- Blogs/Posts: ADMIN, MANAGER, EMPLOYEE.
+- Media: ADMIN, MANAGER, EMPLOYEE.
+- Coupons: ADMIN, MANAGER.
+- Payment Methods: ADMIN, MANAGER.
+
+3.4 Quyen quan ly nhan vien
+- ADMIN co the tao, cap nhat, khoa/xoa va phan quyen nhan vien.
+- ADMIN co the gan role EMPLOYEE hoac MANAGER cho nguoi dung noi bo theo quy tac he thong.
+- MANAGER co the tao nhan vien moi theo gioi han he thong.
+- MANAGER khong duoc chi dinh nhan vien khac lam MANAGER neu khong du quyen.
+- MANAGER khong duoc tu thay doi quyen cua ban than.
+- EMPLOYEE khong duoc phan quyen nhan vien.
+- He thong khong cho khoa/xoa tai khoan dang dang nhap.
+
+3.5 An tinh nang theo quyen
+- Sidebar dashboard chi hien thi module ma role hien tai duoc phep truy cap.
+- Neu nguoi dung go truc tiep URL dashboard khong co quyen, he thong chuyen ve trang dashboard dau tien ma nguoi do duoc phep truy cap.
+- Tieu de dashboard phai lay theo module duoc phep, khong hien module bi cam.
+- Cac nut thao tac nhay cam phai an neu role khong du quyen.
+
+============================================================
+4. YEU CAU CHUC NANG - XAC THUC VA TAI KHOAN
+============================================================
+
+4.1 Dang ky
+- Khach hang co the tao tai khoan bang ho ten, email, so dien thoai va mat khau.
+- Sau khi dang ky, he thong thong bao kiem tra email neu backend yeu cau xac minh.
+
+4.2 Dang nhap
+- Nguoi dung co the dang nhap bang email va mat khau.
+- Sau khi dang nhap thanh cong, FE luu accessToken va thong tin user vao store.
+- He thong goi API /users/me de lay thong tin nguoi dung hien tai.
+- Neu user co role noi bo va truy cap dashboard, ProtectedRoute kiem tra role.
+
+4.3 Dang xuat
+- Nguoi dung co the dang xuat.
+- Sau khi dang xuat, FE xoa accessToken, user va storage lien quan.
+
+4.4 Xac minh email
+- He thong ho tro trang verify email theo token/duong dan backend.
+- Khi thanh cong, hien thong bao xac minh thanh cong.
+
+4.5 Quen mat khau
+- Nguoi dung co the nhap email de yeu cau dat lai mat khau.
+- He thong gui yeu cau den backend.
+- FE hien thong bao huong dan kiem tra email/OTP.
+
+4.6 Dat lai mat khau
+- Nguoi dung co the nhap email, OTP/token va mat khau moi.
+- FE gui yeu cau reset password den backend.
+- Neu thanh cong, nguoi dung co the quay lai trang dang nhap.
+
+4.7 Quan ly tai khoan
+- Khach hang co the xem/cap nhat thong tin ca nhan neu backend ho tro.
+- Khach hang co the xem lich su don hang.
+- Khach hang co the xem chi tiet tung don hang.
+
+============================================================
+5. YEU CAU CHUC NANG - GIAO DIEN KHACH HANG
+============================================================
+
+5.1 Header
+- Logo tren header phai dieu huong ve trang chu.
+- Header su dung logo dong bo voi footer.
+- Header co o tim kiem san pham.
+- Nut search su dung icon search cua React/lucide neu du an co thu vien icon.
+- Khi tim kiem, he thong dieu huong sang trang Category voi keyword tuong ung.
+- Nut gio hang dieu huong sang /cart.
+- Header phai hien thi dung trang thai dang nhap/dang xuat.
+- Neu user co quyen dashboard, co the co lien ket vao dashboard theo thiet ke.
+- Khong tu dong dua ADMIN vao dashboard khi bam vao san pham o giao dien khach hang; thao tac tren public site phai giu dung luong public site tru khi nguoi dung bam Dashboard.
+
+5.2 Footer
+- Logo footer phai dieu huong ve trang chu.
+- Footer lay danh muc that tu backend.
+- Link danh muc trong footer dieu huong dung sang trang danh muc voi category thuc te.
+- Neu backend khong co danh muc, hien thi fallback hop ly.
+
+5.3 Trang chu
+- Trang chu su dung du lieu that tu backend.
+- Hien thi danh muc noi bat/active.
+- Hien thi san pham noi bat, san pham moi hoac san pham dang ban.
+- Hien thi bai viet moi nhat neu co.
+- San pham tren trang chu co the dieu huong sang Product Details.
+- Danh muc tren trang chu dieu huong sang Category theo categoryId/slug.
+- UI trang chu phai co khoang cach hop ly, dong bo voi mau chu dao cua du an.
+
+5.4 Trang danh muc san pham
+- Lay danh muc that tu backend.
+- Lay san pham that tu backend.
+- Ho tro loc theo danh muc.
+- Ho tro tim kiem theo keyword tu header.
+- Moi card san pham hien thi anh, ten sach, tac gia, danh muc, gia, ton kho/trang thai neu can.
+- Moi card san pham co vien xanh mong theo mau chu dao.
+- Moi card co nut them vao gio hang bang icon.
+- Moi card co nut mua bang icon hoac icon + text.
+- Khi bam "Them vao gio hang", san pham duoc them vao gio hang.
+- Khi bam "Mua", san pham duoc them vao gio hang va dieu huong sang /cart de tien hanh thanh toan.
+- Nut mua/them gio hang dung mau #2A83E9.
+- Bam vao phan san pham dieu huong sang Product Details.
+
+5.5 Trang chi tiet san pham
+- Route chi tiet san pham la /product/:slug hoac theo cau hinh hien tai cua FE.
+- Trang lay du lieu san pham that tu backend.
+- Hien thi anh, ten sach, tac gia, nha xuat ban, ISBN, danh muc, gia, ton kho, mo ta.
+- Cho phep chon so luong trong gioi han ton kho.
+- Co nut "Them vao gio hang".
+- Co nut "Mua ngay"; khi bam se them vao gio hang va dieu huong sang /cart.
+- Nut hanh dong dung mau chu dao #2A83E9.
+- Hien thi danh sach danh gia cua san pham.
+- Chi nguoi da mua san pham moi duoc danh gia.
+- Nguoi da danh gia co the sua lai danh gia cua minh neu backend cho phep.
+- Hien thi san pham goi y cung danh muc.
+- San pham goi y cung danh muc hien thi toi da 4 san pham.
+- Card san pham goi y phai hien thi ro anh, ten sach va thong tin chinh, khong bi anh che title.
+- Neu san pham khong ton tai, hien thi trang thai khong tim thay.
+
+5.6 Gio hang
+- Gio hang hien thi danh sach san pham da them.
+- Co the tang/giam so luong, xoa san pham khoi gio hang.
+- Tinh tong tien, so luong va thong tin thanh toan.
+- Tu gio hang co the dieu huong sang trang thanh toan.
+
+5.7 Thanh toan
+- Trang Pay hien thi thong tin don hang, dia chi, phuong thuc thanh toan va tong tien.
+- Sau khi dat hang, he thong tao don hang theo API backend.
+- Neu phuong thuc thanh toan yeu cau xac nhan, dieu huong sang Sepay hoac Payment Confirmation theo flow hien tai.
+- He thong hien trang thai thanh toan cho nguoi dung.
+
+5.8 Contact
+- Trang contact phai co layout dong bo voi cac trang khac.
+- Khoang trong hai ben can can doi, khong bi rong qua muc so voi cac trang public site khac.
+
+============================================================
+6. YEU CAU CHUC NANG - BLOG PUBLIC
+============================================================
+
+6.1 Danh sach blog
+- Trang Blog lay du lieu that tu backend posts.
+- Chi hien thi bai viet published/public theo quy tac backend.
+- Hien thi bai viet moi nhat len dau.
+- Tieu de blog khong qua lon, can doi voi layout.
+- Khoang trong phia tren gan header phai hop ly.
+- Toolbar tim kiem co giao dien ro rang, input de nhin va de thao tac.
+- Ho tro tim kiem theo tieu de, mo ta, tac gia, slug.
+- Card blog phai co anh khong lam be giao dien.
+- Anh blog phai co chieu cao gioi han, object-fit hop ly, khong che mat title.
+
+6.2 Chi tiet blog
+- Route chi tiet blog la /blog/:slug.
+- Trang Blog Detail lay du lieu that tu backend.
+- Hien thi tieu de, anh dai dien, tac gia, ngay dang, thoi gian doc, mo ta va noi dung HTML.
+- Neu bai viet khong ton tai, hien thi trang thai khong tim thay.
+
+============================================================
+7. YEU CAU CHUC NANG - DASHBOARD TONG QUAN
+============================================================
+
+7.1 Truy cap
+- Chi ADMIN va MANAGER duoc truy cap trang tong quan dashboard.
+- EMPLOYEE khong thay menu Tong quan va bi chuyen den module duoc phep neu go truc tiep /dashboard.
+
+7.2 Thong ke
+- Hien thi thong ke doanh thu.
+- Hien thi thong ke san pham ban chay.
+- Hien thi thong ke san pham ton kho.
+- Hien thi thong ke don hang.
+- Hien thi thong ke doanh thu theo thoi gian.
+- Hien thi thong ke nhan vien ban hang neu backend co du lieu.
+
+7.3 UI
+- Cac khoi thong ke phai tach bach ro rang.
+- Co khoang cach, mau sac va heading de nguoi dung doc nhanh.
+- Co nut "Ve giao dien nguoi dung" dieu huong ve trang chu.
+
+============================================================
+8. YEU CAU CHUC NANG - DASHBOARD NHAN VIEN
+============================================================
+
+8.1 Danh sach nhan vien
+- ADMIN/MANAGER xem duoc danh sach nhan vien theo quyen.
+- Ho tro tim kiem theo ten, email, so dien thoai.
+- Hien thi role va trang thai tai khoan.
+
+8.2 Them nhan vien
+- ADMIN co the tao nhan vien moi va chon role theo quyen.
+- MANAGER co the tao nhan vien moi nhung bi gioi han role theo quy tac phan quyen.
+- Form tao nhan vien phai co nut xac nhan ro rang.
+
+8.3 Cap nhat nhan vien
+- ADMIN co the cap nhat thong tin nhan vien.
+- MANAGER co the cap nhat trong pham vi duoc phep.
+- Khong cho MANAGER tu thay doi quyen cua ban than.
+- Khong cho MANAGER chi dinh nhan vien khac lam MANAGER neu khong du quyen.
+
+8.4 Khoa/xoa tai khoan
+- ADMIN/MANAGER theo quyen co the khoa/xoa tai khoan nhan vien.
+- Khong cho khoa/xoa tai khoan dang dang nhap.
+- He thong can confirm truoc thao tac nguy hiem.
+
+============================================================
+9. YEU CAU CHUC NANG - DASHBOARD SAN PHAM
+============================================================
+
+9.1 Truy cap
+- ADMIN, MANAGER va EMPLOYEE duoc truy cap module Products.
+
+9.2 Danh sach san pham
+- Xem danh sach san pham.
+- Tim kiem theo ten san pham.
+- Loc theo trang thai dang ban/tam an/tat ca.
+- Hien thi anh, ten sach, tac gia, danh muc, gia, ton kho, trang thai.
+
+9.3 Them san pham
+- Nguoi co quyen co the them san pham moi.
+- Form gom ten, danh muc, tac gia, nha xuat ban, gia, ton kho, ISBN, anh, mo ta, noi bat, trang thai dang ban.
+- Anh san pham duoc chon tu Media Picker.
+
+9.4 Cap nhat san pham
+- Nguoi co quyen co the sua thong tin san pham.
+- Form edit phai nap san du lieu san pham hien tai.
+- Sau khi cap nhat thanh cong, danh sach san pham duoc refresh.
+
+9.5 Xoa san pham
+- Nguoi co quyen co the xoa san pham.
+- He thong can confirm truoc khi xoa.
+
+============================================================
+10. YEU CAU CHUC NANG - DASHBOARD DANH MUC
+============================================================
+
+10.1 Truy cap
+- ADMIN va MANAGER duoc truy cap module Categories.
+- EMPLOYEE khong thay va khong truy cap duoc module Categories neu khong duoc cap quyen.
+
+10.2 Chuc nang
+- Xem danh sach danh muc.
+- Them danh muc.
+- Cap nhat danh muc.
+- Xoa danh muc.
+- Bat/tat trang thai danh muc neu backend ho tro.
+- Danh muc duoc su dung trong Product, Home, Category va Footer.
+
+============================================================
+11. YEU CAU CHUC NANG - DASHBOARD KHACH HANG
+============================================================
+
+11.1 Truy cap
+- ADMIN va MANAGER duoc truy cap module Customers.
+
+11.2 Chuc nang
+- Xem danh sach khach hang.
+- Them khach hang.
+- Cap nhat khach hang.
+- Tim kiem khach hang.
+- Xem lich su mua hang cua khach hang.
+- Hien thi thong tin lien he va trang thai tai khoan neu co.
+
+============================================================
+12. YEU CAU CHUC NANG - DASHBOARD DON HANG
+============================================================
+
+12.1 Truy cap
+- ADMIN, MANAGER va EMPLOYEE duoc truy cap module Orders.
+
+12.2 Danh sach don hang
+- Xem danh sach don hang.
+- Tim kiem theo ma don, khach hang, email, so dien thoai, nguoi nhan.
+- Loc theo trang thai don hang.
+- Hien thi ma don, khach hang, gia tri, paymentStatus, order status, ngay tao, hanh dong.
+
+12.3 Chi tiet don hang
+- Xem chi tiet don hang.
+- Hien thi thong tin khach hang.
+- Hien thi thong tin giao hang.
+- Hien thi phuong thuc thanh toan.
+- Hien thi danh sach san pham trong don.
+- Hien thi tong tien, giam gia, thanh tien va ghi chu.
+
+12.4 Cap nhat status don hang
+- Nguoi co quyen co the xac nhan don hang.
+- Nguoi co quyen co the cap nhat status don hang.
+- Nguoi co quyen co the huy don hang neu don chua hoan thanh/huy.
+- Trang thai don hang gom:
+  - PENDING: Cho xac nhan.
+  - CONFIRMED: Dang xu ly.
+  - SHIPPING: Dang giao hang.
+  - COMPLETED: Hoan thanh.
+  - CANCELLED: Da huy.
+- Luong nhanh:
+  - PENDING -> CONFIRMED.
+  - CONFIRMED -> SHIPPING.
+  - SHIPPING -> COMPLETED.
+- Huy don can confirm.
+
+12.5 Cap nhat paymentStatus
+- Nguoi co quyen co the cap nhat paymentStatus.
+- paymentStatus gom:
+  - UNPAID.
+  - PAID.
+  - FAILED.
+  - REFUNDED.
+- UI hien thi nhan tieng Viet neu co mapping trong FE.
+
+============================================================
+13. YEU CAU CHUC NANG - DASHBOARD BAI VIET / POSTS
+============================================================
+
+13.1 Truy cap
+- ADMIN, MANAGER va EMPLOYEE duoc truy cap module Blogs/Posts.
+- Backend blog dung route posts; FE khong sua backend.
+
+13.2 Danh sach bai viet
+- Xem danh sach bai viet.
+- Tim kiem theo tieu de, mo ta, slug, tac gia.
+- Loc theo trang thai draft/published.
+- Hien thi anh dai dien, tieu de, mo ta ngan, trang thai, ngay tao, ngay cap nhat.
+
+13.3 Tao bai viet
+- Nguoi co quyen co the tao bai viet.
+- Form gom title, excerpt, coverImageUrl, status, dek, readMinutes, featured, bodyHtml.
+- Anh dai dien duoc chon tu Media Picker.
+
+13.4 Xem chi tiet bai viet
+- Nguoi co quyen co the xem chi tiet bai viet trong modal/trang rieng.
+- Hien thi cover, status, slug, excerpt va noi dung.
+
+13.5 Cap nhat bai viet
+- Nguoi co quyen co the sua bai viet.
+- Form edit nap san du lieu hien tai.
+
+13.6 Xoa bai viet
+- Nguoi co quyen co the xoa bai viet.
+- He thong can confirm truoc khi xoa.
+
+13.7 Cap nhat trang thai
+- Nguoi co quyen co the doi status bang dropdown.
+- Status gom:
+  - DRAFT.
+  - PUBLISHED.
+- UI hien thi Draft/Public hoac Draft/Published theo thiet ke.
+
+============================================================
+14. YEU CAU CHUC NANG - DASHBOARD MEDIA
+============================================================
+
+14.1 Truy cap
+- ADMIN, MANAGER va EMPLOYEE duoc truy cap module Media.
+
+14.2 Thu vien media
+- Xem danh sach media.
+- Upload media theo route backend media.
+- Tim kiem media theo ten, alt hoac folder.
+- Loc theo loai file va folder.
+- Xem chi tiet media.
+- Cap nhat alt va folder.
+- Xoa media.
+
+14.3 Media Picker
+- Cac form CRUD co nhu cau anh phai dung Media Picker.
+- Product Form dung Media Picker de chon anh san pham.
+- Blog/Post Form dung Media Picker de chon anh dai dien.
+- Cac form khac co field anh co the tich hop Media Picker neu phu hop.
+
+============================================================
+15. YEU CAU CHUC NANG - DASHBOARD MA GIAM GIA
+============================================================
+
+15.1 Truy cap
+- ADMIN va MANAGER duoc truy cap module Coupons.
+
+15.2 Chuc nang
+- Xem danh sach ma giam gia.
+- Them ma giam gia.
+- Cap nhat ma giam gia.
+- Xoa ma giam gia.
+- Bat/tat trang thai ma giam gia.
+- Tim kiem theo code.
+- Loc theo loai coupon va trang thai.
+
+15.3 Loai ma
+- He thong ho tro 3 loai:
+  - holiday.
+  - custom.
+  - random.
+- holiday: ma giam gia theo dip/ngay le.
+- custom: nguoi dung nhap ma thu cong.
+- random: he thong tao ma ngau nhien.
+
+15.4 Kieu giam
+- PERCENT: giam theo phan tram.
+- FIXED: giam theo so tien co dinh.
+- Ho tro minOrderAmount, maxDiscountAmount, usageLimit, startsAt, expiresAt, isActive neu backend co truong du lieu.
+
+============================================================
+16. YEU CAU CHUC NANG - DASHBOARD PHUONG THUC THANH TOAN
+============================================================
+
+16.1 Truy cap
+- ADMIN va MANAGER duoc truy cap module Payment Methods.
+
+16.2 Chuc nang
+- Xem danh sach phuong thuc thanh toan.
+- Them phuong thuc thanh toan.
+- Cap nhat phuong thuc thanh toan.
+- Xoa phuong thuc thanh toan neu backend ho tro.
+- Bat/tat trang thai phuong thuc thanh toan neu backend ho tro.
+- Du lieu phuong thuc thanh toan duoc su dung trong luong tao don hang/thanh toan.
+
+============================================================
+17. YEU CAU DU LIEU
+============================================================
+
+17.1 User
+- id.
+- fullName.
+- email.
+- phone.
+- role.
+- avatar.
+- isActive.
+- createdAt.
+- updatedAt.
+
+17.2 Product
+- id.
+- title.
+- slug.
+- categoryId.
+- category.
+- author.
+- publisher.
+- isbn.
+- description.
+- thumbnail.
+- images.
+- price.
+- stock.
+- isFeatured.
+- isActive.
+- createdAt.
+- updatedAt.
+
+17.3 Category
+- id.
+- name.
+- slug.
+- description.
+- isActive.
+- createdAt.
+- updatedAt.
+
+17.4 Order
+- id.
+- userId.
+- user.
+- addressId.
+- address.
+- paymentMethodId.
+- paymentMethod.
+- couponId.
+- coupon.
+- totalAmount.
+- discountAmount.
+- finalAmount.
+- status.
+- paymentStatus.
+- note.
+- items.
+- createdAt.
+- updatedAt.
+
+17.5 Order Item
+- id.
+- orderId.
+- productId.
+- title.
+- price.
+- quantity.
+- subtotal.
+- product.
+
+17.6 Post
+- id.
+- slug.
+- title.
+- dek.
+- excerpt.
+- summary.
+- bodyHtml.
+- content.
+- coverImageUrl.
+- thumbnail.
+- readMinutes.
+- featured.
+- status.
+- publishedAt.
+- authorId.
+- author.
+- categories.
+- createdAt.
+- updatedAt.
+
+17.7 Media
+- id.
+- fileName.
+- originalName.
+- mimeType.
+- size.
+- url.
+- type.
+- alt.
+- folder.
+- uploadedById.
+- uploadedBy.
+- createdAt.
+- updatedAt.
+
+17.8 Coupon
+- id.
+- couponType.
+- code.
+- type.
+- value.
+- minOrderAmount.
+- maxDiscountAmount.
+- usageLimit.
+- usedCount.
+- startsAt.
+- expiresAt.
+- isActive.
+- createdAt.
+- updatedAt.
+
+17.9 Payment Method
+- id.
+- name.
+- code.
+- description.
+- isActive.
+- createdAt.
+- updatedAt.
+
+17.10 Review
+- id.
+- userId.
+- productId.
+- rating.
+- comment.
+- createdAt.
+- updatedAt.
+
+============================================================
+18. YEU CAU API VA TICH HOP
+============================================================
+
+18.1 Nguyen tac goi API
+- Frontend dung Axios service rieng cho tung module.
+- Base URL lay tu VITE_API_URL.
+- Access token duoc gui qua Authorization header neu co.
+- Khi API loi, FE hien toast hoac thong bao phu hop.
+- Khong goi API truc tiep trong page neu module da co service/store.
+
+18.2 Cac nhom service frontend
+- authService.
+- productService.
+- categoryService.
+- orderService.
+- postService.
+- mediaService.
+- couponService.
+- userService.
+- customerService.
+- dashboardService.
+- paymentMethodService.
+- reviewService neu du an da tich hop review.
+
+18.3 Cac nhom store frontend
+- useAuthStore.
+- useProductStore.
+- useCategoryStore.
+- useOrderStore.
+- usePostStore.
+- useMediaStore.
+- useCouponStore.
+- useUserStore.
+- useCustomerStore.
+- useDashboardStore.
+- usePaymentMethodStore.
+- useReviewStore neu du an da tich hop review.
+
+============================================================
+19. YEU CAU PHI CHUC NANG
+============================================================
+
+19.1 Hieu nang
+- Trang danh sach nen gioi han so luong ban ghi hop ly.
+- Co loading state khi dang goi API.
+- Sau khi tao/sua/xoa thanh cong, danh sach can duoc cap nhat.
+- Anh trong card phai co kich thuoc on dinh de tranh be layout.
+- Cac danh sach lon nen co loc, tim kiem hoac phan trang neu backend ho tro.
+
+19.2 Bao mat
+- Dashboard phai yeu cau dang nhap.
+- Dashboard phai kiem tra role.
+- Khong hien tinh nang dashboard neu user khong co quyen.
+- Route dashboard phai co guard, khong chi an menu.
+- Cac thao tac nhay cam phai duoc backend kiem tra lai quyen.
+- Token phai duoc xoa khi dang xuat hoac refresh that bai.
+- Khong luu thong tin nhay cam khong can thiet tren frontend.
+
+19.3 Kha dung
+- UI responsive tren desktop va mobile.
+- Button co mau chu tuong phan voi nen.
+- Form create/edit co nut "Xac nhan" ro rang.
+- Cac input co placeholder/label ro rang.
+- Trang danh sach co empty state khi khong co du lieu.
+- Modal co nut dong va aria-label phu hop.
+- Loi API phai co thong bao de nguoi dung biet.
+
+19.4 Bao tri
+- Tach page, form, service, store, utils theo module.
+- Cac helper format tien, ngay, anh nen dung chung.
+- Cac quyen dashboard nen quan ly tap trung trong file permissions.
+- Khong lap lai logic role trong nhieu page neu co the dung chung.
+- Khong sua backend khi yeu cau chi lien quan frontend.
+
+19.5 Tuong thich
+- Ung dung chay tren trinh duyet hien dai.
+- Build bang Vite.
+- Lint phai pass truoc khi ban giao thay doi lon.
+
+============================================================
+20. RANG BUOC VA GIA DINH
+============================================================
+
+- Backend dang dung REST API voi prefix /api/v1.
+- Frontend dung VITE_API_URL de ket noi backend.
+- Backend posts la nguon du lieu cho Blog dashboard va Blog public.
+- Route media cua backend la nguon du lieu cho module Media va Media Picker.
+- Khong sua backend neu yeu cau chi ro "khong duoc dung toi server".
+- Mot so quyen tren frontend chi dung de an UI va dieu huong; backend van phai la lop bao ve cuoi cung.
+- Du lieu thuc te phu thuoc vao database va API backend cua nhom BE.
+- Ten role su dung dang chu hoa: ADMIN, MANAGER, EMPLOYEE, CUSTOMER.
+
+============================================================
+21. TIEU CHI CHAP NHAN
+============================================================
+
+21.1 Public site
+- Logo header va footer dieu huong ve trang chu.
+- Trang chu hien thi du lieu that tu backend.
+- Trang Category hien thi danh muc va san pham that.
+- Tim kiem san pham tu header dieu huong dung va loc dung.
+- Card san pham co nut them gio hang va mua ngay.
+- Product Details hien dung du lieu san pham, co nut them gio hang, mua ngay, danh gia va goi y cung danh muc.
+- Chi nguoi da mua san pham moi co the danh gia.
+- Blog hien bai viet moi nhat, tim kiem duoc va khong be layout anh.
+- Blog Detail hien dung noi dung bai viet.
+- Contact co layout can doi voi cac trang khac.
+
+21.2 Dashboard
+- Sidebar dashboard chi hien module theo role.
+- URL dashboard khong co quyen bi redirect ve trang duoc phep.
+- ADMIN va MANAGER truy cap duoc Overview.
+- EMPLOYEE truy cap duoc Products, Orders, Blogs/Posts va Media.
+- EMPLOYEE khong thay Overview, Employees, Categories, Customers, Coupons, Payment Methods neu khong du quyen.
+- Products co them/sua/xoa san pham va chon anh tu Media Picker.
+- Orders co xem chi tiet, cap nhat status va paymentStatus.
+- Blogs/Posts co tao, xem chi tiet, sua, xoa, doi draft/published.
+- Media co upload, danh sach, tim kiem/loc, sua thong tin va xoa.
+- Coupons ho tro holiday, custom, random.
+- Payment Methods co module quan ly rieng.
+- Employees co phan quyen dung quy tac ADMIN/MANAGER/EMPLOYEE.
+
+21.3 Chat luong ky thuat
+- Frontend build thanh cong.
+- ESLint khong bao loi.
+- Khong co button trang tren nen trang gay mat chu.
+- Khong co card blog/product bi anh che mat title.
+- Khong co thay doi backend neu task chi yeu cau frontend.
+
+============================================================
+22. HUONG PHAT TRIEN TIEP THEO
+============================================================
+
+- Bo sung phan trang cho cac danh sach lon.
+- Bo sung bao cao nang cao cho doanh thu va nhan vien ban hang.
+- Bo sung dashboard phan tich hanh vi khach hang.
+- Bo sung thong bao realtime cho don hang moi.
+- Bo sung quan ly dia chi khach hang day du.
+- Bo sung he thong comment/like cho blog neu can.
+- Bo sung kiem thu tu dong cho permission dashboard va luong mua hang.
