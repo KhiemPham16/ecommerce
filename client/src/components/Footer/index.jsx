@@ -50,16 +50,16 @@ export default function Footer() {
                     <h3>Hỗ trợ khách hàng</h3>
                     <ul>
                         <li>
-                            <Link to="/contact">&gt; Liên hệ</Link>
+                            <Link to="/contact">Liên hệ</Link>
                         </li>
                         <li>
-                            <Link to="/category">&gt; Hướng dẫn mua hàng</Link>
+                            <Link to="/category"> Hướng dẫn mua hàng</Link>
                         </li>
                         <li>
-                            <Link to="/account/orders">&gt; Lịch sử mua hàng</Link>
+                            <Link to="/account/orders"> Lịch sử mua hàng</Link>
                         </li>
                         <li>
-                            <Link to="/blog">&gt; Tin tức</Link>
+                            <Link to="/blog"> Tin tức</Link>
                         </li>
                     </ul>
                 </div>
@@ -88,12 +88,12 @@ export default function Footer() {
                     <ul>
                         {categories.length === 0 ? (
                             <li>
-                                <Link to="/category">&gt; Tất cả sách</Link>
+                                <Link to="/category"> Tất cả sách</Link>
                             </li>
                         ) : (
                             categories.map((category) => (
                                 <li key={category.id}>
-                                    <Link to={`/category?categoryId=${category.id}`}>&gt; {category.name}</Link>
+                                    <Link to={`/category?categoryId=${category.id}`}> {category.name}</Link>
                                 </li>
                             ))
                         )}
@@ -102,7 +102,7 @@ export default function Footer() {
             </div>
 
             <div className={cx('footer-bottom')}>
-                <p>&copy; 2026 BookSTORY. All rights reserved.</p>
+                <p>&copy; 2026 BookSTORY. Sản phẩm của Team DevChill.</p>
             </div>
         </footer>
     );
